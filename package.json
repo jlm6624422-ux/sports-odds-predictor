@@ -1,0 +1,16 @@
+{
+  "name": "sports-odds-predictor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-sport odds prediction and bet tracking platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:model\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev:model": "cd model-service && uvicorn main:app --host 127.0.0.1 --port 8001 --reload",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../model-service && pip install -r requirements.txt"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

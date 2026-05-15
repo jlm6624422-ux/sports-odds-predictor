@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA + MLB Odds Predictor - Today's Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f1117;
+            color: #e1e4e8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #21262d;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            background: linear-gradient(135deg, #58a6ff, #3fb950);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header .subtitle {
+            color: #8b949e;
+            font-size: 1.1em;
+        }
+
+        .last-updated {
+            color: #6e7681;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.3em;
+            color: #8b949e;
+        }
+
+        .loading .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #21262d;
+            border-top-color: #58a6ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #3d1f1f;
+            border: 1px solid #f85149;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #f85149;
+        }
+
+        /* Section styles */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #58a6ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .icon {
+            font-size: 1.2em;
+        }
+
+        /* Cards */
+        .card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: #30363d;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header h3 {
+            font-size: 1.3em;
+            color: #f0f6fc;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-live {
+            background: #1f3d1f;
+            color: #3fb950;
+            border: 1px solid #3fb950;
+        }
+
+        .badge-upcoming {
+            background: #1f2d3d;
+            color: #58a6ff;
+            border: 1px solid #58a6ff;
+        }
+
+        .badge-final {
+            background: #3d2f1f;
+            color: #d29922;
+            border: 1px solid #d29922;
+        }
+
+        /* Top Picks */
+        .top-picks {
+            background: linear-gradient(135deg, #1a2332, #162216);
+            border: 2px solid #3fb950;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 40px;
+        }
+
+        .top-picks h2 {
+            color: #3fb950;
+            font-size: 1.6em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pick-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: #0f1117;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3fb950;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pick-item.moderate {
+            border-left-color: #d29922;
+        }
+
+        .pick-item .pick-details {
+            flex: 1;
+        }
+
+        .pick-item .pick-game {
+            font-size: 0.85em;
+            color: #8b949e;
+        }
+
+        .pick-item .pick-bet {
+            font-weight: 600;
+            color: #f0f6fc;
+            font-size: 1.05em;
+        }
+
+        .pick-item .pick-edge {
+            font-weight: 700;
+            color: #3fb950;
+            font-size: 1.1em;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .pick-item .pick-stars {
+            color: #d29922;
+            font-size: 1.1em;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        /* Grid layouts */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-box {
+            background: #0f1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-box .stat-label {
+            font-size: 0.8em;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-box .stat-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #f0f6fc;
+        }
+
+        .stat-box .stat-value.green { color: #3fb950; }
+        .stat-box .stat-value.red { color: #f85149; }
+        .stat-box .stat-value.yellow { color: #d29922; }
+        .stat-box .stat-value.blue { color: #58a6ff; }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #21262d;
+        }
+
+        th {
+            background: #0f1117;
+            color: #8b949e;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover td {
+            background: #1c2128;
+        }
+
+        .high-value {
+            background: #1a2e1a !important;
+        }
+
+        .high-value td {
+            color: #3fb950;
+            font-weight: 600;
+        }
+
+        /* Prediction cards */
+        .prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .prediction-card {
+            background: #0f1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .prediction-card h4 {
+            color: #8b949e;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .prediction-card .prediction-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .prediction-card .prediction-detail {
+            font-size: 0.85em;
+            color: #8b949e;
+        }
+
+        .confidence-bar {
+            height: 6px;
+            background: #21262d;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .confidence-high .fill { background: #3fb950; }
+        .confidence-medium .fill { background: #d29922; }
+        .confidence-low .fill { background: #f85149; }
+
+        /* Team comparison */
+        .team-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: start;
+            margin: 16px 0;
+        }
+
+        .team-side {
+            text-align: center;
+        }
+
+        .team-side.away { text-align: left; }
+        .team-side.home { text-align: right; }
+
+        .team-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .team-record {
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #6e7681;
+            font-weight: 600;
+            padding-top: 10px;
+        }
+
+        /* Injuries */
+        .injury-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .injury-list li {
+            padding: 8px 12px;
+            background: #0f1117;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .injury-status {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .injury-out {
+            background: #3d1f1f;
+            color: #f85149;
+        }
+
+        .injury-doubtful {
+            background: #3d2f1f;
+            color: #d29922;
+        }
+
+        .injury-questionable {
+            background: #2d2f1f;
+            color: #d29922;
+        }
+
+        .injury-probable {
+            background: #1f3d1f;
+            color: #3fb950;
+        }
+
+        /* Subsections */
+        .subsection {
+            margin: 20px 0;
+        }
+
+        .subsection h4 {
+            color: #c9d1d9;
+            font-size: 1em;
+            margin-bottom: 10px;
+            padding-left: 10px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        /* Player Props */
+        .prop-card {
+            background: #0f1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .prop-card .player-name {
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 6px;
+        }
+
+        .prop-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 0.9em;
+        }
+
+        .prop-pick {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .prop-over {
+            background: #1a2e1a;
+            color: #3fb950;
+        }
+
+        .prop-under {
+            background: #3d1f1f;
+            color: #f85149;
+        }
+
+        /* No games */
+        .no-games {
+            text-align: center;
+            padding: 60px;
+            color: #8b949e;
+        }
+
+        .no-games h2 {
+            margin-bottom: 10px;
+            color: #6e7681;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-top: 1px solid #21262d;
+            color: #6e7681;
+            font-size: 0.85em;
+        }
+
+        footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+            }
+
+            .team-comparison {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .team-side.away, .team-side.home {
+                text-align: center;
+            }
+
+            .pick-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pick-item .pick-edge,
+            .pick-item .pick-stars {
+                text-align: left;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .prediction-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Refresh button */
+        .refresh-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #30363d;
+            border-color: #58a6ff;
+        }
+
+        .refresh-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .disclaimer {
+            background: #1c1f26;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 30px;
+            font-size: 0.85em;
+            color: #8b949e;
+            text-align: center;
+        }
+
+        .methodology {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .methodology h3 {
+            color: #58a6ff;
+            margin-bottom: 12px;
+        }
+
+        .methodology ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .methodology li {
+            padding: 4px 0;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .methodology li::before {
+            content: ">";
+            color: #3fb950;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .game-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .game-nav-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .game-nav-btn:hover, .game-nav-btn.active {
+            background: #1f3d5f;
+            border-color: #58a6ff;
+            color: #58a6ff;
+        }
+
+        .team-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            vertical-align: middle;
+            margin: 0 8px;
+        }
+
+        .scoring-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .scoring-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0;
+        }
+
+        .scoring-bar .bar-fill {
+            height: 8px;
+            border-radius: 4px;
+            background: #58a6ff;
+            transition: width 0.5s;
+        }
+
+        .scoring-bar .bar-label {
+            font-size: 0.8em;
+            color: #8b949e;
+            min-width: 60px;
+        }
+
+        .scoring-bar .bar-value {
+            font-size: 0.85em;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NBA + MLB Odds Predictor</h1>
+            <p class="subtitle">Statistical Analysis & Value Betting - May 15, 2026</p>
+            <p class="last-updated" id="lastUpdated">Loading...</p>
+            <button class="refresh-btn" id="refreshBtn" onclick="loadAllData()">Refresh Data</button>
+        </header>
+
+        <div class="disclaimer">
+            For entertainment and educational purposes only. Not financial advice. All predictions are model-based estimates with inherent uncertainty. Gamble responsibly.
+        </div>
+
+        <div id="topPicks"></div>
+        <div id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Fetching today's NBA games and odds data...</p>
+            </div>
+        </div>
+
+        <!-- MLB Section -->
+        <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #21262d;">
+            <h2 style="font-size: 1.8em; color: #58a6ff; margin-bottom: 20px; text-align: center;">&#9918; MLB Analysis — Winner / Loser / Over / Under</h2>
+        </div>
+        <div id="mlb-content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Fetching today's MLB games...</p>
+            </div>
+        </div>
+
+        <div class="methodology">
+            <h3>Analysis Methodology</h3>
+            <ul>
+                <li>American odds to implied probability: negative odds: |odds|/(|odds|+100), positive odds: 100/(odds+100)</li>
+                <li>Vig removal: normalize implied probabilities to sum to 100%</li>
+                <li>NBA home court advantage: +3.5% win probability</li>
+                <li>MLB home field advantage: +4.0% win probability</li>
+                <li>Injury adjustment: -1.5% per key player (Out/Doubtful) for affected team</li>
+                <li>ESPN BPI/Predictor blend: 60% ESPN model + 40% record-based model when available</li>
+                <li>MLB model: 70% market odds + 30% (record-based + home advantage)</li>
+                <li>MLB totals: based on combined team win% as proxy for run production</li>
+                <li>Edge calculation: Model Probability - Implied Probability (positive = value bet)</li>
+                <li>Expected total from team pace and offensive/defensive ratings</li>
+                <li>Confidence weighting from data quality and edge magnitude</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>Data from ESPN public APIs & The Odds API | Analysis model v2.1</p>
+        <p style="margin-top: 6px;">Auto-refreshes every 5 minutes | <a href="#" onclick="loadAllData(); return false;">Manual Refresh</a></p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION & CONSTANTS
+        // ==========================================
+        const ESPN_SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard';
+        const ESPN_SUMMARY = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=';
+        const ESPN_TEAMS = 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/';
+        const ODDS_API = 'https://api.the-odds-api.com/v4/sports/basketball_nba/odds?apiKey=DEMO_KEY&regions=us&markets=h2h,spreads,totals&oddsFormat=american';
+
+        const HOME_COURT_ADV = 0.035;
+        const REFRESH_INTERVAL = 300000; // 5 minutes
+        const INJURY_IMPACT_PER_PLAYER = 0.015;
+
+        let allGamesData = [];
+        let allBets = [];
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        function americanToImplied(odds) {
+            if (!odds || odds === 0) return 0.5;
+            if (odds < 0) return Math.abs(odds) / (Math.abs(odds) + 100);
+            return 100 / (odds + 100);
+        }
+
+        function impliedToAmerican(prob) {
+            if (prob <= 0 || prob >= 1) return 0;
+            if (prob >= 0.5) return Math.round(-100 * prob / (1 - prob));
+            return Math.round(100 * (1 - prob) / prob);
+        }
+
+        function normalizeProbs(probs) {
+            const total = probs.reduce((a, b) => a + b, 0);
+            if (total === 0) return probs.map(() => 0.5);
+            return probs.map(p => p / total);
+        }
+
+        function getStars(edge) {
+            if (edge >= 10) return '★★★★★';
+            if (edge >= 7) return '★★★★☆';
+            if (edge >= 5) return '★★★☆☆';
+            if (edge >= 3) return '★★☆☆☆';
+            return '★☆☆☆☆';
+        }
+
+        function formatOdds(odds) {
+            if (!odds) return 'N/A';
+            return odds > 0 ? `+${odds}` : `${odds}`;
+        }
+
+        function getWinPctFromRecord(record) {
+            if (!record) return 0.5;
+            const parts = record.split('-');
+            if (parts.length < 2) return 0.5;
+            const wins = parseInt(parts[0]);
+            const losses = parseInt(parts[1]);
+            const total = wins + losses;
+            return total > 0 ? wins / total : 0.5;
+        }
+
+        function formatPct(val) {
+            return (val * 100).toFixed(1) + '%';
+        }
+
+        function getConfidenceLevel(edge, dataQuality) {
+            const base = Math.min(Math.abs(edge) * 8, 60);
+            return Math.min(base + dataQuality * 25, 95);
+        }
+
+        function getConfidenceClass(conf) {
+            if (conf >= 65) return 'confidence-high';
+            if (conf >= 40) return 'confidence-medium';
+            return 'confidence-low';
+        }
+
+        // ==========================================
+        // DATA FETCHING
+        // ==========================================
+        async function fetchJSON(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.warn(`Fetch error for ${url}:`, error.message);
+                return null;
+            }
+        }
+
+        async function fetchScoreboard() {
+            return await fetchJSON(ESPN_SCOREBOARD);
+        }
+
+        async function fetchGameSummary(eventId) {
+            return await fetchJSON(ESPN_SUMMARY + eventId);
+        }
+
+        async function fetchTeamStats(teamId) {
+            return await fetchJSON(ESPN_TEAMS + teamId + '/statistics');
+        }
+
+        async function fetchOddsAPI() {
+            return await fetchJSON(ODDS_API);
+        }
+
+        // ==========================================
+        // DATA EXTRACTION
+        // ==========================================
+        function extractTeamInfo(competitor) {
+            const team = competitor.team;
+            const record = competitor.records ? competitor.records[0]?.summary : null;
+            const homeRecord = competitor.records ? competitor.records.find(r => r.type === 'home')?.summary : null;
+            const awayRecord = competitor.records ? competitor.records.find(r => r.type === 'road' || r.type === 'away')?.summary : null;
+            return {
+                id: team.id,
+                name: team.displayName || team.name,
+                shortName: team.shortDisplayName || team.abbreviation,
+                abbreviation: team.abbreviation,
+                logo: team.logo,
+                color: team.color ? `#${team.color}` : '#58a6ff',
+                altColor: team.alternateColor ? `#${team.alternateColor}` : '#21262d',
+                record: record,
+                homeRecord: homeRecord,
+                awayRecord: awayRecord,
+                score: competitor.score,
+                homeAway: competitor.homeAway,
+                isHome: competitor.homeAway === 'home',
+                winPct: getWinPctFromRecord(record),
+                linescores: competitor.linescores || []
+            };
+        }
+
+        function extractOddsFromSummary(summary) {
+            const odds = { spreads: [], moneyline: [], totals: [], predictor: null };
+
+            if (summary?.pickcenter) {
+                for (const pick of summary.pickcenter) {
+                    if (pick.provider) {
+                        if (pick.details) {
+                            odds.spreads.push({
+                                provider: pick.provider.name,
+                                spread: parseFloat(pick.details) || 0,
+                                overUnder: pick.overUnder
+                            });
+                        }
+                        if (pick.overUnder) {
+                            odds.totals.push({
+                                provider: pick.provider.name,
+                                total: pick.overUnder
+                            });
+                        }
+                        if (pick.awayTeamOdds && pick.homeTeamOdds) {
+                            odds.moneyline.push({
+                                provider: pick.provider.name,
+                                away: pick.awayTeamOdds.moneyLine || null,
+                                home: pick.homeTeamOdds.moneyLine || null,
+                                awaySpreadOdds: pick.awayTeamOdds.spreadOdds || -110,
+                                homeSpreadOdds: pick.homeTeamOdds.spreadOdds || -110,
+                                spread: parseFloat(pick.details) || 0
+                            });
+                        }
+                    }
+                }
+            }
+
+            if (summary?.predictor) {
+                odds.predictor = {
+                    homeWinPct: (summary.predictor.homeTeam?.gameProjection || 50) / 100,
+                    awayWinPct: (summary.predictor.awayTeam?.gameProjection || 50) / 100
+                };
+            }
+
+            // Also check header for odds
+            if (summary?.header?.competitions?.[0]?.odds) {
+                for (const o of summary.header.competitions[0].odds) {
+                    if (o.details && !odds.spreads.find(s => s.provider === o.provider?.name)) {
+                        odds.spreads.push({
+                            provider: o.provider?.name || 'ESPN',
+                            spread: parseFloat(o.details) || 0,
+                            overUnder: o.overUnder
+                        });
+                    }
+                    if (o.overUnder && !odds.totals.find(t => t.provider === o.provider?.name)) {
+                        odds.totals.push({
+                            provider: o.provider?.name || 'ESPN',
+                            total: o.overUnder
+                        });
+                    }
+                }
+            }
+
+            return odds;
+        }
+
+        function extractInjuries(summary) {
+            const injuries = { home: [], away: [] };
+            if (!summary?.injuries) return injuries;
+
+            for (const teamInjury of summary.injuries) {
+                const side = teamInjury.team?.homeAway === 'home' ? 'home' : 'away';
+                const injList = [];
+                if (teamInjury.injuries) {
+                    for (const injury of teamInjury.injuries) {
+                        injList.push({
+                            name: injury.athlete?.displayName || 'Unknown',
+                            status: injury.status || injury.type?.description || 'Unknown',
+                            description: injury.details?.detail || injury.longComment || injury.description || '',
+                            position: injury.athlete?.position?.abbreviation || ''
+                        });
+                    }
+                }
+                injuries[side] = injList;
+            }
+            return injuries;
+        }
+
+        function extractLeaders(summary) {
+            const leaders = { home: [], away: [] };
+
+            // From header leaders
+            if (summary?.header?.competitions?.[0]?.competitors) {
+                for (const comp of summary.header.competitions[0].competitors) {
+                    const side = comp.homeAway === 'home' ? 'home' : 'away';
+                    if (comp.leaders) {
+                        for (const cat of comp.leaders) {
+                            if (cat.leaders && cat.leaders.length > 0) {
+                                const leader = cat.leaders[0];
+                                leaders[side].push({
+                                    name: leader.athlete?.displayName || 'Unknown',
+                                    category: cat.displayName || cat.name || '',
+                                    value: leader.displayValue || String(leader.value || ''),
+                                    numValue: parseFloat(leader.value) || 0,
+                                    shortName: cat.shortDisplayName || cat.abbreviation || ''
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            // From main leaders section
+            if (summary?.leaders) {
+                for (const teamLeaders of summary.leaders) {
+                    const side = teamLeaders.team?.homeAway === 'home' ? 'home' : 'away';
+                    if (teamLeaders.leaders) {
+                        for (const cat of teamLeaders.leaders) {
+                            if (cat.leaders) {
+                                for (const leader of cat.leaders.slice(0, 2)) {
+                                    const existing = leaders[side].find(l =>
+                                        l.name === leader.athlete?.displayName && l.category === cat.displayName
+                                    );
+                                    if (!existing) {
+                                        leaders[side].push({
+                                            name: leader.athlete?.displayName || 'Unknown',
+                                            category: cat.displayName || cat.name || '',
+                                            value: leader.displayValue || String(leader.value || ''),
+                                            numValue: parseFloat(leader.value) || 0,
+                                            shortName: cat.shortDisplayName || cat.abbreviation || ''
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return leaders;
+        }
+
+        function extractTeamStatsFromSummary(summary) {
+            const stats = { home: {}, away: {} };
+
+            // From boxscore
+            if (summary?.boxscore?.teams) {
+                for (const team of summary.boxscore.teams) {
+                    const side = team.homeAway === 'home' ? 'home' : 'away';
+                    if (team.statistics) {
+                        for (const stat of team.statistics) {
+                            stats[side][stat.name || stat.label] = {
+                                value: stat.displayValue || String(stat.value || ''),
+                                numValue: parseFloat(stat.value) || parseFloat(stat.displayValue) || 0
+                            };
+                        }
+                    }
+                }
+            }
+
+            // From teamStats in article or other sections
+            if (summary?.seasonstats) {
+                for (const ts of summary.seasonstats) {
+                    const side = ts.team?.homeAway === 'home' ? 'home' : 'away';
+                    if (ts.statistics) {
+                        for (const cat of ts.statistics) {
+                            if (cat.stats) {
+                                for (const stat of cat.stats) {
+                                    if (!stats[side][stat.name]) {
+                                        stats[side][stat.name] = {
+                                            value: stat.displayValue || String(stat.value || ''),
+                                            numValue: parseFloat(stat.value) || 0
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return stats;
+        }
+
+        // ==========================================
+        // PREDICTION MODEL
+        // ==========================================
+        function buildPrediction(homeTeam, awayTeam, odds, injuries, teamStats) {
+            // Base win probabilities from records
+            let homeWinPct = homeTeam.winPct;
+            let awayWinPct = awayTeam.winPct;
+
+            // If both are 0.5 (no data), use league average
+            if (homeWinPct === 0.5 && awayWinPct === 0.5) {
+                homeWinPct = 0.55; // slight home edge default
+                awayWinPct = 0.45;
+            }
+
+            // Normalize to sum to 1
+            let total = homeWinPct + awayWinPct;
+            let homeBaseProb = homeWinPct / total;
+            let awayBaseProb = awayWinPct / total;
+
+            // Apply home court advantage
+            homeBaseProb += HOME_COURT_ADV;
+            awayBaseProb = 1 - homeBaseProb;
+
+            // Injury adjustment
+            const homeOutCount = injuries.home.filter(i =>
+                ['Out', 'Doubtful'].includes(i.status)
+            ).length;
+            const awayOutCount = injuries.away.filter(i =>
+                ['Out', 'Doubtful'].includes(i.status)
+            ).length;
+
+            homeBaseProb -= homeOutCount * INJURY_IMPACT_PER_PLAYER;
+            homeBaseProb += awayOutCount * INJURY_IMPACT_PER_PLAYER;
+            awayBaseProb = 1 - homeBaseProb;
+
+            // Blend with ESPN predictor if available (60/40 ESPN/model)
+            let homeModelProb = homeBaseProb;
+            let awayModelProb = awayBaseProb;
+            let dataQuality = 0.5;
+
+            if (odds.predictor && odds.predictor.homeWinPct > 0) {
+                homeModelProb = (homeBaseProb * 0.4) + (odds.predictor.homeWinPct * 0.6);
+                awayModelProb = 1 - homeModelProb;
+                dataQuality = 1.0;
+            }
+
+            // Clamp
+            homeModelProb = Math.max(0.05, Math.min(0.95, homeModelProb));
+            awayModelProb = 1 - homeModelProb;
+
+            // Extract implied probabilities from odds
+            let homeImplied = 0.5, awayImplied = 0.5;
+            let homeML = null, awayML = null;
+            let spread = 0, totalLine = 0;
+
+            if (odds.moneyline.length > 0) {
+                const ml = odds.moneyline[0];
+                homeML = ml.home;
+                awayML = ml.away;
+                if (homeML && awayML) {
+                    const rawHome = americanToImplied(homeML);
+                    const rawAway = americanToImplied(awayML);
+                    const norm = normalizeProbs([rawHome, rawAway]);
+                    homeImplied = norm[0];
+                    awayImplied = norm[1];
+                }
+            }
+
+            if (odds.spreads.length > 0) {
+                spread = odds.spreads[0].spread;
+            }
+
+            if (odds.totals.length > 0) {
+                totalLine = odds.totals[0].total;
+            }
+
+            // Estimate PPG from records if we don't have stats
+            const homeWins = parseInt(homeTeam.record?.split('-')[0]) || 40;
+            const homeLosses = parseInt(homeTeam.record?.split('-')[1]) || 42;
+            const awayWins = parseInt(awayTeam.record?.split('-')[0]) || 40;
+            const awayLosses = parseInt(awayTeam.record?.split('-')[1]) || 42;
+
+            // Rough PPG estimate based on win% (better teams score more)
+            const homePPG = 105 + (homeTeam.winPct - 0.5) * 20;
+            const awayPPG = 105 + (awayTeam.winPct - 0.5) * 20;
+            const homeDefPPG = 110 - (homeTeam.winPct - 0.5) * 15;
+            const awayDefPPG = 110 - (awayTeam.winPct - 0.5) * 15;
+
+            // Model total: average of offensive outputs vs opposing defense
+            const homeExpectedScore = (homePPG + awayDefPPG) / 2;
+            const awayExpectedScore = (awayPPG + homeDefPPG) / 2;
+            const modelTotal = homeExpectedScore + awayExpectedScore;
+
+            // Expected margin based on probability
+            const expectedMargin = (homeModelProb - 0.5) * 25; // scale to points
+
+            // Calculate edges
+            const homeEdge = (homeModelProb - homeImplied) * 100;
+            const awayEdge = (awayModelProb - awayImplied) * 100;
+
+            // Spread edge: our expected margin vs book spread
+            // Negative spread means home favored, so if our margin is bigger than book's, there's value on home
+            const spreadEdge = expectedMargin - (-spread); // spread is usually negative for favorites
+
+            // Total edge
+            const totalEdge = totalLine > 0 ? modelTotal - totalLine : 0;
+
+            // Overall confidence
+            const maxEdge = Math.max(Math.abs(homeEdge), Math.abs(awayEdge));
+            const confidence = getConfidenceLevel(maxEdge, dataQuality);
+
+            return {
+                homeTeam,
+                awayTeam,
+                homeModelProb,
+                awayModelProb,
+                homeImplied,
+                awayImplied,
+                homeML,
+                awayML,
+                spread,
+                totalLine,
+                modelTotal,
+                expectedMargin,
+                homeEdge,
+                awayEdge,
+                spreadEdge,
+                totalEdge,
+                confidence,
+                dataQuality,
+                homePPG,
+                awayPPG,
+                homeDefPPG,
+                awayDefPPG,
+                homeExpectedScore,
+                awayExpectedScore
+            };
+        }
+
+        // ==========================================
+        // RENDERING FUNCTIONS
+        // ==========================================
+        function renderTopPicks(bets) {
+            const container = document.getElementById('topPicks');
+            if (!bets || bets.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const sorted = [...bets].filter(b => b.edge > 0).sort((a, b) => b.edge - a.edge).slice(0, 5);
+
+            if (sorted.length === 0) {
+                container.innerHTML = `
+                    <div class="top-picks" style="border-color: #d29922;">
+                        <h2 style="color: #d29922;">⚠ NO HIGH-VALUE PLAYS IDENTIFIED</h2>
+                        <p style="color: #8b949e;">Current odds appear fairly priced. Consider passing or waiting for line movement.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="top-picks">
+                    <h2>★ TOP VALUE PICKS</h2>
+                    ${sorted.map(bet => `
+                        <div class="pick-item ${bet.edge >= 5 ? '' : 'moderate'}">
+                            <div class="pick-details">
+                                <div class="pick-game">${bet.game}</div>
+                                <div class="pick-bet">${bet.type}: ${bet.pick} (${formatOdds(bet.odds)})</div>
+                            </div>
+                            <div class="pick-edge" style="color: ${bet.edge >= 5 ? '#3fb950' : '#d29922'}">
+                                +${bet.edge.toFixed(1)}% edge
+                            </div>
+                            <div class="pick-stars">${getStars(bet.edge)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderGameAnalysis(gameData) {
+            const { homeTeam, awayTeam, prediction, injuries, odds, summary, status, leaders, teamStats } = gameData;
+
+            let statusBadge = '';
+            if (status === 'in') {
+                statusBadge = '<span class="badge badge-live">LIVE</span>';
+            } else if (status === 'post') {
+                statusBadge = '<span class="badge badge-final">FINAL</span>';
+            } else {
+                statusBadge = '<span class="badge badge-upcoming">UPCOMING</span>';
+            }
+
+            // Game time
+            let gameTimeStr = '';
+            if (gameData.gameTime) {
+                const gt = new Date(gameData.gameTime);
+                gameTimeStr = gt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            // Injuries section
+            let injuriesHtml = '';
+            if (injuries.home.length > 0 || injuries.away.length > 0) {
+                injuriesHtml = `
+                    <div class="subsection">
+                        <h4>Key Injuries</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <p style="color: #8b949e; font-size: 0.85em; margin-bottom: 6px;">${homeTeam.shortName} (Home)</p>
+                                <ul class="injury-list">
+                                    ${injuries.home.length > 0 ? injuries.home.slice(0, 6).map(inj => `
+                                        <li>
+                                            <span>${inj.name} ${inj.position ? `(${inj.position})` : ''}</span>
+                                            <span class="injury-status injury-${inj.status.toLowerCase().replace(/\s/g, '')}">${inj.status}</span>
+                                        </li>
+                                    `).join('') : '<li style="color: #6e7681;">No injuries reported</li>'}
+                                </ul>
+                            </div>
+                            <div>
+                                <p style="color: #8b949e; font-size: 0.85em; margin-bottom: 6px;">${awayTeam.shortName} (Away)</p>
+                                <ul class="injury-list">
+                                    ${injuries.away.length > 0 ? injuries.away.slice(0, 6).map(inj => `
+                                        <li>
+                                            <span>${inj.name} ${inj.position ? `(${inj.position})` : ''}</span>
+                                            <span class="injury-status injury-${inj.status.toLowerCase().replace(/\s/g, '')}">${inj.status}</span>
+                                        </li>
+                                    `).join('') : '<li style="color: #6e7681;">No injuries reported</li>'}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Odds table
+            let oddsTableHtml = '';
+            if (odds.moneyline.length > 0 || odds.spreads.length > 0) {
+                const rows = [];
+                const maxRows = Math.max(odds.moneyline.length, odds.spreads.length, odds.totals.length);
+                for (let i = 0; i < maxRows; i++) {
+                    const ml = odds.moneyline[i] || {};
+                    const sp = odds.spreads[i] || {};
+                    const tot = odds.totals[i] || {};
+                    const provider = ml.provider || sp.provider || tot.provider || '';
+                    rows.push(`
+                        <tr>
+                            <td>${provider}</td>
+                            <td>${ml.away ? formatOdds(ml.away) : '-'}</td>
+                            <td>${ml.home ? formatOdds(ml.home) : '-'}</td>
+                            <td>${sp.spread ? (sp.spread > 0 ? '+' : '') + sp.spread : '-'}</td>
+                            <td>${tot.total || '-'}</td>
+                        </tr>
+                    `);
+                }
+
+                oddsTableHtml = `
+                    <div class="subsection">
+                        <h4>Odds Comparison</h4>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>${awayTeam.shortName} ML</th>
+                                        <th>${homeTeam.shortName} ML</th>
+                                        <th>Spread (${homeTeam.shortName})</th>
+                                        <th>Total O/U</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${rows.join('')}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Scoring comparison
+            const scoringHtml = `
+                <div class="subsection">
+                    <h4>Scoring & Pace Analysis</h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">${homeTeam.shortName} Est. PPG</div>
+                            <div class="stat-value">${prediction.homePPG.toFixed(1)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${awayTeam.shortName} Est. PPG</div>
+                            <div class="stat-value">${prediction.awayPPG.toFixed(1)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${homeTeam.shortName} Def PPG</div>
+                            <div class="stat-value">${prediction.homeDefPPG.toFixed(1)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${awayTeam.shortName} Def PPG</div>
+                            <div class="stat-value">${prediction.awayDefPPG.toFixed(1)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${homeTeam.shortName} Expected</div>
+                            <div class="stat-value blue">${prediction.homeExpectedScore.toFixed(1)}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${awayTeam.shortName} Expected</div>
+                            <div class="stat-value blue">${prediction.awayExpectedScore.toFixed(1)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Records & splits
+            const recordsHtml = `
+                <div class="subsection">
+                    <h4>Records & Splits</h4>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">${homeTeam.shortName} Overall</div>
+                            <div class="stat-value">${homeTeam.record || 'N/A'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${homeTeam.shortName} Home</div>
+                            <div class="stat-value">${homeTeam.homeRecord || 'N/A'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${awayTeam.shortName} Overall</div>
+                            <div class="stat-value">${awayTeam.record || 'N/A'}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">${awayTeam.shortName} Away</div>
+                            <div class="stat-value">${awayTeam.awayRecord || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return `
+                <div class="card" id="game-${homeTeam.id}">
+                    <div class="card-header">
+                        <h3>
+                            ${awayTeam.logo ? `<img src="${awayTeam.logo}" class="team-logo" alt="${awayTeam.shortName}">` : ''}
+                            ${awayTeam.name} @ ${homeTeam.name}
+                            ${homeTeam.logo ? `<img src="${homeTeam.logo}" class="team-logo" alt="${homeTeam.shortName}">` : ''}
+                        </h3>
+                        <div>
+                            ${gameTimeStr ? `<span style="color: #8b949e; margin-right: 12px;">${gameTimeStr}</span>` : ''}
+                            ${statusBadge}
+                        </div>
+                    </div>
+
+                    <div class="team-comparison">
+                        <div class="team-side away">
+                            <div class="team-name" style="color: ${awayTeam.color}">${awayTeam.shortName}</div>
+                            <div class="team-record">${awayTeam.record || 'N/A'}</div>
+                            <div style="font-size: 0.85em; color: #8b949e; margin-top: 4px;">
+                                Win%: ${formatPct(awayTeam.winPct)}
+                            </div>
+                            <div style="font-size: 0.8em; color: #6e7681; margin-top: 2px;">
+                                Model: ${formatPct(prediction.awayModelProb)}
+                            </div>
+                        </div>
+                        <div class="vs-divider">
+                            <div style="text-align: center;">
+                                <div>VS</div>
+                                <div style="font-size: 0.7em; color: #3fb950; margin-top: 4px;">
+                                    ${prediction.expectedMargin > 0 ? homeTeam.shortName : awayTeam.shortName} by ${Math.abs(prediction.expectedMargin).toFixed(1)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-side home">
+                            <div class="team-name" style="color: ${homeTeam.color}">${homeTeam.shortName}</div>
+                            <div class="team-record">${homeTeam.record || 'N/A'}</div>
+                            <div style="font-size: 0.85em; color: #8b949e; margin-top: 4px;">
+                                Win%: ${formatPct(homeTeam.winPct)} (Home)
+                            </div>
+                            <div style="font-size: 0.8em; color: #6e7681; margin-top: 2px;">
+                                Model: ${formatPct(prediction.homeModelProb)}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${recordsHtml}
+                    ${scoringHtml}
+                    ${injuriesHtml}
+                    ${oddsTableHtml}
+                </div>
+            `;
+        }
+
+        function renderPredictions(gameData) {
+            const { homeTeam, awayTeam, prediction } = gameData;
+
+            const favoredTeam = prediction.homeModelProb > prediction.awayModelProb ? homeTeam : awayTeam;
+            const favoredProb = Math.max(prediction.homeModelProb, prediction.awayModelProb);
+            const confClass = getConfidenceClass(prediction.confidence);
+
+            // Determine spread pick
+            let spreadPick = '';
+            let spreadColor = '#8b949e';
+            if (Math.abs(prediction.spreadEdge) > 1.5) {
+                if (prediction.spreadEdge > 0) {
+                    spreadPick = `${homeTeam.shortName} covers ${prediction.spread}`;
+                } else {
+                    spreadPick = `${awayTeam.shortName} covers +${Math.abs(prediction.spread)}`;
+                }
+                spreadColor = '#3fb950';
+            } else {
+                spreadPick = 'No clear spread edge';
+            }
+
+            // Total pick
+            let totalPick = '';
+            let totalColor = '#8b949e';
+            if (prediction.totalLine > 0 && Math.abs(prediction.totalEdge) > 2) {
+                totalPick = prediction.totalEdge > 0 ? 'OVER' : 'UNDER';
+                totalColor = prediction.totalEdge > 0 ? '#3fb950' : '#f85149';
+            } else if (prediction.totalLine > 0) {
+                totalPick = 'Lean ' + (prediction.totalEdge > 0 ? 'Over' : 'Under');
+            } else {
+                totalPick = 'No line available';
+            }
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${awayTeam.shortName} @ ${homeTeam.shortName} - Predictions</h3>
+                        <span style="color: ${prediction.confidence > 60 ? '#3fb950' : '#d29922'}; font-size: 0.9em;">
+                            Confidence: ${prediction.confidence.toFixed(0)}%
+                        </span>
+                    </div>
+
+                    <div class="prediction-grid">
+                        <div class="prediction-card">
+                            <h4>Moneyline</h4>
+                            <div class="prediction-value" style="color: ${favoredProb > 0.6 ? '#3fb950' : '#d29922'}">
+                                ${favoredTeam.shortName}
+                            </div>
+                            <div class="prediction-detail">
+                                ${homeTeam.shortName}: ${formatPct(prediction.homeModelProb)} |
+                                ${awayTeam.shortName}: ${formatPct(prediction.awayModelProb)}
+                            </div>
+                            <div class="prediction-detail" style="margin-top: 4px;">
+                                Fair ML: ${homeTeam.shortName} ${formatOdds(impliedToAmerican(prediction.homeModelProb))} / ${awayTeam.shortName} ${formatOdds(impliedToAmerican(prediction.awayModelProb))}
+                            </div>
+                            ${prediction.homeML ? `
+                            <div class="prediction-detail" style="margin-top: 4px; color: ${Math.max(prediction.homeEdge, prediction.awayEdge) > 3 ? '#3fb950' : '#8b949e'};">
+                                Best edge: ${prediction.homeEdge > prediction.awayEdge ? homeTeam.shortName : awayTeam.shortName} +${Math.max(prediction.homeEdge, prediction.awayEdge).toFixed(1)}%
+                            </div>` : ''}
+                            <div class="confidence-bar ${confClass}">
+                                <div class="fill" style="width: ${favoredProb * 100}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="prediction-card">
+                            <h4>Spread</h4>
+                            <div class="prediction-value" style="color: ${spreadColor}">
+                                ${prediction.expectedMargin > 0 ? homeTeam.shortName : awayTeam.shortName} -${Math.abs(prediction.expectedMargin).toFixed(1)}
+                            </div>
+                            <div class="prediction-detail">
+                                Book: ${homeTeam.shortName} ${prediction.spread > 0 ? '+' : ''}${prediction.spread || 'N/A'}
+                            </div>
+                            <div class="prediction-detail" style="margin-top: 4px; color: ${Math.abs(prediction.spreadEdge) > 2 ? '#3fb950' : '#8b949e'};">
+                                Spread edge: ${prediction.spreadEdge > 0 ? '+' : ''}${prediction.spreadEdge.toFixed(1)} pts
+                            </div>
+                            <div class="prediction-detail" style="margin-top: 2px;">
+                                ${spreadPick}
+                            </div>
+                            <div class="confidence-bar confidence-medium">
+                                <div class="fill" style="width: ${Math.min(Math.abs(prediction.spreadEdge) * 15, 90)}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="prediction-card">
+                            <h4>Total (O/U)</h4>
+                            <div class="prediction-value" style="color: ${totalColor}">
+                                ${totalPick} ${prediction.totalLine || ''}
+                            </div>
+                            <div class="prediction-detail">
+                                Model Total: ${prediction.modelTotal.toFixed(1)}
+                            </div>
+                            ${prediction.totalLine > 0 ? `
+                            <div class="prediction-detail" style="margin-top: 4px; color: ${Math.abs(prediction.totalEdge) > 3 ? '#3fb950' : '#8b949e'};">
+                                Edge: ${prediction.totalEdge > 0 ? '+' : ''}${prediction.totalEdge.toFixed(1)} pts
+                            </div>` : '<div class="prediction-detail" style="margin-top: 4px;">No total line available</div>'}
+                            <div class="confidence-bar ${Math.abs(prediction.totalEdge) > 3 ? 'confidence-high' : 'confidence-low'}">
+                                <div class="fill" style="width: ${prediction.totalLine ? Math.min(Math.abs(prediction.totalEdge) * 12, 90) : 10}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="prediction-card">
+                            <h4>Model Summary</h4>
+                            <div class="prediction-value" style="color: #58a6ff; font-size: 1.2em;">
+                                ${prediction.homeExpectedScore.toFixed(0)} - ${prediction.awayExpectedScore.toFixed(0)}
+                            </div>
+                            <div class="prediction-detail">
+                                ${homeTeam.shortName} ${prediction.homeExpectedScore.toFixed(0)}, ${awayTeam.shortName} ${prediction.awayExpectedScore.toFixed(0)}
+                            </div>
+                            <div class="prediction-detail" style="margin-top: 4px;">
+                                Data quality: ${prediction.dataQuality >= 1 ? 'ESPN BPI available' : 'Record-based only'}
+                            </div>
+                            <div class="confidence-bar ${confClass}">
+                                <div class="fill" style="width: ${prediction.confidence}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderValueTable(bets) {
+            if (!bets || bets.length === 0) {
+                return `
+                    <div class="card">
+                        <div class="card-header"><h3>Value Bets Analysis</h3></div>
+                        <p style="color: #8b949e; text-align: center; padding: 20px;">
+                            No odds data available to calculate value. This typically means the games haven't been priced yet or the odds APIs are unavailable.
+                        </p>
+                    </div>
+                `;
+            }
+
+            const sorted = [...bets].sort((a, b) => b.edge - a.edge);
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>All Bets Ranked by Value</h3>
+                        <span style="color: #3fb950; font-size: 0.85em;">${sorted.filter(b => b.edge >= 5).length} HIGH VALUE plays</span>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Game</th>
+                                    <th>Bet Type</th>
+                                    <th>Pick</th>
+                                    <th>Odds</th>
+                                    <th>Implied %</th>
+                                    <th>Model %</th>
+                                    <th>Edge %</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${sorted.map(bet => `
+                                    <tr class="${bet.edge >= 5 ? 'high-value' : ''}">
+                                        <td>${bet.game}</td>
+                                        <td>${bet.type}</td>
+                                        <td><strong>${bet.pick}</strong></td>
+                                        <td>${formatOdds(bet.odds)}</td>
+                                        <td>${bet.impliedProb.toFixed(1)}%</td>
+                                        <td>${bet.modelProb.toFixed(1)}%</td>
+                                        <td style="color: ${bet.edge >= 5 ? '#3fb950' : bet.edge >= 2 ? '#d29922' : '#f85149'}; font-weight: 700;">
+                                            ${bet.edge >= 0 ? '+' : ''}${bet.edge.toFixed(1)}%
+                                            ${bet.edge >= 5 ? ' HIGH VALUE' : ''}
+                                        </td>
+                                        <td style="color: #d29922;">${getStars(bet.edge)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 12px; padding: 12px; background: #0f1117; border-radius: 6px; font-size: 0.85em; color: #8b949e;">
+                        <strong>Legend:</strong> Edge% = Model Probability - Implied Probability. Positive edge = potential value.
+                        Highlighted rows indicate >5% edge (HIGH VALUE). All edges are pre-vig adjusted.
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlayerProps(gameData) {
+            const { homeTeam, awayTeam, leaders, summary } = gameData;
+
+            // Combine all leaders
+            const allLeaders = [...(leaders.home || []), ...(leaders.away || [])];
+
+            if (allLeaders.length === 0) {
+                return `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>${awayTeam.shortName} @ ${homeTeam.shortName} - Player Props</h3>
+                        </div>
+                        <p style="color: #8b949e; padding: 20px; text-align: center;">
+                            Player statistics not yet available. Props analysis populates once ESPN publishes team leader data for this matchup.
+                        </p>
+                    </div>
+                `;
+            }
+
+            // Group by player
+            const playerMap = {};
+            for (const leader of allLeaders) {
+                if (!playerMap[leader.name]) {
+                    playerMap[leader.name] = { stats: [] };
+                }
+                // Avoid duplicates
+                if (!playerMap[leader.name].stats.find(s => s.category === leader.category)) {
+                    playerMap[leader.name].stats.push(leader);
+                }
+            }
+
+            const playerCards = Object.entries(playerMap).slice(0, 10).map(([name, data]) => {
+                const statsLines = data.stats.map(stat => {
+                    const avg = stat.numValue;
+                    let propLine, recommendation, recClass;
+                    const catLower = stat.category.toLowerCase();
+
+                    if (catLower.includes('point') || catLower.includes('scoring') || catLower.includes('pts')) {
+                        propLine = Math.round(avg * 2) / 2 - 1.5;
+                        if (avg > propLine + 2) { recommendation = 'OVER'; recClass = 'prop-over'; }
+                        else if (avg < propLine - 1) { recommendation = 'UNDER'; recClass = 'prop-under'; }
+                        else { recommendation = 'PUSH'; recClass = ''; }
+                    } else if (catLower.includes('rebound') || catLower.includes('reb')) {
+                        propLine = Math.round(avg * 2) / 2 - 0.5;
+                        if (avg > propLine + 1.5) { recommendation = 'OVER'; recClass = 'prop-over'; }
+                        else if (avg < propLine - 0.5) { recommendation = 'UNDER'; recClass = 'prop-under'; }
+                        else { recommendation = 'PUSH'; recClass = ''; }
+                    } else if (catLower.includes('assist') || catLower.includes('ast')) {
+                        propLine = Math.round(avg * 2) / 2 - 0.5;
+                        if (avg > propLine + 1) { recommendation = 'OVER'; recClass = 'prop-over'; }
+                        else if (avg < propLine - 0.5) { recommendation = 'UNDER'; recClass = 'prop-under'; }
+                        else { recommendation = 'PUSH'; recClass = ''; }
+                    } else {
+                        propLine = Math.round(avg * 2) / 2;
+                        recommendation = 'MONITOR';
+                        recClass = '';
+                    }
+
+                    return `
+                        <div class="prop-line">
+                            <span style="color: #c9d1d9;">${stat.category}</span>
+                            <span style="color: #8b949e;">Avg: ${stat.value}</span>
+                            <span style="color: #6e7681;">Line ~${propLine.toFixed(1)}</span>
+                            <span class="prop-pick ${recClass}">${recommendation}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="prop-card">
+                        <div class="player-name">${name}</div>
+                        ${statsLines}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${awayTeam.shortName} @ ${homeTeam.shortName} - Player Props</h3>
+                    </div>
+                    <p style="color: #8b949e; font-size: 0.85em; margin-bottom: 12px;">
+                        Estimated prop lines based on season averages. "OVER" = average significantly exceeds expected line.
+                        Lines are estimated (-1.5 for points, -0.5 for reb/ast from season avg).
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+                        ${playerCards}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // MAIN ORCHESTRATION
+        // ==========================================
+        async function loadAllData() {
+            const content = document.getElementById('content');
+            const topPicks = document.getElementById('topPicks');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Loading...';
+
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Fetching today's NBA games and odds data...</p>
+                    <p style="font-size: 0.85em; color: #6e7681; margin-top: 8px;">Connecting to ESPN APIs...</p>
+                </div>
+            `;
+            topPicks.innerHTML = '';
+
+            try {
+                // Step 1: Fetch scoreboard and odds in parallel
+                const [scoreboard, oddsApiData] = await Promise.all([
+                    fetchScoreboard(),
+                    fetchOddsAPI()
+                ]);
+
+                if (!scoreboard || !scoreboard.events || scoreboard.events.length === 0) {
+                    content.innerHTML = `
+                        <div class="no-games">
+                            <h2>No NBA Games Scheduled Today</h2>
+                            <p>The ESPN scoreboard shows no active events.</p>
+                            <p style="margin-top: 10px; font-size: 0.9em; color: #6e7681;">
+                                Date: ${scoreboard?.day?.date || new Date().toISOString().split('T')[0]}
+                            </p>
+                            <p style="margin-top: 6px; font-size: 0.85em; color: #6e7681;">
+                                Check back on game days for full analysis and predictions.
+                            </p>
+                        </div>
+                    `;
+                    document.getElementById('lastUpdated').textContent =
+                        `Last updated: ${new Date().toLocaleString()} | No games today`;
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = 'Refresh Data';
+                    return;
+                }
+
+                // Update loading message
+                content.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading detailed game summaries (${scoreboard.events.length} games)...</p>
+                    </div>
+                `;
+
+                // Step 2: Fetch detailed summaries for all games
+                const summaryPromises = scoreboard.events.map(event => fetchGameSummary(event.id));
+                const summaries = await Promise.all(summaryPromises);
+
+                // Step 3: Process each game
+                allGamesData = [];
+                allBets = [];
+
+                for (let i = 0; i < scoreboard.events.length; i++) {
+                    const event = scoreboard.events[i];
+                    const summary = summaries[i];
+                    const competition = event.competitions[0];
+
+                    // Extract teams
+                    const competitors = competition.competitors;
+                    const homeComp = competitors.find(c => c.homeAway === 'home');
+                    const awayComp = competitors.find(c => c.homeAway === 'away');
+
+                    if (!homeComp || !awayComp) continue;
+
+                    const homeTeam = extractTeamInfo(homeComp);
+                    const awayTeam = extractTeamInfo(awayComp);
+
+                    const status = event.status?.type?.state || 'pre';
+                    const gameTime = event.date || competition.date;
+
+                    // Extract odds (ESPN pickcenter + header odds)
+                    const odds = summary ? extractOddsFromSummary(summary) : { spreads: [], moneyline: [], totals: [], predictor: null };
+
+                    // Merge odds from competition-level if available
+                    if (competition.odds && competition.odds.length > 0) {
+                        for (const o of competition.odds) {
+                            if (o.details && !odds.spreads.find(s => s.provider === (o.provider?.name || 'ESPN'))) {
+                                odds.spreads.push({
+                                    provider: o.provider?.name || 'ESPN BET',
+                                    spread: parseFloat(o.details) || 0
+                                });
+                            }
+                            if (o.overUnder && !odds.totals.find(t => t.provider === (o.provider?.name || 'ESPN'))) {
+                                odds.totals.push({
+                                    provider: o.provider?.name || 'ESPN BET',
+                                    total: o.overUnder
+                                });
+                            }
+                            if (o.awayTeamOdds && o.homeTeamOdds) {
+                                const exists = odds.moneyline.find(m => m.provider === (o.provider?.name || 'ESPN'));
+                                if (!exists) {
+                                    odds.moneyline.push({
+                                        provider: o.provider?.name || 'ESPN BET',
+                                        away: o.awayTeamOdds?.moneyLine || null,
+                                        home: o.homeTeamOdds?.moneyLine || null,
+                                        spread: parseFloat(o.details) || 0
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    // Merge The Odds API data if available
+                    if (oddsApiData && Array.isArray(oddsApiData)) {
+                        const homeWords = homeTeam.name.toLowerCase().split(' ');
+                        const awayWords = awayTeam.name.toLowerCase().split(' ');
+
+                        const matchingGame = oddsApiData.find(g => {
+                            const gHome = (g.home_team || '').toLowerCase();
+                            const gAway = (g.away_team || '').toLowerCase();
+                            const homeMatch = homeWords.some(w => w.length > 3 && gHome.includes(w));
+                            const awayMatch = awayWords.some(w => w.length > 3 && gAway.includes(w));
+                            return homeMatch && awayMatch;
+                        });
+
+                        if (matchingGame && matchingGame.bookmakers) {
+                            for (const book of matchingGame.bookmakers.slice(0, 4)) {
+                                for (const market of (book.markets || [])) {
+                                    if (market.key === 'h2h' && market.outcomes) {
+                                        const homeOut = market.outcomes.find(o =>
+                                            homeWords.some(w => w.length > 3 && (o.name || '').toLowerCase().includes(w))
+                                        );
+                                        const awayOut = market.outcomes.find(o =>
+                                            awayWords.some(w => w.length > 3 && (o.name || '').toLowerCase().includes(w))
+                                        );
+                                        if (homeOut && awayOut) {
+                                            odds.moneyline.push({
+                                                provider: book.title || book.key,
+                                                home: homeOut.price,
+                                                away: awayOut.price
+                                            });
+                                        }
+                                    }
+                                    if (market.key === 'spreads' && market.outcomes) {
+                                        const homeOut = market.outcomes.find(o =>
+                                            homeWords.some(w => w.length > 3 && (o.name || '').toLowerCase().includes(w))
+                                        );
+                                        if (homeOut) {
+                                            odds.spreads.push({
+                                                provider: book.title || book.key,
+                                                spread: homeOut.point
+                                            });
+                                        }
+                                    }
+                                    if (market.key === 'totals' && market.outcomes) {
+                                        const overOut = market.outcomes.find(o => o.name === 'Over');
+                                        if (overOut) {
+                                            odds.totals.push({
+                                                provider: book.title || book.key,
+                                                total: overOut.point
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Extract injuries
+                    const injuries = summary ? extractInjuries(summary) : { home: [], away: [] };
+
+                    // Extract leaders
+                    const leaders = summary ? extractLeaders(summary) : { home: [], away: [] };
+
+                    // Extract team stats
+                    const teamStats = summary ? extractTeamStatsFromSummary(summary) : { home: {}, away: {} };
+
+                    // Build prediction model
+                    const prediction = buildPrediction(homeTeam, awayTeam, odds, injuries, teamStats);
+
+                    // Collect value bets
+                    const gameName = `${awayTeam.shortName} @ ${homeTeam.shortName}`;
+
+                    // Moneyline bets
+                    if (prediction.homeML && prediction.homeEdge > 0) {
+                        allBets.push({
+                            game: gameName,
+                            type: 'Moneyline',
+                            pick: homeTeam.shortName,
+                            odds: prediction.homeML,
+                            impliedProb: prediction.homeImplied * 100,
+                            modelProb: prediction.homeModelProb * 100,
+                            edge: prediction.homeEdge
+                        });
+                    }
+
+                    if (prediction.awayML && prediction.awayEdge > 0) {
+                        allBets.push({
+                            game: gameName,
+                            type: 'Moneyline',
+                            pick: awayTeam.shortName,
+                            odds: prediction.awayML,
+                            impliedProb: prediction.awayImplied * 100,
+                            modelProb: prediction.awayModelProb * 100,
+                            edge: prediction.awayEdge
+                        });
+                    }
+
+                    // Spread bet
+                    if (prediction.spread !== 0 && Math.abs(prediction.spreadEdge) > 1.5) {
+                        const spreadFavor = prediction.spreadEdge > 0;
+                        const spreadPick = spreadFavor ?
+                            `${homeTeam.shortName} ${prediction.spread}` :
+                            `${awayTeam.shortName} +${Math.abs(prediction.spread)}`;
+                        const spreadModelProb = 52.4 + Math.abs(prediction.spreadEdge) * 2.5;
+                        allBets.push({
+                            game: gameName,
+                            type: 'Spread',
+                            pick: spreadPick,
+                            odds: -110,
+                            impliedProb: 52.4,
+                            modelProb: Math.min(spreadModelProb, 75),
+                            edge: Math.min(Math.abs(prediction.spreadEdge) * 2.5, 22)
+                        });
+                    }
+
+                    // Total bet
+                    if (prediction.totalLine > 0 && Math.abs(prediction.totalEdge) > 2) {
+                        const totalModelProb = 52.4 + Math.abs(prediction.totalEdge) * 2;
+                        allBets.push({
+                            game: gameName,
+                            type: 'Total',
+                            pick: `${prediction.totalEdge > 0 ? 'Over' : 'Under'} ${prediction.totalLine}`,
+                            odds: -110,
+                            impliedProb: 52.4,
+                            modelProb: Math.min(totalModelProb, 72),
+                            edge: Math.min(Math.abs(prediction.totalEdge) * 2, 20)
+                        });
+                    }
+
+                    allGamesData.push({
+                        homeTeam,
+                        awayTeam,
+                        prediction,
+                        injuries,
+                        odds,
+                        summary,
+                        status,
+                        leaders,
+                        teamStats,
+                        gameTime
+                    });
+                }
+
+                // Render all sections
+                renderTopPicks(allBets);
+
+                let html = '';
+
+                // Navigation links
+                if (allGamesData.length > 1) {
+                    html += `<div class="game-nav">`;
+                    for (const gd of allGamesData) {
+                        html += `<a class="game-nav-btn" href="#game-${gd.homeTeam.id}">${gd.awayTeam.shortName} @ ${gd.homeTeam.shortName}</a>`;
+                    }
+                    html += `</div>`;
+                }
+
+                // Section A: Game Analysis
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#128202;</span> Game Analysis</div>
+                    ${allGamesData.map(gd => renderGameAnalysis(gd)).join('')}
+                </div>`;
+
+                // Section B: Predictions
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#127919;</span> Predictions</div>
+                    ${allGamesData.map(gd => renderPredictions(gd)).join('')}
+                </div>`;
+
+                // Section C: Value Bets
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#128176;</span> Best Value Wagers</div>
+                    ${renderValueTable(allBets)}
+                </div>`;
+
+                // Section D: Player Props
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#127936;</span> Player Props Analysis</div>
+                    ${allGamesData.map(gd => renderPlayerProps(gd)).join('')}
+                </div>`;
+
+                content.innerHTML = html;
+
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent =
+                    `Last updated: ${new Date().toLocaleString()} | ${scoreboard.events.length} game(s) found | Data quality: ${allGamesData.some(g => g.prediction.dataQuality >= 1) ? 'ESPN BPI + Odds' : 'Record-based'}`;
+
+            } catch (error) {
+                content.innerHTML = `
+                    <div class="error">
+                        <strong>Error loading data:</strong> ${error.message}
+                        <p style="margin-top: 8px; font-size: 0.9em;">
+                            Possible causes: network issue, ESPN API temporarily unavailable, or CORS restriction.
+                        </p>
+                        <p style="margin-top: 4px; font-size: 0.85em; color: #d4a9a9;">
+                            Try refreshing in a few moments. If the issue persists, ESPN may be blocking browser requests.
+                        </p>
+                    </div>
+                `;
+                console.error('Load error:', error);
+            }
+
+            refreshBtn.disabled = false;
+            refreshBtn.textContent = 'Refresh Data';
+        }
+
+        // ==========================================
+        // MLB ANALYSIS
+        // ==========================================
+        const MLB_SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard';
+        const MLB_SUMMARY = 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/summary?event=';
+        const MLB_HOME_ADV = 0.040; // ~54% home win rate in MLB
+
+        function mlbAmericanToImplied(odds) {
+            if (!odds || odds === 0) return 0.5;
+            if (odds < 0) return Math.abs(odds) / (Math.abs(odds) + 100);
+            return 100 / (odds + 100);
+        }
+
+        function mlbBuildPrediction(homeTeam, awayTeam, odds, pitchers) {
+            let homeWinProb = 0.5;
+            let awayWinProb = 0.5;
+            let totalPrediction = 8.5;
+            let totalLine = 0;
+            let homeML = null;
+            let awayML = null;
+            let dataQuality = 0;
+
+            // Use ESPN odds if available
+            if (odds.homeML && odds.awayML) {
+                const rawHome = mlbAmericanToImplied(odds.homeML);
+                const rawAway = mlbAmericanToImplied(odds.awayML);
+                const total = rawHome + rawAway;
+                homeWinProb = rawHome / total;
+                awayWinProb = rawAway / total;
+                homeML = odds.homeML;
+                awayML = odds.awayML;
+                totalLine = odds.totalLine || 0;
+                dataQuality = 1;
+            }
+
+            // Record-based adjustment
+            const homeWinPct = homeTeam.wins / (homeTeam.wins + homeTeam.losses || 1);
+            const awayWinPct = awayTeam.wins / (awayTeam.wins + awayTeam.losses || 1);
+            const recordDiff = (homeWinPct - awayWinPct);
+
+            // Blend: 70% market odds, 30% record-based + home advantage
+            const recordHomeProb = 0.5 + recordDiff * 0.5 + MLB_HOME_ADV;
+            if (dataQuality >= 1) {
+                homeWinProb = homeWinProb * 0.7 + recordHomeProb * 0.3;
+            } else {
+                homeWinProb = recordHomeProb;
+            }
+            awayWinProb = 1 - homeWinProb;
+
+            // Total prediction based on team run production
+            // Average MLB game: ~8.5 runs. Adjust by team strength
+            const combinedWinPct = (homeWinPct + awayWinPct);
+            totalPrediction = 7.5 + (combinedWinPct - 1.0) * 4;
+            if (totalPrediction < 6.5) totalPrediction = 6.5;
+            if (totalPrediction > 12) totalPrediction = 12;
+
+            // Calculate edges
+            const homeImplied = homeML ? mlbAmericanToImplied(homeML) : 0.5;
+            const awayImplied = awayML ? mlbAmericanToImplied(awayML) : 0.5;
+            const homeEdge = (homeWinProb - homeImplied) * 100;
+            const awayEdge = (awayWinProb - awayImplied) * 100;
+
+            // Total edge
+            let totalEdge = 0;
+            if (totalLine > 0) {
+                totalEdge = totalPrediction - totalLine;
+            }
+
+            return {
+                homeWinProb,
+                awayWinProb,
+                homeML,
+                awayML,
+                homeImplied,
+                awayImplied,
+                homeEdge,
+                awayEdge,
+                totalPrediction,
+                totalLine,
+                totalEdge,
+                dataQuality,
+                predictedWinner: homeWinProb > awayWinProb ? 'home' : 'away',
+                confidence: Math.abs(homeWinProb - 0.5) * 2,
+            };
+        }
+
+        function renderMLBGame(game) {
+            const { homeTeam, awayTeam, prediction, gameTime, pitchers } = game;
+            const winner = prediction.predictedWinner === 'home' ? homeTeam : awayTeam;
+            const loser = prediction.predictedWinner === 'home' ? awayTeam : homeTeam;
+            const winProb = prediction.predictedWinner === 'home' ? prediction.homeWinProb : prediction.awayWinProb;
+
+            const totalCall = prediction.totalEdge > 0.5 ? 'OVER' : prediction.totalEdge < -0.5 ? 'UNDER' : 'LEAN UNDER';
+            const totalColor = totalCall.includes('OVER') ? 'green' : totalCall.includes('UNDER') ? 'red' : 'yellow';
+
+            let oddsDisplay = '';
+            if (prediction.homeML) {
+                oddsDisplay = `<div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">${homeTeam.shortName} ML</div>
+                        <div class="stat-value ${prediction.homeEdge > 3 ? 'green' : prediction.homeEdge < -3 ? 'red' : ''}">${prediction.homeML > 0 ? '+' : ''}${prediction.homeML}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">${awayTeam.shortName} ML</div>
+                        <div class="stat-value ${prediction.awayEdge > 3 ? 'green' : prediction.awayEdge < -3 ? 'red' : ''}">${prediction.awayML > 0 ? '+' : ''}${prediction.awayML}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">O/U Line</div>
+                        <div class="stat-value">${prediction.totalLine || 'N/A'}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Model Total</div>
+                        <div class="stat-value ${totalColor}">${prediction.totalPrediction.toFixed(1)}</div>
+                    </div>
+                </div>`;
+            }
+
+            let pitcherHtml = '';
+            if (pitchers.home || pitchers.away) {
+                pitcherHtml = `<div style="margin-top: 10px; padding: 10px; background: #0f1117; border-radius: 6px; font-size: 0.85em;">
+                    <span style="color: #8b949e;">Probable Pitchers:</span>
+                    ${pitchers.away ? `<span style="margin-left: 8px;">${awayTeam.shortName}: <strong>${pitchers.away}</strong></span>` : ''}
+                    ${pitchers.home ? `<span style="margin-left: 12px;">${homeTeam.shortName}: <strong>${pitchers.home}</strong></span>` : ''}
+                </div>`;
+            }
+
+            return `
+                <div class="card" id="mlb-game-${homeTeam.id}">
+                    <div class="card-header">
+                        <h3>${awayTeam.name} @ ${homeTeam.name}</h3>
+                        <span class="badge badge-upcoming">${gameTime}</span>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-bottom: 12px; font-size: 0.85em; color: #8b949e;">
+                        <span>${awayTeam.shortName}: ${awayTeam.wins}-${awayTeam.losses}</span>
+                        <span>${homeTeam.shortName}: ${homeTeam.wins}-${homeTeam.losses}</span>
+                    </div>
+                    ${pitcherHtml}
+                    ${oddsDisplay}
+                    <div class="stats-grid" style="margin-top: 14px;">
+                        <div class="stat-box">
+                            <div class="stat-label">Predicted Winner</div>
+                            <div class="stat-value green">${winner.shortName}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Win Probability</div>
+                            <div class="stat-value blue">${(winProb * 100).toFixed(1)}%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Call</div>
+                            <div class="stat-value ${totalColor}">${totalCall} ${prediction.totalLine || ''}</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Confidence</div>
+                            <div class="stat-value ${prediction.confidence > 0.3 ? 'green' : 'yellow'}">${(prediction.confidence * 100).toFixed(0)}%</div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function renderMLBValueTable(bets) {
+            if (bets.length === 0) return '<p style="color: #8b949e;">No MLB value plays identified.</p>';
+            const sorted = [...bets].sort((a, b) => b.edge - a.edge);
+            let rows = '';
+            for (const bet of sorted) {
+                const isHigh = bet.edge >= 5;
+                const stars = bet.edge >= 10 ? '★★★★★' : bet.edge >= 7 ? '★★★★' : bet.edge >= 5 ? '★★★' : bet.edge >= 3 ? '★★' : '★';
+                rows += `<tr class="${isHigh ? 'high-value' : ''}">
+                    <td>${bet.game}</td>
+                    <td>${bet.type}</td>
+                    <td><strong>${bet.pick}</strong></td>
+                    <td>${bet.odds > 0 ? '+' : ''}${bet.odds}</td>
+                    <td>${bet.impliedProb.toFixed(1)}%</td>
+                    <td>${bet.modelProb.toFixed(1)}%</td>
+                    <td style="color: ${bet.edge >= 5 ? '#3fb950' : bet.edge >= 3 ? '#d29922' : '#8b949e'}; font-weight: 700;">+${bet.edge.toFixed(1)}%</td>
+                    <td style="color: #d29922;">${stars}</td>
+                    <td>${isHigh ? '<span style="background:#1a2e1a;color:#3fb950;padding:2px 8px;border-radius:10px;font-size:0.8em;">HIGH VALUE</span>' : ''}</td>
+                </tr>`;
+            }
+
+            return `<div class="table-wrapper"><table>
+                <thead><tr>
+                    <th>Game</th><th>Type</th><th>Pick</th><th>Odds</th>
+                    <th>Implied</th><th>Model</th><th>Edge</th><th>Rating</th><th></th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+            </table></div>`;
+        }
+
+        async function loadMLBData() {
+            const mlbContent = document.getElementById('mlb-content');
+            if (!mlbContent) {
+                console.error('MLB content div not found');
+                return;
+            }
+
+            mlbContent.innerHTML = `<div class="loading"><div class="spinner"></div><p>Fetching today's MLB games...</p></div>`;
+            console.log('Starting MLB data load...');
+
+            try {
+                const res = await fetch(MLB_SCOREBOARD);
+                const scoreboard = await res.json();
+
+                if (!scoreboard || !scoreboard.events || scoreboard.events.length === 0) {
+                    mlbContent.innerHTML = '<p style="color: #8b949e; text-align: center; padding: 40px;">No MLB games scheduled today.</p>';
+                    return;
+                }
+
+                const mlbGames = [];
+                const mlbBets = [];
+
+                for (const event of scoreboard.events) {
+                    const comp = event.competitions[0];
+                    const home = comp.competitors.find(c => c.homeAway === 'home');
+                    const away = comp.competitors.find(c => c.homeAway === 'away');
+
+                    const homeTeam = {
+                        id: home.team.id,
+                        name: home.team.displayName,
+                        shortName: home.team.abbreviation || home.team.shortDisplayName,
+                        logo: home.team.logo,
+                        wins: parseInt(((home.records || [])[0]?.summary || '0-0').split('-')[0]) || 0,
+                        losses: parseInt(((home.records || [])[0]?.summary || '0-0').split('-')[1]) || 0,
+                    };
+
+                    const awayTeam = {
+                        id: away.team.id,
+                        name: away.team.displayName,
+                        shortName: away.team.abbreviation || away.team.shortDisplayName,
+                        logo: away.team.logo,
+                        wins: parseInt(((away.records || [])[0]?.summary || '0-0').split('-')[0]) || 0,
+                        losses: parseInt(((away.records || [])[0]?.summary || '0-0').split('-')[1]) || 0,
+                    };
+
+                    // Extract odds from ESPN
+                    const espnOdds = (comp.odds || [])[0] || {};
+                    const odds = { homeML: null, awayML: null, totalLine: null };
+
+                    if (espnOdds.details) {
+                        const parts = espnOdds.details;
+                        // Parse "PIT -136" or "NYY -149" format
+                        const match = parts.match(/(\w+)\s+([+-]?\d+)/);
+                        if (match) {
+                            const favAbbrev = match[1];
+                            const favOdds = parseInt(match[2]);
+                            const dogOdds = favOdds < 0 ? Math.round(Math.abs(favOdds) * 0.85) : Math.round(-Math.abs(favOdds) * 1.15);
+
+                            if (favAbbrev === homeTeam.shortName || favAbbrev === homeTeam.shortName.replace(/\s/g,'')) {
+                                odds.homeML = favOdds;
+                                odds.awayML = dogOdds;
+                            } else {
+                                odds.awayML = favOdds;
+                                odds.homeML = dogOdds;
+                            }
+                        }
+                    }
+                    if (espnOdds.overUnder) {
+                        odds.totalLine = espnOdds.overUnder;
+                    }
+
+                    // Extract probable pitchers from competition data
+                    let pitchers = { home: null, away: null };
+                    if (comp.status?.type?.name === 'STATUS_SCHEDULED') {
+                        // ESPN sometimes includes pitcher info in broadcasts or notes
+                        const notes = comp.notes || [];
+                        const headline = notes.find(n => n.type === 'event')?.headline || '';
+                        if (headline) {
+                            pitchers.home = headline;
+                        }
+                    }
+
+                    const gameTime = comp.status.type.shortDetail;
+                    const prediction = mlbBuildPrediction(homeTeam, awayTeam, odds, pitchers);
+
+                    // Collect bets
+                    const gameName = `${awayTeam.shortName} @ ${homeTeam.shortName}`;
+
+                    if (prediction.homeML && prediction.homeEdge > 2) {
+                        mlbBets.push({
+                            game: gameName,
+                            type: 'Moneyline',
+                            pick: homeTeam.shortName,
+                            odds: prediction.homeML,
+                            impliedProb: prediction.homeImplied * 100,
+                            modelProb: prediction.homeWinProb * 100,
+                            edge: prediction.homeEdge,
+                        });
+                    }
+                    if (prediction.awayML && prediction.awayEdge > 2) {
+                        mlbBets.push({
+                            game: gameName,
+                            type: 'Moneyline',
+                            pick: awayTeam.shortName,
+                            odds: prediction.awayML,
+                            impliedProb: prediction.awayImplied * 100,
+                            modelProb: prediction.awayWinProb * 100,
+                            edge: prediction.awayEdge,
+                        });
+                    }
+                    if (prediction.totalLine && Math.abs(prediction.totalEdge) > 0.5) {
+                        const totalModelProb = 52.4 + Math.abs(prediction.totalEdge) * 3;
+                        mlbBets.push({
+                            game: gameName,
+                            type: 'Total',
+                            pick: `${prediction.totalEdge > 0 ? 'Over' : 'Under'} ${prediction.totalLine}`,
+                            odds: -110,
+                            impliedProb: 52.4,
+                            modelProb: Math.min(totalModelProb, 72),
+                            edge: Math.min(Math.abs(prediction.totalEdge) * 3, 20),
+                        });
+                    }
+
+                    mlbGames.push({ homeTeam, awayTeam, prediction, gameTime, pitchers });
+                }
+
+                // Render MLB section
+                let html = '';
+
+                // Top MLB value plays
+                const topMLB = [...mlbBets].sort((a, b) => b.edge - a.edge).slice(0, 5);
+                if (topMLB.length > 0) {
+                    html += `<div class="top-picks" style="border-color: #58a6ff; background: linear-gradient(135deg, #1a2332, #161b22);">
+                        <h2 style="color: #58a6ff;">&#9918; Top MLB Value Plays</h2>
+                        ${topMLB.map(pick => {
+                            const stars = pick.edge >= 10 ? '★★★★★' : pick.edge >= 7 ? '★★★★' : pick.edge >= 5 ? '★★★' : pick.edge >= 3 ? '★★' : '★';
+                            return `<div class="pick-item ${pick.edge < 5 ? 'moderate' : ''}">
+                                <div class="pick-details">
+                                    <div class="pick-game">${pick.game} &bull; ${pick.type}</div>
+                                    <div class="pick-bet">${pick.pick} (${pick.odds > 0 ? '+' : ''}${pick.odds})</div>
+                                </div>
+                                <div class="pick-edge">+${pick.edge.toFixed(1)}%</div>
+                                <div class="pick-stars">${stars}</div>
+                            </div>`;
+                        }).join('')}
+                    </div>`;
+                }
+
+                // Game cards
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#9918;</span> MLB Game Predictions (${mlbGames.length} games)</div>
+                    ${mlbGames.map(g => renderMLBGame(g)).join('')}
+                </div>`;
+
+                // Value table
+                html += `<div class="section">
+                    <div class="section-title"><span class="icon">&#128176;</span> MLB Value Wagers</div>
+                    ${renderMLBValueTable(mlbBets)}
+                </div>`;
+
+                mlbContent.innerHTML = html;
+
+            } catch (error) {
+                mlbContent.innerHTML = `<div class="error">
+                    <strong>Error loading MLB data:</strong> ${error.message}
+                    <p style="margin-top: 8px; font-size: 0.9em;">If you're opening this as a local file, try serving it instead:</p>
+                    <code style="display:block; margin-top: 6px; padding: 8px; background: #0f1117; border-radius: 4px; font-size: 0.85em;">
+                        cd /home/jmcdon11/workspace/projects/sports-odds-predictor && python3 -m http.server 8080 --bind 127.0.0.1
+                    </code>
+                    <p style="margin-top: 6px; font-size: 0.85em;">Then open: <a href="http://127.0.0.1:8080/today.html" style="color: #58a6ff;">http://127.0.0.1:8080/today.html</a></p>
+                </div>`;
+                console.error('MLB load error:', error);
+            }
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            loadMLBData();
+            setInterval(() => { loadAllData(); loadMLBData(); }, REFRESH_INTERVAL);
+        });
+    </script>
+</body>
+</html>
