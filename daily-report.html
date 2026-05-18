@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Best Bets — May 18, 2026 (Ensemble v2)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e14; color: #d4d4d4; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif; line-height: 1.5; padding: 24px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; padding: 32px 0; margin-bottom: 32px; border-bottom: 1px solid #1e2530; }
+        header h1 { font-size: 2em; background: linear-gradient(135deg, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .subtitle { color: #6b7280; margin-top: 6px; font-size: 0.9em; }
+        .model-badge { display: inline-block; background: #1e3a5f; color: #60a5fa; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; margin-top: 10px; }
+        .streak { display: inline-block; background: #064e3b; color: #34d399; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-top: 10px; margin-left: 8px; }
+        .section { margin-bottom: 48px; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #1e2530; }
+        .section-header h2 { font-size: 1.4em; color: #e5e7eb; }
+        .badge { font-size: 0.7em; padding: 3px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+        .badge-hot { background: #7c2d12; color: #fb923c; }
+        .badge-new { background: #1e3a5f; color: #60a5fa; }
+        .badge-kelly { background: #064e3b; color: #34d399; }
+        .bets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .bet-card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; transition: border-color 0.2s; }
+        .bet-card:hover { border-color: #374151; }
+        .bet-card.top { border-left: 3px solid #34d399; }
+        .bet-card.nba { border-left: 3px solid #f59e0b; }
+        .bet-card .matchup { font-size: 0.8em; color: #6b7280; margin-bottom: 4px; }
+        .bet-card .pick { font-size: 1.2em; font-weight: 700; color: #f9fafb; }
+        .bet-card .details { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+        .bet-card .detail {}
+        .bet-card .detail-label { font-size: 0.7em; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bet-card .detail-value { font-weight: 600; color: #d1d5db; }
+        .bet-card .detail-value.green { color: #34d399; }
+        .bet-card .detail-value.blue { color: #60a5fa; }
+        .bet-card .detail-value.orange { color: #f59e0b; }
+        .bet-card .edge-bar { margin-top: 12px; height: 4px; background: #1f2937; border-radius: 2px; overflow: hidden; }
+        .bet-card .edge-fill { height: 100%; background: linear-gradient(90deg, #34d399, #60a5fa); border-radius: 2px; }
+        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th { text-align: left; padding: 10px 14px; background: #111827; color: #6b7280; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; }
+        td { padding: 10px 14px; border-bottom: 1px solid #1a1f2e; }
+        tr:hover td { background: rgba(96, 165, 250, 0.03); }
+        .positive { color: #34d399; font-weight: 600; }
+        .negative { color: #f87171; }
+        .neutral { color: #6b7280; }
+        .summary-bar { display: flex; gap: 24px; background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+        .summary-stat { text-align: center; }
+        .summary-stat .value { font-size: 1.6em; font-weight: 700; }
+        .summary-stat .label { font-size: 0.7em; color: #6b7280; text-transform: uppercase; }
+        footer { text-align: center; padding: 32px 0; color: #4b5563; font-size: 0.8em; border-top: 1px solid #1e2530; margin-top: 40px; }
+        footer a { color: #60a5fa; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Daily Best Bets</h1>
+        <div class="subtitle">Sunday, May 18, 2026</div>
+        <span class="model-badge">Ensemble v2: Pythagorean + Elo + FIP + Market (4/4 models)</span>
+        <span class="streak">Yesterday: 7-0</span>
+    </header>
+
+    <div class="summary-bar">
+        <div class="summary-stat"><div class="value" style="color:#34d399">6</div><div class="label">Actionable Bets</div></div>
+        <div class="summary-stat"><div class="value" style="color:#60a5fa">$125</div><div class="label">Total Exposure</div></div>
+        <div class="summary-stat"><div class="value" style="color:#6b7280">12.5%</div><div class="label">Bankroll Risk</div></div>
+        <div class="summary-stat"><div class="value" style="color:#f59e0b">4/4</div><div class="label">Models Active</div></div>
+        <div class="summary-stat"><div class="value" style="color:#d4d4d4">9</div><div class="label">Bookmakers</div></div>
+    </div>
+
+    
+    <!-- DAILY PARLAYS -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Daily Parlays</h2>
+            <span class="badge badge-hot">BEST PLAY</span>
+        </div>
+
+        <!-- Target callout -->
+        <div style="background:#1a1a2e; border:1px solid #f59e0b; border-radius:10px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; gap:16px;">
+            <div style="font-size:2em;">&#127942;</div>
+            <div>
+                <div style="color:#f59e0b; font-weight:700; font-size:1.1em;">Monthly Target: $3,000</div>
+                <div style="color:#6b7280; font-size:0.85em;">Need ~$150/day from parlays + straights combined. Track daily below.</div>
+            </div>
+        </div>
+
+        <!-- BEST PARLAY - 2 Leg -->
+        <div class="bet-card" style="border-left:4px solid #f59e0b; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="color:#f59e0b; font-size:0.75em; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Best Parlay — Highest EV</div>
+                    <div class="pick" style="margin-top:4px;">2-Leg: Spurs +6.5 + Jalen Williams OVER 19.5 PTS</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.8em; font-weight:800; color:#34d399;">$182</div>
+                    <div style="font-size:0.75em; color:#6b7280;">payout on $50</div>
+                </div>
+            </div>
+            <div class="details" style="margin-top:14px;">
+                <div class="detail"><div class="detail-label">Stake</div><div class="detail-value">$50</div></div>
+                <div class="detail"><div class="detail-label">Profit</div><div class="detail-value green">$132</div></div>
+                <div class="detail"><div class="detail-label">Win Prob</div><div class="detail-value blue">33.6%</div></div>
+                <div class="detail"><div class="detail-label">EV</div><div class="detail-value green">+$11.30/bet</div></div>
+                <div class="detail"><div class="detail-label">Correlation</div><div class="detail-value orange">Positive (same game)</div></div>
+            </div>
+            <div style="margin-top:14px; padding-top:12px; border-top:1px solid #1f2937;">
+                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px; background:#0f1520; border-radius:6px; padding:10px 14px;">
+                        <div style="color:#f59e0b; font-size:0.7em; font-weight:600;">LEG 1 — NBA SPREAD</div>
+                        <div style="font-weight:700; margin-top:2px;">Spurs +6.5 (-110)</div>
+                        <div style="color:#6b7280; font-size:0.8em;">Model: OKC by 2.9, not 6.5 | 58% to cover</div>
+                    </div>
+                    <div style="flex:1; min-width:200px; background:#0f1520; border-radius:6px; padding:10px 14px;">
+                        <div style="color:#f59e0b; font-size:0.7em; font-weight:600;">LEG 2 — NBA PROP</div>
+                        <div style="font-weight:700; margin-top:2px;">Jalen Williams OVER 19.5 PTS (-110)</div>
+                        <div style="color:#6b7280; font-size:0.8em;">Season avg: 21.5 | Proj: 21.4 | 58% to hit</div>
+                    </div>
+                </div>
+            </div>
+            <div style="color:#4b5563; font-size:0.75em; margin-top:10px;">&#9888; Correlated: tight game = SA covers + Williams gets volume. Both benefit from competitive game script.</div>
+        </div>
+
+        <!-- 3-Leg Parlay -->
+        <div class="bet-card" style="border-left:4px solid #60a5fa; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="color:#60a5fa; font-size:0.75em; font-weight:700; text-transform:uppercase; letter-spacing:1px;">3-Leg Parlay — Higher Payout</div>
+                    <div class="pick" style="margin-top:4px;">Spurs +6.5 + J. Williams O19.5 + Twins ML</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.8em; font-weight:800; color:#60a5fa;">$345</div>
+                    <div style="font-size:0.75em; color:#6b7280;">payout on $50</div>
+                </div>
+            </div>
+            <div class="details" style="margin-top:14px;">
+                <div class="detail"><div class="detail-label">Stake</div><div class="detail-value">$50</div></div>
+                <div class="detail"><div class="detail-label">Profit</div><div class="detail-value blue">$295</div></div>
+                <div class="detail"><div class="detail-label">Win Prob</div><div class="detail-value">18.9%</div></div>
+                <div class="detail"><div class="detail-label">EV</div><div class="detail-value green">+$15.21/bet</div></div>
+            </div>
+            <div style="margin-top:12px; padding-top:10px; border-top:1px solid #1f2937; color:#6b7280; font-size:0.8em;">
+                Adds: <strong>Minnesota Twins ML (-112)</strong> vs Houston | Model: 56.2% | HOU worst Elo in AL (1473)
+            </div>
+        </div>
+
+        <!-- Monitoring parlays -->
+        <div style="margin-top:24px;">
+            <div style="color:#6b7280; font-size:0.85em; font-weight:600; margin-bottom:10px;">OTHER PARLAYS (Tracking)</div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Parlay</th><th>Legs</th><th>Stake</th><th>Payout</th><th>Win%</th><th>EV</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr style="background:rgba(245,158,11,0.05);">
+                            <td style="color:#f59e0b; font-weight:600;">Best Play (2-leg)</td>
+                            <td>SA +6.5 / Williams O19.5</td>
+                            <td>$50</td>
+                            <td>$182</td>
+                            <td>33.6%</td>
+                            <td class="positive">+$11.30</td>
+                            <td>&#9203; Pending</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#60a5fa; font-weight:600;">3-Leg Cross-Sport</td>
+                            <td>SA +6.5 / Williams O19.5 / MIN ML</td>
+                            <td>$50</td>
+                            <td>$345</td>
+                            <td>18.9%</td>
+                            <td class="positive">+$15.21</td>
+                            <td>&#9203; Pending</td>
+                        </tr>
+                        <tr>
+                            <td>MLB Dogs (4-leg)</td>
+                            <td>CLE / CHW / MIL / ATL</td>
+                            <td>$20</td>
+                            <td>$516</td>
+                            <td>4.5%</td>
+                            <td class="neutral">-$6.72</td>
+                            <td>&#9203; Pending</td>
+                        </tr>
+                        <tr>
+                            <td>Sweet Spot (3-leg)</td>
+                            <td>WSH / SD / COL</td>
+                            <td>$20</td>
+                            <td>$209</td>
+                            <td>11.9%</td>
+                            <td class="positive">+$4.80</td>
+                            <td>&#9203; Pending</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly P&L Tracker -->
+        <div style="margin-top:24px; background:#111827; border:1px solid #1f2937; border-radius:10px; padding:16px 20px;">
+            <div style="color:#e5e7eb; font-weight:600; margin-bottom:10px;">Monthly P&L — May 2026</div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                <div><span style="color:#6b7280; font-size:0.75em;">TOTAL WAGERED</span><br><span style="font-weight:700;">$265</span></div>
+                <div><span style="color:#6b7280; font-size:0.75em;">STRAIGHT BETS</span><br><span style="font-weight:700; color:#34d399;">10-5 (66.7%)</span></div>
+                <div><span style="color:#6b7280; font-size:0.75em;">PARLAYS</span><br><span style="font-weight:700;">0-0 (starting today)</span></div>
+                <div><span style="color:#6b7280; font-size:0.75em;">NET P&L</span><br><span style="font-weight:700; color:#34d399;">TBD (tracking starts today)</span></div>
+                <div><span style="color:#6b7280; font-size:0.75em;">TARGET</span><br><span style="font-weight:700; color:#f59e0b;">$3,000/month</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MLB TOP PICKS -->
+    <div class="section">
+        <div class="section-header">
+            <h2>MLB Best Bets</h2>
+            <span class="badge badge-kelly">Kelly Sized</span>
+        </div>
+        <div class="bets-grid">
+
+            <div class="bet-card top">
+                <div class="matchup">Guardians @ Tigers &bull; MLB Moneyline</div>
+                <div class="pick">Guardians ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">45.9%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+5.9%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$25</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:24%"></div></div>
+            </div>
+            <div class="bet-card top">
+                <div class="matchup">Sox @ Mariners &bull; MLB Moneyline</div>
+                <div class="pick">Sox ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">43.6%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+5.4%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$22</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:22%"></div></div>
+            </div>
+            <div class="bet-card top">
+                <div class="matchup">Brewers @ Cubs &bull; MLB Moneyline</div>
+                <div class="pick">Brewers ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">43.5%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+5.3%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$21</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:21%"></div></div>
+            </div>
+            <div class="bet-card top">
+                <div class="matchup">Braves @ Marlins &bull; MLB Moneyline</div>
+                <div class="pick">Braves ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">51.5%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+4.7%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$22</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:19%"></div></div>
+            </div>
+            <div class="bet-card top">
+                <div class="matchup">Mets @ Nationals &bull; MLB Moneyline</div>
+                <div class="pick">Nationals ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">51.9%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+4.3%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$21</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:17%"></div></div>
+            </div>
+            <div class="bet-card top">
+                <div class="matchup">Rangers @ Rockies &bull; MLB Moneyline</div>
+                <div class="pick">Rockies ML</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model</div><div class="detail-value green">47.5%</div></div>
+                    <div class="detail"><div class="detail-label">Edge</div><div class="detail-value green">+3.3%</div></div>
+                    <div class="detail"><div class="detail-label">Kelly</div><div class="detail-value blue">$15</div></div>
+                    <div class="detail"><div class="detail-label">Models</div><div class="detail-value">4/4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:13%"></div></div>
+            </div>
+            <div class="bet-card nba">
+                <div class="matchup">SA @ OKC &bull; NBA WCF Game 1 Spread</div>
+                <div class="pick">Spurs +6.5 (-110)</div>
+                <div class="details">
+                    <div class="detail"><div class="detail-label">Model Margin</div><div class="detail-value orange">OKC by 2.9</div></div>
+                    <div class="detail"><div class="detail-label">Spread Edge</div><div class="detail-value green">+3.6 pts</div></div>
+                    <div class="detail"><div class="detail-label">OKC Win%</div><div class="detail-value">57.2%</div></div>
+                    <div class="detail"><div class="detail-label">Four Factors</div><div class="detail-value blue">OKC edge all 4</div></div>
+                </div>
+                <div class="edge-bar"><div class="edge-fill" style="width:45%"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVER/UNDER -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Over/Under Picks</h2>
+            <span class="badge badge-new">Park + Weather + FIP Adjusted</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Game</th><th>Line</th><th>Model Total</th><th>Park Factor</th><th>Edge</th><th>Call</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Rangers @ Rockies</td>
+                        <td>9.5</td>
+                        <td class="positive">12.6</td>
+                        <td style="color:#fb923c">1.35</td>
+                        <td class="positive">+3.1</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>Giants @ Diamondbacks</td>
+                        <td>9</td>
+                        <td class="positive">10.5</td>
+                        <td style="">1.06</td>
+                        <td class="positive">+1.5</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>Astros @ Twins</td>
+                        <td>9.5</td>
+                        <td class="positive">10.9</td>
+                        <td style="">1.01</td>
+                        <td class="positive">+1.4</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>Reds @ Phillies</td>
+                        <td>10</td>
+                        <td class="positive">11.4</td>
+                        <td style="">1.06</td>
+                        <td class="positive">+1.4</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>Guardians @ Tigers</td>
+                        <td>8</td>
+                        <td class="positive">9.0</td>
+                        <td style="">0.95</td>
+                        <td class="positive">+1.0</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>Sox @ Mariners</td>
+                        <td>7.5</td>
+                        <td class="positive">8.5</td>
+                        <td style="">0.93</td>
+                        <td class="positive">+1.0</td>
+                        <td class="positive">OVER</td>
+                    </tr>
+                    <tr>
+                        <td>SA @ OKC (NBA)</td>
+                        <td>221.5</td>
+                        <td class="neutral">238*</td>
+                        <td>—</td>
+                        <td class="neutral">+17*</td>
+                        <td class="neutral">No play (reg season pace)*</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="color:#4b5563; font-size:0.75em; margin-top:8px;">*NBA total uses regular season pace; playoff G1s typically run 5-8% slower. Lean UNDER.</p>
+    </div>
+
+    <!-- FULL MLB SLATE -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Full MLB Slate — 14 Games</h2>
+            <span class="badge badge-hot">Live Odds (9 Books)</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Game</th><th>Pitchers</th><th>Fav</th><th>Win%</th><th>Edge</th><th>Exp Total</th><th>O/U</th><th>Total Edge</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>Guardians @ Tigers</td>
+                        <td>Cecconi v Valdez</td>
+                        <td class="positive">Tigers</td>
+                        <td>54.1%</td>
+                        <td class="positive">+5.9%</td>
+                        <td>9.0</td>
+                        <td>8</td>
+                        <td class="neutral">+1.0</td>
+                    </tr>
+                    <tr>
+                        <td>Sox @ Mariners</td>
+                        <td>Schultz v Woo</td>
+                        <td class="positive">Mariners</td>
+                        <td>56.4%</td>
+                        <td class="positive">+5.4%</td>
+                        <td>8.5</td>
+                        <td>7.5</td>
+                        <td class="neutral">+1.0</td>
+                    </tr>
+                    <tr>
+                        <td>Brewers @ Cubs</td>
+                        <td>Sproat v Imanaga</td>
+                        <td class="positive">Cubs</td>
+                        <td>56.5%</td>
+                        <td class="positive">+5.3%</td>
+                        <td>10.0</td>
+                        <td>10.5</td>
+                        <td class="neutral">-0.5</td>
+                    </tr>
+                    <tr>
+                        <td>Braves @ Marlins</td>
+                        <td>Ritchie v Meyer</td>
+                        <td class="positive">Braves</td>
+                        <td>51.5%</td>
+                        <td class="positive">+4.8%</td>
+                        <td>9.4</td>
+                        <td>8.5</td>
+                        <td class="neutral">+0.9</td>
+                    </tr>
+                    <tr>
+                        <td>Mets @ Nationals</td>
+                        <td>Scott v Irvin</td>
+                        <td class="positive">Nationals</td>
+                        <td>51.9%</td>
+                        <td class="positive">+4.3%</td>
+                        <td>10.5</td>
+                        <td>10</td>
+                        <td class="neutral">+0.5</td>
+                    </tr>
+                    <tr>
+                        <td>Rangers @ Rockies</td>
+                        <td>Gore v Quintana</td>
+                        <td class="positive">Rangers</td>
+                        <td>52.5%</td>
+                        <td class="positive">+3.3%</td>
+                        <td>12.6</td>
+                        <td>9.5</td>
+                        <td class="positive">+3.1</td>
+                    </tr>
+                    <tr>
+                        <td>Jays @ Yankees</td>
+                        <td>Corbin v Weathers</td>
+                        <td class="neutral">Yankees</td>
+                        <td>60.3%</td>
+                        <td class="neutral">+2.7%</td>
+                        <td>9.7</td>
+                        <td>9</td>
+                        <td class="neutral">+0.7</td>
+                    </tr>
+                    <tr>
+                        <td>Astros @ Twins</td>
+                        <td>Imai v Rojas</td>
+                        <td class="neutral">Twins</td>
+                        <td>56.2%</td>
+                        <td class="neutral">+2.5%</td>
+                        <td>10.9</td>
+                        <td>9.5</td>
+                        <td class="positive">+1.4</td>
+                    </tr>
+                    <tr>
+                        <td>Dodgers @ Padres</td>
+                        <td>Yamamoto v King</td>
+                        <td class="neutral">Dodgers</td>
+                        <td>51.8%</td>
+                        <td class="neutral">+2.5%</td>
+                        <td>8.1</td>
+                        <td>7.5</td>
+                        <td class="neutral">+0.6</td>
+                    </tr>
+                    <tr>
+                        <td>Sox @ Royals</td>
+                        <td>Gray v Lugo</td>
+                        <td class="neutral">Royals</td>
+                        <td>53.4%</td>
+                        <td class="neutral">+2.2%</td>
+                        <td>8.3</td>
+                        <td>9</td>
+                        <td class="neutral">-0.7</td>
+                    </tr>
+                    <tr>
+                        <td>Giants @ Diamondbacks</td>
+                        <td>Ray v Gallen</td>
+                        <td class="neutral">Diamondbacks</td>
+                        <td>56.4%</td>
+                        <td class="neutral">+1.8%</td>
+                        <td>10.5</td>
+                        <td>9</td>
+                        <td class="positive">+1.5</td>
+                    </tr>
+                    <tr>
+                        <td>Orioles @ Rays</td>
+                        <td>Rogers v McClanahan</td>
+                        <td class="neutral">Rays</td>
+                        <td>59.8%</td>
+                        <td class="neutral">+1.0%</td>
+                        <td>8.3</td>
+                        <td>7.5</td>
+                        <td class="neutral">+0.8</td>
+                    </tr>
+                    <tr>
+                        <td>Athletics @ Angels</td>
+                        <td>Ginn v Ureña</td>
+                        <td class="neutral">Athletics</td>
+                        <td>51.3%</td>
+                        <td class="neutral">+0.6%</td>
+                        <td>9.6</td>
+                        <td>9</td>
+                        <td class="neutral">+0.6</td>
+                    </tr>
+                    <tr>
+                        <td>Reds @ Phillies</td>
+                        <td>Lodolo v Painter</td>
+                        <td class="neutral">Phillies</td>
+                        <td>55.3%</td>
+                        <td class="neutral">+0.5%</td>
+                        <td>11.4</td>
+                        <td>10</td>
+                        <td class="positive">+1.4</td>
+                    </tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>Ensemble Model v2: Pythagorean + Elo (687 games) + FIP + Market Consensus (9 bookmakers)</p>
+        <p style="margin-top:4px;">+ Park Factors + Weather + Platoon Splits + Kelly Criterion Sizing</p>
+        <p style="margin-top:8px;">Results tracked daily. Yesterday 7-0. Season tracker: <a href="mlb-best-bets-tracker.html">here</a></p>
+        <p style="margin-top:6px; color:#374151;">For entertainment purposes only.</p>
+    </footer>
+</div>
+</body>
+</html>

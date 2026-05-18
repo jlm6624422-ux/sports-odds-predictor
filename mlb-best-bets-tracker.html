@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Best Bets Tracker - 2026 Season</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0f1117;
+            color: #e1e4e8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid #21262d;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            background: linear-gradient(135deg, #58a6ff, #3fb950);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header .subtitle { color: #8b949e; font-size: 1.1em; }
+
+        /* Stats Banner */
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #58a6ff;
+        }
+
+        .stat-card .label {
+            font-size: 0.85em;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        .stat-card.wins .value { color: #3fb950; }
+        .stat-card.losses .value { color: #f85149; }
+        .stat-card.pct .value { color: #d2a8ff; }
+        .stat-card.streak .value { color: #f0883e; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 0;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            font-size: 0.95em;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: #e1e4e8; }
+        .tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Day Section */
+        .day-section {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #1c2128;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+        }
+
+        .day-header h3 { font-size: 1.1em; }
+
+        .day-record {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+        }
+
+        .day-record .w { color: #3fb950; }
+        .day-record .l { color: #f85149; }
+        .day-record .p { color: #8b949e; }
+
+        /* Picks Table */
+        .picks-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .picks-table th {
+            text-align: left;
+            padding: 10px 15px;
+            color: #8b949e;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #21262d;
+        }
+
+        .picks-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #21262d;
+            font-size: 0.9em;
+        }
+
+        .picks-table tr:last-child td { border-bottom: none; }
+
+        .pick-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .pick-type.ml { background: #1f3a5f; color: #58a6ff; }
+        .pick-type.over { background: #1a4023; color: #3fb950; }
+        .pick-type.under { background: #3d1f20; color: #f85149; }
+
+        .result {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 700;
+        }
+
+        .result.win { background: #1a4023; color: #3fb950; }
+        .result.loss { background: #3d1f20; color: #f85149; }
+        .result.push { background: #2d2a1f; color: #d29922; }
+        .result.pending { background: #21262d; color: #8b949e; }
+
+        .confidence {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+        }
+
+        .confidence.high { background: #1a4023; color: #3fb950; }
+        .confidence.med { background: #2d2a1f; color: #d29922; }
+        .confidence.low { background: #21262d; color: #8b949e; }
+
+        /* Chart placeholder */
+        .chart-container {
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 15px;
+            color: #58a6ff;
+        }
+
+        .chart-bar-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .chart-label {
+            width: 80px;
+            font-size: 0.85em;
+            color: #8b949e;
+            text-align: right;
+        }
+
+        .chart-bar-bg {
+            flex: 1;
+            height: 24px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .chart-bar.green { background: linear-gradient(90deg, #238636, #3fb950); }
+        .chart-bar.red { background: linear-gradient(90deg, #9e1c23, #f85149); }
+        .chart-bar.blue { background: linear-gradient(90deg, #1f3a5f, #58a6ff); }
+
+        .chart-value {
+            width: 50px;
+            font-size: 0.85em;
+            color: #e1e4e8;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6e7681;
+            font-size: 0.85em;
+            border-top: 1px solid #21262d;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MLB Best Bets Tracker</h1>
+            <p class="subtitle">2026 Season | Model: Odds Consensus + Record + Home Advantage</p>
+        </header>
+
+        <!-- Stats Banner - auto-calculated from data -->
+        <div class="stats-banner" id="stats-banner"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('daily')">Daily Picks</button>
+            <button class="tab" onclick="switchTab('performance')">Performance</button>
+            <button class="tab" onclick="switchTab('streaks')">Streaks & Trends</button>
+        </div>
+
+        <!-- Daily Picks Tab -->
+        <div class="tab-content active" id="tab-daily"></div>
+
+        <!-- Performance Tab -->
+        <div class="tab-content" id="tab-performance"></div>
+
+        <!-- Streaks Tab -->
+        <div class="tab-content" id="tab-streaks"></div>
+
+        <footer>
+            MLB Best Bets Tracker | Data: ESPN + MLB Stats API | Model: Claude Odds Predictor
+        </footer>
+    </div>
+
+    <script>
+    // ============================================================
+    // DAILY PICKS DATA - Add new days at the TOP of this array
+    // Each day has: date, picks array
+    // Each pick: type (ml/over/under), team, matchup, line, winProb, confidence, result (win/loss/push/pending), score
+    // ============================================================
+    const PICKS_DATA = [
+        {
+            date: "2026-05-18",
+            picks: [
+                {
+                    type: "ml",
+                    team: "Atlanta Braves",
+                    matchup: "ATL @ MIA",
+                    line: "ATL +85",
+                    winProb: 53.4,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Tampa Bay Rays",
+                    matchup: "BAL @ TB",
+                    line: "TB -149",
+                    winProb: 58.4,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Seattle Mariners",
+                    matchup: "CHW @ SEA",
+                    line: "SEA -168",
+                    winProb: 54.9,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Los Angeles Dodgers",
+                    matchup: "LAD @ SD",
+                    line: "LAD -155",
+                    winProb: 53.2,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.5",
+                    matchup: "LAD @ SD",
+                    line: "O 7.5 (+3.5 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.5",
+                    matchup: "BAL @ TB",
+                    line: "O 7.5 (+2.5 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "under",
+                    team: "UNDER 10.5",
+                    matchup: "NYM @ WSH",
+                    line: "U 10.5 (-2.2 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "pending",
+                    score: ""
+                }
+            ]
+        },
+        {
+            date: "2026-05-17",
+            picks: [
+                {
+                    type: "ml",
+                    team: "Tampa Bay Rays",
+                    matchup: "MIA @ TB",
+                    line: "TB -155",
+                    winProb: 57.2,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "MIA 3, TB 6"
+                },
+                {
+                    type: "ml",
+                    team: "Atlanta Braves",
+                    matchup: "BOS @ ATL",
+                    line: "ATL -145",
+                    winProb: 56.8,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "BOS 1, ATL 8"
+                },
+                {
+                    type: "ml",
+                    team: "Cleveland Guardians",
+                    matchup: "CIN @ CLE",
+                    line: "CLE -138",
+                    winProb: 55.4,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "CIN 3, CLE 10"
+                },
+                {
+                    type: "ml",
+                    team: "Los Angeles Dodgers",
+                    matchup: "LAD @ LAA",
+                    line: "LAD -165",
+                    winProb: 58.1,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "LAD 10, LAA 1"
+                },
+                {
+                    type: "ml",
+                    team: "Texas Rangers",
+                    matchup: "TEX @ HOU",
+                    line: "TEX -140",
+                    winProb: 55.8,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "TEX 8, HOU 0"
+                },
+                {
+                    type: "over",
+                    team: "OVER 8.0",
+                    matchup: "SD @ SEA",
+                    line: "O 8.0 (+2.1 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "SD 8, SEA 3 (11 total)"
+                },
+                {
+                    type: "over",
+                    team: "OVER 8.5",
+                    matchup: "ARI @ COL",
+                    line: "O 8.5 (+1.8 edge)",
+                    winProb: null,
+                    confidence: "med",
+                    pitchers: "TBD vs TBD",
+                    result: "win",
+                    score: "ARI 8, COL 6 (14 total)"
+                }
+            ]
+        },
+        {
+            date: "2026-05-16",
+            picks: [
+                {
+                    type: "ml",
+                    team: "Seattle Mariners",
+                    matchup: "SD @ SEA",
+                    line: "SEA -175",
+                    winProb: 56.8,
+                    confidence: "high",
+                    pitchers: "Buehler vs Gilbert",
+                    result: "loss",
+                    score: "SD 7, SEA 4"
+                },
+                {
+                    type: "ml",
+                    team: "Texas Rangers",
+                    matchup: "TEX @ HOU",
+                    line: "TEX -149",
+                    winProb: 55.2,
+                    confidence: "high",
+                    pitchers: "deGrom vs Teng",
+                    result: "loss",
+                    score: "TEX 1, HOU 4"
+                },
+                {
+                    type: "ml",
+                    team: "Atlanta Braves",
+                    matchup: "BOS @ ATL",
+                    line: "ATL -129",
+                    winProb: 54.8,
+                    confidence: "med",
+                    pitchers: "Tolle vs Elder",
+                    result: "loss",
+                    score: "BOS 3, ATL 2"
+                },
+                {
+                    type: "ml",
+                    team: "Los Angeles Dodgers",
+                    matchup: "LAD @ LAA",
+                    line: "LAD -136",
+                    winProb: 54.2,
+                    confidence: "med",
+                    pitchers: "Wrobleski vs Soriano",
+                    result: "win",
+                    score: "LAD 15, LAA 2"
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.0",
+                    matchup: "SD @ SEA",
+                    line: "O 7.0 (+2.2 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Buehler vs Gilbert",
+                    result: "win",
+                    score: "SD 7, SEA 4 (11 total)"
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.5",
+                    matchup: "BOS @ ATL",
+                    line: "O 7.5 (+1.9 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Tolle vs Elder",
+                    result: "loss",
+                    score: "BOS 3, ATL 2 (5 total)"
+                },
+                {
+                    type: "under",
+                    team: "UNDER 9.5",
+                    matchup: "SF @ ATH",
+                    line: "U 9.5 (-1.6 edge)",
+                    winProb: null,
+                    confidence: "med",
+                    pitchers: "McDonald vs Severino",
+                    result: "loss",
+                    score: "SF 6, ATH 4 (10 total)"
+                },
+                {
+                    type: "over",
+                    team: "OVER 8.5",
+                    matchup: "CHC @ CHW",
+                    line: "O 8.5 (+1.3 edge)",
+                    winProb: null,
+                    confidence: "med",
+                    pitchers: "Taillon vs Martin",
+                    result: "win",
+                    score: "CHC 3, CHW 8 (11 total)"
+                }
+            ]
+        }
+        // ADD NEW DAYS ABOVE THIS LINE
+    ];
+
+    // ============================================================
+    // RENDERING LOGIC
+    // ============================================================
+
+    function calculateStats() {
+        let wins = 0, losses = 0, pushes = 0, pending = 0;
+        let mlWins = 0, mlTotal = 0, ouWins = 0, ouTotal = 0;
+        let currentStreak = { type: null, count: 0 };
+        let bestStreak = 0;
+
+        // Process all picks across all days (newest first)
+        const allResults = [];
+        for (const day of PICKS_DATA) {
+            for (const pick of day.picks) {
+                if (pick.result === "win") { wins++; allResults.push("W"); }
+                else if (pick.result === "loss") { losses++; allResults.push("L"); }
+                else if (pick.result === "push") { pushes++; }
+                else { pending++; }
+
+                if (pick.result === "win" || pick.result === "loss") {
+                    if (pick.type === "ml") { mlTotal++; if (pick.result === "win") mlWins++; }
+                    else { ouTotal++; if (pick.result === "win") ouWins++; }
+                }
+            }
+        }
+
+        // Calculate streak (from most recent resolved pick)
+        for (const r of allResults) {
+            if (currentStreak.type === null) { currentStreak = { type: r, count: 1 }; }
+            else if (r === currentStreak.type) { currentStreak.count++; }
+            else { break; }
+        }
+
+        const total = wins + losses;
+        const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : "0.0";
+        const mlPct = mlTotal > 0 ? ((mlWins / mlTotal) * 100).toFixed(1) : "0.0";
+        const ouPct = ouTotal > 0 ? ((ouWins / ouTotal) * 100).toFixed(1) : "0.0";
+
+        return { wins, losses, pushes, pending, winPct, mlWins, mlTotal, mlPct, ouWins, ouTotal, ouPct, currentStreak };
+    }
+
+    function renderStats() {
+        const s = calculateStats();
+        const streakText = s.currentStreak.type
+            ? `${s.currentStreak.type}${s.currentStreak.count}`
+            : "—";
+
+        document.getElementById("stats-banner").innerHTML = `
+            <div class="stat-card wins"><div class="value">${s.wins}</div><div class="label">Wins</div></div>
+            <div class="stat-card losses"><div class="value">${s.losses}</div><div class="label">Losses</div></div>
+            <div class="stat-card pct"><div class="value">${s.winPct}%</div><div class="label">Win Rate</div></div>
+            <div class="stat-card"><div class="value">${s.mlPct}%</div><div class="label">ML Record (${s.mlWins}-${s.mlTotal - s.mlWins})</div></div>
+            <div class="stat-card"><div class="value">${s.ouPct}%</div><div class="label">O/U Record (${s.ouWins}-${s.ouTotal - s.ouWins})</div></div>
+            <div class="stat-card streak"><div class="value">${streakText}</div><div class="label">Streak</div></div>
+        `;
+    }
+
+    function renderDaily() {
+        let html = "";
+
+        for (const day of PICKS_DATA) {
+            const dayWins = day.picks.filter(p => p.result === "win").length;
+            const dayLosses = day.picks.filter(p => p.result === "loss").length;
+            const dayPending = day.picks.filter(p => p.result === "pending").length;
+
+            const dateStr = new Date(day.date + "T12:00:00").toLocaleDateString("en-US", {
+                weekday: "long", month: "short", day: "numeric", year: "numeric"
+            });
+
+            html += `
+            <div class="day-section">
+                <div class="day-header">
+                    <h3>${dateStr}</h3>
+                    <div class="day-record">
+                        <span class="w">${dayWins}W</span>
+                        <span class="l">${dayLosses}L</span>
+                        ${dayPending > 0 ? `<span class="p">${dayPending} pending</span>` : ""}
+                    </div>
+                </div>
+                <table class="picks-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Pick</th>
+                            <th>Matchup</th>
+                            <th>Line</th>
+                            <th>Win%</th>
+                            <th>Conf</th>
+                            <th>Pitchers</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${day.picks.map(p => `
+                        <tr>
+                            <td><span class="pick-type ${p.type}">${p.type === "ml" ? "ML" : p.type.toUpperCase()}</span></td>
+                            <td><strong>${p.team}</strong></td>
+                            <td>${p.matchup}</td>
+                            <td>${p.line}</td>
+                            <td>${p.winProb ? p.winProb + "%" : "—"}</td>
+                            <td><span class="confidence ${p.confidence}">${p.confidence}</span></td>
+                            <td>${p.pitchers}</td>
+                            <td>${p.score || "—"}</td>
+                            <td><span class="result ${p.result}">${p.result.toUpperCase()}</span></td>
+                        </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>
+            `;
+        }
+
+        document.getElementById("tab-daily").innerHTML = html;
+    }
+
+    function renderPerformance() {
+        const s = calculateStats();
+        const total = s.wins + s.losses;
+        const maxBar = Math.max(s.wins, s.losses, s.mlWins, s.ouWins, 1);
+
+        document.getElementById("tab-performance").innerHTML = `
+        <div class="chart-container">
+            <h3>Overall Record</h3>
+            <div class="chart-bar-container">
+                <div class="chart-label">Wins</div>
+                <div class="chart-bar-bg"><div class="chart-bar green" style="width: ${total > 0 ? (s.wins/total)*100 : 0}%"></div></div>
+                <div class="chart-value">${s.wins}</div>
+            </div>
+            <div class="chart-bar-container">
+                <div class="chart-label">Losses</div>
+                <div class="chart-bar-bg"><div class="chart-bar red" style="width: ${total > 0 ? (s.losses/total)*100 : 0}%"></div></div>
+                <div class="chart-value">${s.losses}</div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <h3>By Pick Type</h3>
+            <div class="chart-bar-container">
+                <div class="chart-label">Moneyline</div>
+                <div class="chart-bar-bg"><div class="chart-bar blue" style="width: ${s.mlTotal > 0 ? (s.mlWins/s.mlTotal)*100 : 0}%"></div></div>
+                <div class="chart-value">${s.mlWins}-${s.mlTotal - s.mlWins} (${s.mlPct}%)</div>
+            </div>
+            <div class="chart-bar-container">
+                <div class="chart-label">Over/Under</div>
+                <div class="chart-bar-bg"><div class="chart-bar blue" style="width: ${s.ouTotal > 0 ? (s.ouWins/s.ouTotal)*100 : 0}%"></div></div>
+                <div class="chart-value">${s.ouWins}-${s.ouTotal - s.ouWins} (${s.ouPct}%)</div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <h3>By Confidence Level</h3>
+            ${renderConfidenceBreakdown()}
+        </div>
+        `;
+    }
+
+    function renderConfidenceBreakdown() {
+        const conf = { high: { w: 0, l: 0 }, med: { w: 0, l: 0 }, low: { w: 0, l: 0 } };
+        for (const day of PICKS_DATA) {
+            for (const pick of day.picks) {
+                if (pick.result === "win") conf[pick.confidence].w++;
+                else if (pick.result === "loss") conf[pick.confidence].l++;
+            }
+        }
+
+        return ["high", "med", "low"].map(level => {
+            const total = conf[level].w + conf[level].l;
+            const pct = total > 0 ? ((conf[level].w / total) * 100).toFixed(0) : 0;
+            return `
+            <div class="chart-bar-container">
+                <div class="chart-label">${level.charAt(0).toUpperCase() + level.slice(1)}</div>
+                <div class="chart-bar-bg"><div class="chart-bar green" style="width: ${pct}%"></div></div>
+                <div class="chart-value">${conf[level].w}-${conf[level].l} (${pct}%)</div>
+            </div>`;
+        }).join("");
+    }
+
+    function renderStreaks() {
+        // Build daily W/L timeline
+        let html = '<div class="chart-container"><h3>Daily Results Timeline</h3>';
+
+        for (const day of PICKS_DATA) {
+            const dayWins = day.picks.filter(p => p.result === "win").length;
+            const dayLosses = day.picks.filter(p => p.result === "loss").length;
+            const dayTotal = dayWins + dayLosses;
+            if (dayTotal === 0) continue;
+
+            const pct = ((dayWins / dayTotal) * 100).toFixed(0);
+            const dateLabel = new Date(day.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+            html += `
+            <div class="chart-bar-container">
+                <div class="chart-label">${dateLabel}</div>
+                <div class="chart-bar-bg"><div class="chart-bar ${parseInt(pct) >= 50 ? 'green' : 'red'}" style="width: ${pct}%"></div></div>
+                <div class="chart-value">${dayWins}-${dayLosses}</div>
+            </div>`;
+        }
+
+        html += "</div>";
+
+        // Best/worst picks
+        const teamRecords = {};
+        for (const day of PICKS_DATA) {
+            for (const pick of day.picks) {
+                if (pick.result !== "win" && pick.result !== "loss") continue;
+                const key = pick.type === "ml" ? pick.team : `${pick.type.toUpperCase()} (${pick.matchup})`;
+                if (!teamRecords[key]) teamRecords[key] = { w: 0, l: 0 };
+                if (pick.result === "win") teamRecords[key].w++;
+                else teamRecords[key].l++;
+            }
+        }
+
+        html += '<div class="chart-container"><h3>Team/Pick Performance</h3>';
+        const sorted = Object.entries(teamRecords).sort((a, b) => {
+            const aPct = a[1].w / (a[1].w + a[1].l);
+            const bPct = b[1].w / (b[1].w + b[1].l);
+            return bPct - aPct;
+        });
+
+        for (const [team, rec] of sorted.slice(0, 10)) {
+            const total = rec.w + rec.l;
+            const pct = ((rec.w / total) * 100).toFixed(0);
+            html += `
+            <div class="chart-bar-container">
+                <div class="chart-label" style="width:150px;font-size:0.8em">${team}</div>
+                <div class="chart-bar-bg"><div class="chart-bar ${parseInt(pct) >= 50 ? 'green' : 'red'}" style="width: ${pct}%"></div></div>
+                <div class="chart-value">${rec.w}-${rec.l}</div>
+            </div>`;
+        }
+        html += "</div>";
+
+        document.getElementById("tab-streaks").innerHTML = html;
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add("active");
+        document.getElementById(`tab-${tab}`).classList.add("active");
+    }
+
+    // Initial render
+    renderStats();
+    renderDaily();
+    renderPerformance();
+    renderStreaks();
+    </script>
+</body>
+</html>
