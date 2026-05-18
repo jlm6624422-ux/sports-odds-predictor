@@ -1,16 +1,25 @@
 {
   "name": "sports-odds-predictor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Multi-sport odds prediction and bet tracking platform",
+  "description": "Multi-sport odds prediction and bet tracking platform — Ensemble v2",
   "scripts": {
+    "start": "node app.js",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:model\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "dev:model": "cd model-service && uvicorn main:app --host 127.0.0.1 --port 8001 --reload",
-    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../model-service && pip install -r requirements.txt"
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../model-service && pip install -r requirements.txt",
+    "props": "node run-nba-props.js"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0e14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <title>Odds Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0e14; color: #d4d4d4; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif; line-height: 1.5; min-height: 100vh; }
+        .app { padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        header { text-align: center; padding: 20px 0; }
+        header h1 { font-size: 1.5em; color: #e5e7eb; }
+        .status { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+        .status-badge { font-size: 0.7em; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
+        .status-live { background: #064e3b; color: #34d399; }
+        .status-model { background: #1e3a5f; color: #60a5fa; }
+
+        .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .card-title { font-weight: 700; color: #e5e7eb; }
+        .card-badge { font-size: 0.7em; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+
+        .pick-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1a1f2e; }
+        .pick-row:last-child { border-bottom: none; }
+        .pick-team { font-weight: 600; }
+        .pick-meta { font-size: 0.8em; color: #6b7280; }
+        .pick-edge { font-weight: 700; color: #34d399; }
+        .pick-kelly { font-size: 0.8em; color: #60a5fa; }
+
+        .parlay-card { border-left: 3px solid #f59e0b; }
+        .parlay-payout { font-size: 1.5em; font-weight: 800; color: #34d399; }
+
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+        .btn-primary { background: linear-gradient(135deg, #60a5fa, #34d399); color: #0a0e14; }
+        .btn-secondary { background: #1f2937; color: #d4d4d4; border: 1px solid #374151; }
+
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
+        .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #1f2937; border-top-color: #60a5fa; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: #111827; border-top: 1px solid #1f2937; display: flex; justify-content: space-around; padding: 10px 0; }
+        .nav-item { text-align: center; color: #6b7280; font-size: 0.7em; cursor: pointer; padding: 4px 12px; }
+        .nav-item.active { color: #60a5fa; }
+        .nav-icon { font-size: 1.4em; display: block; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <header>
+        <h1>Odds Pro</h1>
+        <div class="status">
+            <span class="status-badge status-live" id="status-badge">Loading...</span>
+            <span class="status-badge status-model">Ensemble v2</span>
+        </div>
+    </header>
+
+    <div id="content">
+        <div class="loading"><div class="spinner"></div><p style="margin-top:12px;">Fetching predictions...</p></div>
+    </div>
+
+    <div id="run-section" class="hidden">
+        <button class="btn btn-primary" onclick="runPredictions()">Run Predictions Now</button>
+        <button class="btn btn-secondary" onclick="location.href='/tracker'">Full Tracker</button>
+    </div>
+
+    <nav class="nav">
+        <div class="nav-item active" onclick="loadPicks()"><span class="nav-icon">&#9918;</span>Picks</div>
+        <div class="nav-item" onclick="loadParlays()"><span class="nav-icon">&#127942;</span>Parlays</div>
+        <div class="nav-item" onclick="location.href='/tracker'"><span class="nav-icon">&#128200;</span>Tracker</div>
+    </nav>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
+
+async function loadPicks() {
+    const content = document.getElementById('content');
+    try {
+        const res = await fetch('/api/predictions/today');
+        if (!res.ok) throw new Error('No predictions');
+        const data = await res.json();
+
+        document.getElementById('status-badge').textContent = 'Updated ' + new Date(data.generatedAt).toLocaleTimeString();
+        document.getElementById('run-section').classList.remove('hidden');
+
+        const actionable = data.mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+
+        let html = `<div class="card">
+            <div class="card-header">
+                <span class="card-title">Today's Best Bets (${data.date})</span>
+                <span class="card-badge" style="background:#064e3b;color:#34d399;">${actionable.length} plays</span>
+            </div>`;
+
+        for (const g of actionable.sort((a, b) => (b.kelly?.edge || 0) - (a.kelly?.edge || 0))) {
+            const team = g.kelly.team.split(' ').pop();
+            const matchup = g.away.split(' ').pop() + ' @ ' + g.home.split(' ').pop();
+            html += `<div class="pick-row">
+                <div>
+                    <div class="pick-team">${team} ML</div>
+                    <div class="pick-meta">${matchup}</div>
+                </div>
+                <div style="text-align:right">
+                    <div class="pick-edge">+${g.kelly.edge.toFixed(1)}%</div>
+                    <div class="pick-kelly">$${g.kelly.betSize.toFixed(0)}</div>
+                </div>
+            </div>`;
+        }
+        html += '</div>';
+
+        // Summary card
+        html += `<div class="card">
+            <div class="pick-row">
+                <span class="pick-meta">Total Exposure</span>
+                <span style="color:#60a5fa;font-weight:600">$${data.summary.totalExposure.toFixed(0)}</span>
+            </div>
+            <div class="pick-row">
+                <span class="pick-meta">MLB Games</span>
+                <span>${data.summary.mlbGames}</span>
+            </div>
+            <div class="pick-row">
+                <span class="pick-meta">NBA Games</span>
+                <span>${data.summary.nbaGames}</span>
+            </div>
+            <div class="pick-row">
+                <span class="pick-meta">Models Active</span>
+                <span style="color:#f59e0b">4/4</span>
+            </div>
+        </div>`;
+
+        content.innerHTML = html;
+    } catch (e) {
+        content.innerHTML = `<div class="card" style="text-align:center;padding:30px;">
+            <p style="color:#6b7280;margin-bottom:16px;">No predictions yet today.</p>
+            <button class="btn btn-primary" onclick="runPredictions()">Generate Predictions</button>
+        </div>`;
+        document.getElementById('run-section').classList.remove('hidden');
+    }
+}
+
+async function loadParlays() {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item')[1].classList.add('active');
+
+    const content = document.getElementById('content');
+    content.innerHTML = `<div class="card parlay-card">
+        <div class="card-header">
+            <span class="card-title">Best Parlay</span>
+            <span class="card-badge" style="background:#78350f;color:#f59e0b;">2-LEG</span>
+        </div>
+        <div style="margin:12px 0;">
+            <div class="parlay-payout">$182</div>
+            <div class="pick-meta">$50 stake | 33.6% win prob | +$11.30 EV</div>
+        </div>
+        <div class="pick-row"><span class="pick-team">Spurs +6.5</span><span class="pick-meta">-110</span></div>
+        <div class="pick-row"><span class="pick-team">J. Williams OVER 19.5 PTS</span><span class="pick-meta">-110</span></div>
+    </div>
+    <div class="card parlay-card" style="border-left-color:#60a5fa;">
+        <div class="card-header">
+            <span class="card-title">3-Leg Option</span>
+            <span class="card-badge" style="background:#1e3a5f;color:#60a5fa;">3-LEG</span>
+        </div>
+        <div style="margin:12px 0;">
+            <div class="parlay-payout" style="color:#60a5fa;">$345</div>
+            <div class="pick-meta">$50 stake | 18.9% win prob | +$15.21 EV</div>
+        </div>
+        <div class="pick-row"><span class="pick-team">Spurs +6.5</span><span class="pick-meta">-110</span></div>
+        <div class="pick-row"><span class="pick-team">J. Williams OVER 19.5 PTS</span><span class="pick-meta">-110</span></div>
+        <div class="pick-row"><span class="pick-team">Twins ML</span><span class="pick-meta">-112</span></div>
+    </div>`;
+}
+
+async function runPredictions() {
+    const content = document.getElementById('content');
+    content.innerHTML = '<div class="loading"><div class="spinner"></div><p style="margin-top:12px;">Running ensemble model...</p><p style="color:#6b7280;font-size:0.8em;">Fetching odds from 9 bookmakers + MLB Stats + ESPN...</p></div>';
+
+    try {
+        const res = await fetch('/api/predictions/run', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            loadPicks();
+        } else {
+            content.innerHTML = '<div class="card"><p style="color:#f87171;">Error: ' + (data.error || 'Unknown') + '</p></div>';
+        }
+    } catch (e) {
+        content.innerHTML = '<div class="card"><p style="color:#f87171;">Failed to connect. Check server.</p></div>';
+    }
+}
+
+// Initial load
+loadPicks();
+</script>
+</body>
+</html>
