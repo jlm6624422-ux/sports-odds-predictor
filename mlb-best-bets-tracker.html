@@ -111,14 +111,30 @@
             background: #1c2128;
             border-bottom: 1px solid #21262d;
             cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
         }
 
+        .day-header:hover { background: #22272e; }
+
         .day-header h3 { font-size: 1.1em; }
+
+        .day-header .chevron {
+            font-size: 1.2em;
+            color: #8b949e;
+            transition: transform 0.3s ease;
+            margin-left: 12px;
+        }
+
+        .day-section.collapsed .day-header .chevron { transform: rotate(-90deg); }
+        .day-section.collapsed .day-body { display: none; }
+        .day-section.collapsed .day-header { border-bottom: none; }
 
         .day-record {
             display: flex;
             gap: 15px;
             font-size: 0.9em;
+            align-items: center;
         }
 
         .day-record .w { color: #3fb950; }
@@ -724,60 +740,70 @@
     function renderDaily() {
         let html = "";
 
-        for (const day of PICKS_DATA) {
+        for (let i = 0; i < PICKS_DATA.length; i++) {
+            const day = PICKS_DATA[i];
             const dayWins = day.picks.filter(p => p.result === "win").length;
             const dayLosses = day.picks.filter(p => p.result === "loss").length;
             const dayPending = day.picks.filter(p => p.result === "pending").length;
+            const collapsed = i > 0 ? 'collapsed' : '';
 
             const dateStr = new Date(day.date + "T12:00:00").toLocaleDateString("en-US", {
                 weekday: "long", month: "short", day: "numeric", year: "numeric"
             });
 
             html += `
-            <div class="day-section">
-                <div class="day-header">
+            <div class="day-section ${collapsed}" id="day-${day.date}">
+                <div class="day-header" onclick="toggleDay('${day.date}')">
                     <h3>${dateStr}</h3>
                     <div class="day-record">
                         <span class="w">${dayWins}W</span>
                         <span class="l">${dayLosses}L</span>
                         ${dayPending > 0 ? `<span class="p">${dayPending} pending</span>` : ""}
+                        <span class="chevron">▼</span>
                     </div>
                 </div>
-                <table class="picks-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Pick</th>
-                            <th>Matchup</th>
-                            <th>Line</th>
-                            <th>Win%</th>
-                            <th>Conf</th>
-                            <th>Pitchers</th>
-                            <th>Score</th>
-                            <th>Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${day.picks.map(p => `
-                        <tr style="${p.result === 'win' ? 'background:#0d2818;border-left:4px solid #3fb950' : p.result === 'loss' ? 'background:#2d1215;border-left:4px solid #f85149' : 'border-left:4px solid transparent'}">
-                            <td><span class="pick-type ${p.type}">${p.type === "ml" ? "ML" : p.type.toUpperCase()}</span></td>
-                            <td><strong>${p.team}</strong></td>
-                            <td>${p.matchup}</td>
-                            <td>${p.line}</td>
-                            <td>${p.winProb ? p.winProb + "%" : "—"}</td>
-                            <td><span class="confidence ${p.confidence}">${p.confidence}</span></td>
-                            <td>${p.pitchers}</td>
-                            <td>${p.score || "—"}</td>
-                            <td><span class="result ${p.result}" style="font-size:1em;padding:5px 14px;font-weight:800">${p.result === "win" ? "✓ WIN" : p.result === "loss" ? "✗ LOSS" : p.result === "push" ? "— PUSH" : "PENDING"}</span></td>
-                        </tr>
-                        `).join("")}
-                    </tbody>
-                </table>
+                <div class="day-body">
+                    <table class="picks-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Pick</th>
+                                <th>Matchup</th>
+                                <th>Line</th>
+                                <th>Win%</th>
+                                <th>Conf</th>
+                                <th>Pitchers</th>
+                                <th>Score</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${day.picks.map(p => `
+                            <tr style="${p.result === 'win' ? 'background:#0d2818;border-left:4px solid #3fb950' : p.result === 'loss' ? 'background:#2d1215;border-left:4px solid #f85149' : 'border-left:4px solid transparent'}">
+                                <td><span class="pick-type ${p.type}">${p.type === "ml" ? "ML" : p.type.toUpperCase()}</span></td>
+                                <td><strong>${p.team}</strong></td>
+                                <td>${p.matchup}</td>
+                                <td>${p.line}</td>
+                                <td>${p.winProb ? p.winProb + "%" : "—"}</td>
+                                <td><span class="confidence ${p.confidence}">${p.confidence}</span></td>
+                                <td>${p.pitchers}</td>
+                                <td>${p.score || "—"}</td>
+                                <td><span class="result ${p.result}" style="font-size:1em;padding:5px 14px;font-weight:800">${p.result === "win" ? "✓ WIN" : p.result === "loss" ? "✗ LOSS" : p.result === "push" ? "— PUSH" : "PENDING"}</span></td>
+                            </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             `;
         }
 
         document.getElementById("tab-daily").innerHTML = html;
+    }
+
+    function toggleDay(date) {
+        const section = document.getElementById(`day-${date}`);
+        section.classList.toggle('collapsed');
     }
 
     function renderPerformance() {
