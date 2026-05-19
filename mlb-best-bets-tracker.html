@@ -930,6 +930,42 @@
         document.getElementById(`tab-${tab}`).classList.add("active");
     }
 
+    // Team name to abbreviation mapping for reliable matching
+    const TEAM_ABBREVS = {
+        'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
+        'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
+        'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
+        'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
+        'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
+        'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
+        'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
+        'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
+        'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
+        'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
+        'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
+        'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
+        'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
+        'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
+    };
+
+    function getAbbrev(teamName) {
+        return TEAM_ABBREVS[teamName] || teamName.split(' ').pop().toUpperCase().slice(0, 3);
+    }
+
+    function matchesPickToGame(pick, awayName, homeName) {
+        const awayAbbr = getAbbrev(awayName);
+        const homeAbbr = getAbbrev(homeName);
+        const matchup = pick.matchup.toUpperCase().replace(/\s/g, '');
+        const expected = `${awayAbbr}@${homeAbbr}`;
+        if (matchup === expected) return true;
+
+        // Fallback: check if team name keywords appear in the matchup
+        const awayKey = awayName.split(' ').pop().toLowerCase();
+        const homeKey = homeName.split(' ').pop().toLowerCase();
+        const pickLower = pick.matchup.toLowerCase();
+        return pickLower.includes(awayKey) || pickLower.includes(homeKey);
+    }
+
     // Refresh results from live MLB scores
     async function refreshResults() {
         const btn = document.getElementById('refresh-btn');
@@ -957,23 +993,16 @@
                         const awayScore = game.teams.away.score;
                         const total = homeScore + awayScore;
                         const winner = homeScore > awayScore ? home : away;
-                        const matchupStr = pick.matchup.toUpperCase();
 
-                        // Check if this game matches the pick's matchup
-                        const homeAbbr = home.split(' ').pop().toUpperCase().slice(0, 3);
-                        const awayAbbr = away.split(' ').pop().toUpperCase().slice(0, 3);
-                        const matchesGame = matchupStr.includes(homeAbbr.slice(0, 2)) || matchupStr.includes(awayAbbr.slice(0, 2)) ||
-                            home.toLowerCase().includes(pick.matchup.split('@')[1]?.trim().split(' ')[0]?.toLowerCase() || '___') ||
-                            away.toLowerCase().includes(pick.matchup.split('@')[0]?.trim().split(' ')[0]?.toLowerCase() || '___');
-
-                        if (!matchesGame) continue;
+                        if (!matchesPickToGame(pick, away, home)) continue;
 
                         const score = `${away.split(' ').pop()} ${awayScore}, ${home.split(' ').pop()} ${homeScore}`;
 
                         if (pick.type === 'ml') {
                             const pickedTeam = pick.team.toLowerCase();
-                            const won = winner.toLowerCase().includes(pickedTeam.split(' ').pop()) ||
-                                        pickedTeam.includes(winner.split(' ').pop().toLowerCase());
+                            const winnerLower = winner.toLowerCase();
+                            const won = winnerLower.includes(pickedTeam.split(' ').pop()) ||
+                                        pickedTeam.includes(winnerLower.split(' ').pop());
                             pick.result = won ? 'win' : 'loss';
                             pick.score = score;
                         } else if (pick.type === 'over') {
