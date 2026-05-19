@@ -643,7 +643,7 @@
                     </thead>
                     <tbody>
                         ${day.picks.map(p => `
-                        <tr style="${p.result === 'win' ? 'border-left:3px solid #3fb950;background:rgba(63,185,80,0.04)' : p.result === 'loss' ? 'border-left:3px solid #f85149;background:rgba(248,81,73,0.04)' : ''}">
+                        <tr style="${p.result === 'win' ? 'background:#0d2818;border-left:4px solid #3fb950' : p.result === 'loss' ? 'background:#2d1215;border-left:4px solid #f85149' : 'border-left:4px solid transparent'}">
                             <td><span class="pick-type ${p.type}">${p.type === "ml" ? "ML" : p.type.toUpperCase()}</span></td>
                             <td><strong>${p.team}</strong></td>
                             <td>${p.matchup}</td>
@@ -652,7 +652,7 @@
                             <td><span class="confidence ${p.confidence}">${p.confidence}</span></td>
                             <td>${p.pitchers}</td>
                             <td>${p.score || "—"}</td>
-                            <td><span class="result ${p.result}" style="font-size:0.9em;padding:4px 12px">${p.result === "win" ? "✓ WIN" : p.result === "loss" ? "✗ LOSS" : p.result === "push" ? "— PUSH" : "PENDING"}</span></td>
+                            <td><span class="result ${p.result}" style="font-size:1em;padding:5px 14px;font-weight:800">${p.result === "win" ? "✓ WIN" : p.result === "loss" ? "✗ LOSS" : p.result === "push" ? "— PUSH" : "PENDING"}</span></td>
                         </tr>
                         `).join("")}
                     </tbody>
