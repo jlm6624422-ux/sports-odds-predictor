@@ -338,8 +338,11 @@ async function main() {
   fs.writeFileSync(path.join(dataDir, 'today.json'), JSON.stringify(output, null, 2));
   fs.writeFileSync(path.join(historyDir, `${today}.json`), JSON.stringify(output, null, 2));
 
+  // Fetch NBA player props for best bets
+  const nbaProps = await generateNBAProps(nbaGames, today);
+
   // Generate NBA page
-  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today));
+  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today), nbaProps);
   fs.writeFileSync(path.join(__dirname, 'nba-picks.html'), nbaPageHTML);
 
   const totalExposure = kellyBets.reduce((s, p) => s + (p.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0);
@@ -576,47 +579,91 @@ async function refreshResults() {
 </html>`;
 }
 
-async function fetchNBAPlayerProps(nbaGames, today) {
+async function generateNBAProps(nbaGames, today) {
+  if (nbaGames.length === 0) return [];
+
   const props = [];
-  for (const nba of nbaGames) {
-    // Fetch team rosters/stats from ESPN
-    for (const teamName of [nba.home, nba.away]) {
-      try {
-        const teamRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams?limit=50`);
-        const teamData = await teamRes.json();
-        const team = (teamData.sports?.[0]?.leagues?.[0]?.teams || []).find(t => t.team.displayName === teamName);
-        if (!team) continue;
 
-        const rosterRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${team.team.id}/roster`);
-        const rosterData = await rosterRes.json();
-        const athletes = rosterData.athletes || [];
+  try {
+    const dateCompact = today.replace(/-/g, '');
+    const scoreRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${dateCompact}`);
+    const scoreData = await scoreRes.json();
 
-        for (const athlete of athletes.slice(0, 8)) {
-          const stats = athlete.statistics;
-          if (!stats) continue;
-          const ppg = parseFloat(stats.splits?.categories?.[0]?.stats?.find(s => s.name === 'avgPoints')?.value || 0);
-          const rpg = parseFloat(stats.splits?.categories?.[0]?.stats?.find(s => s.name === 'avgRebounds')?.value || 0);
-          const apg = parseFloat(stats.splits?.categories?.[0]?.stats?.find(s => s.name === 'avgAssists')?.value || 0);
+    for (const event of (scoreData.events || [])) {
+      const gameId = event.id;
+      const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${gameId}`);
+      const summary = await summaryRes.json();
 
-          if (ppg > 10) {
-            props.push({
-              player: athlete.displayName || athlete.fullName,
-              team: teamName,
-              ppg, rpg, apg,
-              pra: ppg + rpg + apg,
-            });
+      // Extract season leaders (gives us top scorers/rebounders/assisters)
+      const leaders = summary.leaders || [];
+      const playerAvgs = new Map();
+
+      for (const team of leaders) {
+        const teamName = team.team?.displayName || '';
+        for (const cat of (team.leaders || [])) {
+          for (const leader of (cat.leaders || [])) {
+            const name = leader.athlete?.displayName;
+            if (!name) continue;
+            if (!playerAvgs.has(name)) playerAvgs.set(name, { team: teamName, ppg: 0, rpg: 0, apg: 0 });
+            const entry = playerAvgs.get(name);
+            if (cat.displayName === 'Points') entry.ppg = parseFloat(leader.displayValue) || 0;
+            if (cat.displayName === 'Rebounds') entry.rpg = parseFloat(leader.displayValue) || 0;
+            if (cat.displayName === 'Assists') entry.apg = parseFloat(leader.displayValue) || 0;
           }
         }
-      } catch(e) {}
+      }
+
+      // Generate props for each player with known averages
+      for (const [player, avgs] of playerAvgs) {
+        const teamShort = avgs.team.split(' ').pop();
+
+        // Points prop — line is typically season avg - 1.5 to - 2
+        if (avgs.ppg >= 15) {
+          const line = Math.floor(avgs.ppg - 1.5) + 0.5;
+          const edge = avgs.ppg - line;
+          const confidence = edge > 3 ? 'high' : edge > 1.5 ? 'med' : 'low';
+          props.push({ player, team: teamShort, prop: 'Points', line, avg: avgs.ppg, edge, confidence });
+        }
+
+        // Rebounds prop
+        if (avgs.rpg >= 6) {
+          const line = Math.floor(avgs.rpg - 1) + 0.5;
+          const edge = avgs.rpg - line;
+          const confidence = edge > 2 ? 'high' : edge > 1 ? 'med' : 'low';
+          props.push({ player, team: teamShort, prop: 'Rebounds', line, avg: avgs.rpg, edge, confidence });
+        }
+
+        // Assists prop
+        if (avgs.apg >= 4) {
+          const line = Math.floor(avgs.apg - 1) + 0.5;
+          const edge = avgs.apg - line;
+          const confidence = edge > 2 ? 'high' : edge > 1 ? 'med' : 'low';
+          props.push({ player, team: teamShort, prop: 'Assists', line, avg: avgs.apg, edge, confidence });
+        }
+
+        // PRA (points + rebounds + assists) combo
+        const pra = avgs.ppg + avgs.rpg + avgs.apg;
+        if (pra >= 25) {
+          const line = Math.floor(pra - 2) + 0.5;
+          const edge = pra - line;
+          const confidence = edge > 3 ? 'high' : edge > 1.5 ? 'med' : 'low';
+          props.push({ player, team: teamShort, prop: 'PTS+REB+AST', line, avg: pra, edge, confidence });
+        }
+      }
     }
+  } catch(e) {
+    console.log('[props] ESPN fetch failed:', e.message);
   }
-  return props.sort((a, b) => b.ppg - a.ppg);
+
+  // Sort by edge descending, take top 10
+  return props.sort((a, b) => b.edge - a.edge).slice(0, 10);
 }
 
-function buildNBATab(nbaGames, today) {
+function buildNBATab(nbaGames, today, playerProps) {
   if (nbaGames.length === 0) {
     return `<div class="section"><div class="section-title nba">&#127936; NBA</div><div class="game-card"><p style="color:#8b949e">No NBA games today.</p></div></div>`;
   }
+  const props = playerProps || [];
 
   let html = `<div class="section"><div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>`;
 
@@ -648,29 +695,30 @@ function buildNBATab(nbaGames, today) {
 </div>`;
   }
 
-  // Props section
-  html += `<div style="margin-top:20px"><div style="font-size:1.1em;font-weight:700;color:#f0883e;margin-bottom:12px">&#127942; Player Props</div>`;
+  // Props section - Best Bets
+  html += `<div style="margin-top:20px"><div style="font-size:1.1em;font-weight:700;color:#f0883e;margin-bottom:4px">&#127942; Player Prop Best Bets</div>
+<p style="color:#8b949e;font-size:0.8em;margin-bottom:12px">Top 10 props ranked by edge vs. projected line. Hit Refresh after game for actual results.</p>`;
 
-  // Generate prop projections from the game data
-  for (const nba of nbaGames) {
-    const spread = parseFloat(nba.spread);
-    const favHome = spread < 0;
-    const favTeam = favHome ? nba.home : nba.away;
-    const dogTeam = favHome ? nba.away : nba.home;
+  html += `<div class="table-wrapper" style="margin-bottom:16px"><table>
+<thead><tr><th>Player</th><th>Team</th><th>Prop</th><th>Line</th><th>Season Avg</th><th>Edge</th><th>Confidence</th><th>Result</th></tr></thead>
+<tbody id="nba-props-body">`;
 
-    html += `<div class="table-wrapper" style="margin-bottom:16px"><table>
-<thead><tr><th>Player</th><th>Team</th><th>Prop</th><th>Line</th><th>Projection</th><th>Edge</th><th>Result</th></tr></thead>
-<tbody id="nba-props-body">
-<tr><td colspan="7" style="color:#8b949e;text-align:center;padding:16px">Props load on refresh — click "Refresh Results" after tip-off for live player stats and prop grading</td></tr>
-</tbody></table></div>`;
+  if (props.length > 0) {
+    for (const p of props.slice(0, 10)) {
+      const edgeStr = p.edge > 0 ? '+' + p.edge.toFixed(1) : p.edge.toFixed(1);
+      const confClass = p.confidence === 'high' ? 'background:#064e3b;color:#3fb950' : p.confidence === 'med' ? 'background:#2d2a1f;color:#d29922' : 'background:#21262d;color:#8b949e';
+      html += `<tr data-prop-player="${p.player}" data-prop-type="${p.prop}" data-prop-line="${p.line}"><td style="font-weight:600">${p.player}</td><td>${p.team}</td><td>${p.prop}</td><td>O ${p.line}</td><td style="font-weight:700;color:#58a6ff">${p.avg.toFixed(1)}</td><td style="color:#3fb950;font-weight:600">${edgeStr}</td><td><span style="${confClass};padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">${p.confidence.toUpperCase()}</span></td><td class="nba-prop-result">—</td></tr>`;
+    }
+  } else {
+    html += `<tr><td colspan="8" style="color:#8b949e;text-align:center;padding:16px">No player data available pre-game. Click Refresh after tip-off.</td></tr>`;
   }
 
-  html += `</div></div>`;
+  html += `</tbody></table></div></div></div>`;
   return html;
 }
 
-function buildNBAPage(nbaGames, today, formatDate) {
-  const nbaContent = buildNBATab(nbaGames, today);
+function buildNBAPage(nbaGames, today, formatDate, playerProps) {
+  const nbaContent = buildNBATab(nbaGames, today, playerProps);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
