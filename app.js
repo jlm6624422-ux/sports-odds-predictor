@@ -15,16 +15,16 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve HTML pages (before static so they take priority)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'today-picks.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve HTML pages
-app.get('/', (req, res) => {
-  const reportPath = path.join(__dirname, 'daily-report.html');
-  if (fs.existsSync(reportPath)) {
-    res.sendFile(reportPath);
-  } else {
-    res.redirect('/tracker');
-  }
+app.get('/picks', (req, res) => {
+  res.sendFile(path.join(__dirname, 'today-picks.html'));
 });
 
 app.get('/tracker', (req, res) => {
@@ -119,15 +119,13 @@ async function runPredictions() {
     mlb.getProbablePitchers(today.slice(0, 4) + '-' + today.slice(4, 6) + '-' + today.slice(6, 8)),
   ]);
 
-  // Fetch live odds
+  // Fetch live odds (ESPN DraftKings lines — no DNS issues)
+  const { fetchESPNOdds } = require('./server/services/espnOdds');
   let oddsData = [];
   try {
-    const oddsApiKey = process.env.ODDS_API_KEY;
-    if (oddsApiKey) {
-      const oddsRes = await fetch(`https://api.the-odds-api.com/v4/sports/baseball_mlb/odds?apiKey=${oddsApiKey}&regions=us&markets=h2h,spreads,totals&oddsFormat=american`);
-      if (oddsRes.ok) oddsData = await oddsRes.json();
-    }
-  } catch (e) { console.log('Odds API fetch failed, continuing without market data'); }
+    oddsData = await fetchESPNOdds('MLB', today.slice(0,4) + '-' + today.slice(4,6) + '-' + today.slice(6,8));
+    console.log(`[odds] ESPN odds fetched: ${oddsData.filter(g => g.bookmakers.length > 0).length} games with lines`);
+  } catch (e) { console.log('ESPN odds fetch failed, continuing without market data:', e.message); }
 
   const oddsMap = new Map();
   for (const g of oddsData) oddsMap.set(g.home_team, g);

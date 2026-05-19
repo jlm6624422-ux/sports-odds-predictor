@@ -119,6 +119,13 @@ function ensembleMLB(params) {
   let finalHomeProb = totalWeight > 0 ? weightedProb / totalWeight : 0.5;
   finalHomeProb = Math.min(0.85, Math.max(0.15, finalHomeProb));
 
+  // Dampen home-field bias in coin-flip territory when market data is missing
+  // Without market consensus, the model tends to push ~50% games toward home
+  const hasMarket = !!subModels.market;
+  if (!hasMarket && Math.abs(finalHomeProb - 0.5) < 0.04) {
+    finalHomeProb = 0.5 + (finalHomeProb - 0.5) * 0.5;
+  }
+
   // --- TOTALS MODEL (separate from sides) ---
   const homeRPG = homeGames > 0 ? (homeTeam.runsScored || 0) / homeGames : 4.5;
   const awayRPG = awayGames > 0 ? (awayTeam.runsScored || 0) / awayGames : 4.5;
@@ -208,8 +215,10 @@ function ensembleMLB(params) {
 
   // --- CONFIDENCE ---
   const modelsUsed = Object.keys(subModels).length;
+  const isCoinFlip = Math.abs(finalHomeProb - 0.5) < 0.03;
   let confidence;
-  if (modelsUsed >= 4) confidence = 'high';
+  if (isCoinFlip) confidence = 'coin-flip';
+  else if (modelsUsed >= 4) confidence = 'high';
   else if (modelsUsed >= 3) confidence = 'medium';
   else confidence = 'low';
 
@@ -237,9 +246,10 @@ function ensembleMLB(params) {
 
     edge: mlEdge,
     totalEdge: totalEdge,
-    kelly: kellySizing,
+    kelly: isCoinFlip ? null : kellySizing,
     confidence,
     modelsUsed,
+    coinFlip: isCoinFlip,
   };
 }
 
