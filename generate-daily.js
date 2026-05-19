@@ -350,6 +350,7 @@ function buildHTML({ today, yesterday, formatDate, mlbPicks, nbaGames, parlays, 
   const parlaysHTML = buildParlays(parlays);
   const nbaHTML = buildNBA(nbaGames);
   const mlbTableHTML = buildMLBTable(mlbPicks);
+  const totalExposure = kellyBets.reduce((s, p) => s + (p.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -361,63 +362,77 @@ function buildHTML({ today, yesterday, formatDate, mlbPicks, nbaGames, parlays, 
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
 .container{max-width:1200px;margin:0 auto}
-header{text-align:center;padding:30px 0;border-bottom:1px solid #21262d;margin-bottom:30px}
-header h1{font-size:2.2em;background:linear-gradient(135deg,#58a6ff,#3fb950);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
-header .subtitle{color:#8b949e;font-size:1.1em}
-header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#3fb950;padding:4px 12px;border-radius:20px;font-size:0.8em;font-weight:600;margin-top:8px}
-.section{margin-bottom:40px}
-.section-title{font-size:1.5em;color:#58a6ff;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #21262d}
+header{text-align:center;padding:20px 0 16px;margin-bottom:0}
+header h1{font-size:2em;background:linear-gradient(135deg,#58a6ff,#3fb950);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+header .subtitle{color:#8b949e;font-size:1em}
+header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#3fb950;padding:3px 10px;border-radius:20px;font-size:0.75em;font-weight:600;margin-top:6px}
+
+.stats-bar{display:flex;justify-content:center;gap:24px;padding:12px 0;margin-bottom:16px;border-bottom:1px solid #21262d;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .val{font-size:1.3em;font-weight:700;color:#3fb950}
+.stat .val.blue{color:#58a6ff}
+.stat .lbl{font-size:0.7em;color:#6b7280;text-transform:uppercase;letter-spacing:0.3px}
+
+.tabs{display:flex;gap:0;border-bottom:2px solid #21262d;margin-bottom:24px;overflow-x:auto}
+.tab{padding:12px 24px;cursor:pointer;color:#6b7280;font-weight:600;font-size:0.9em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;white-space:nowrap;user-select:none}
+.tab:hover{color:#e1e4e8}
+.tab.active{color:#58a6ff;border-bottom-color:#58a6ff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.section{margin-bottom:30px}
+.section-title{font-size:1.3em;color:#58a6ff;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
 .section-title.nba{color:#f0883e}
 .section-title.parlays{color:#a371f7}
-.results-banner{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;margin-bottom:30px}
-.result-card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:20px;text-align:center}
-.result-card .date{color:#8b949e;font-size:0.85em}
-.result-card .record{font-size:1.8em;font-weight:700}
-.result-card.good .record{color:#3fb950}
-.result-card .detail{color:#8b949e;font-size:0.85em;margin-top:4px}
-.top-picks{background:linear-gradient(135deg,#1a2332,#161b22);border:2px solid #3fb950;border-radius:12px;padding:25px;margin-bottom:30px}
-.top-picks h2{color:#3fb950;margin-bottom:15px;font-size:1.3em}
-.pick-item{display:flex;align-items:center;padding:12px 15px;background:rgba(63,185,80,0.05);border-radius:8px;margin-bottom:8px;border-left:3px solid #3fb950}
+
+.top-picks{background:linear-gradient(135deg,#1a2332,#161b22);border:2px solid #3fb950;border-radius:12px;padding:20px;margin-bottom:20px}
+.top-picks h2{color:#3fb950;margin-bottom:12px;font-size:1.2em}
+.pick-item{display:flex;align-items:center;padding:10px 14px;background:rgba(63,185,80,0.05);border-radius:8px;margin-bottom:6px;border-left:3px solid #3fb950}
 .pick-item.nba{border-left-color:#f0883e;background:rgba(240,136,62,0.05)}
 .pick-item.kelly{border-left-color:#ff7b72;background:rgba(255,123,114,0.05)}
 .pick-item.over{border-left-color:#a371f7;background:rgba(163,113,247,0.05)}
 .pick-details{flex:1}
-.pick-game{font-size:0.85em;color:#8b949e}
-.pick-bet{font-weight:600;font-size:1.1em;margin-top:2px}
-.pick-edge{font-weight:700;font-size:1.2em;color:#3fb950;margin:0 15px}
-.pick-conf{font-size:0.75em;padding:2px 8px;border-radius:4px;font-weight:600;text-transform:uppercase}
+.pick-game{font-size:0.8em;color:#8b949e}
+.pick-bet{font-weight:600;font-size:1.05em;margin-top:2px}
+.pick-edge{font-weight:700;font-size:1.1em;color:#3fb950;margin:0 12px}
+.pick-conf{font-size:0.7em;padding:2px 7px;border-radius:4px;font-weight:600;text-transform:uppercase}
 .pick-conf.high{background:rgba(63,185,80,0.2);color:#3fb950}
 .pick-conf.med{background:rgba(210,153,34,0.2);color:#d29922}
 .pick-conf.kelly{background:rgba(255,123,114,0.2);color:#ff7b72}
-.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:20px;margin-bottom:15px}
-.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.game-matchup{font-size:1.2em;font-weight:600}
+
+.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.game-matchup{font-size:1.1em;font-weight:600}
 .game-time{color:#8b949e;font-size:0.85em}
-.game-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.detail-label{font-size:0.75em;color:#8b949e;text-transform:uppercase}
+.game-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.detail-label{font-size:0.7em;color:#8b949e;text-transform:uppercase}
 .detail-value{font-weight:600;margin-top:2px}
 .detail-value.green{color:#3fb950}
 .detail-value.blue{color:#58a6ff}
 .detail-value.orange{color:#f0883e}
-.parlay-card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;margin-bottom:12px;border-left:3px solid #a371f7}
+
+.parlay-card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:18px;margin-bottom:10px;border-left:3px solid #a371f7}
 .parlay-card.best{border-color:#3fb950;border-width:2px}
-.parlay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.parlay-type{font-weight:700;color:#a371f7}
+.parlay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.parlay-type{font-weight:700;color:#a371f7;font-size:0.95em}
 .parlay-odds{font-weight:700;font-size:1.2em}
-.parlay-legs{color:#8b949e;font-size:0.9em;margin-bottom:8px}
-.parlay-footer{display:flex;gap:20px;font-size:0.85em;color:#8b949e;flex-wrap:wrap}
+.parlay-legs{color:#8b949e;font-size:0.85em;margin-bottom:6px}
+.parlay-footer{display:flex;gap:16px;font-size:0.8em;color:#8b949e;flex-wrap:wrap}
 .parlay-footer .ev{color:#3fb950;font-weight:600}
-.table-wrapper{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:0.9em}
-th{text-align:left;padding:10px 12px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.8em;text-transform:uppercase}
-td{padding:10px 12px;border-bottom:1px solid #21262d}
-tr:hover{background:rgba(88,166,255,0.03)}
+
+.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
+table{width:100%;border-collapse:collapse;font-size:0.85em}
+th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;position:sticky;top:0}
+td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
+tr:hover td{background:rgba(88,166,255,0.03)}
 .edge-positive{color:#3fb950;font-weight:600}
 .edge-high{color:#3fb950;font-weight:700}
 .skip{color:#484f58}
-.nav-links{text-align:center;margin-top:30px;padding-top:20px;border-top:1px solid #21262d}
-.nav-links a{color:#58a6ff;text-decoration:none;margin:0 15px}
-footer{text-align:center;padding:30px 0;color:#6e7681;font-size:0.85em;border-top:1px solid #21262d;margin-top:40px}
+
+.nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
+.nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
+.nav-links a:hover{text-decoration:underline}
+footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
 </style>
 </head>
 <body>
@@ -425,27 +440,55 @@ footer{text-align:center;padding:30px 0;color:#6e7681;font-size:0.85em;border-to
 <header>
 <h1>Daily Picks &amp; Projections</h1>
 <div class="subtitle">${formatDate}</div>
-<div class="model-badge">Ensemble v2.1 | 4/4 Models | ESPN/DK Odds | Auto-generated 7am ET</div>
+<div class="model-badge">Ensemble v2.1 | 4/4 Models | ESPN/DK Odds</div>
 </header>
 
-<div class="results-banner">
-<div class="result-card good"><div class="date">Running Total</div><div class="record">${runningTotal >= 0 ? '+' : ''}$${runningTotal.toFixed(0)}</div><div class="detail">${targetPct}% of $3K target</div></div>
-<div class="result-card good"><div class="date">Avg/Day</div><div class="record">${avgDay >= 0 ? '+' : ''}$${avgDay.toFixed(0)}</div><div class="detail">${daysActive} days active</div></div>
-<div class="result-card good"><div class="date">Today</div><div class="record">${actionable.length} picks</div><div class="detail">${kellyBets.length} kelly + ${parlays.length} parlays</div></div>
+<div class="stats-bar">
+<div class="stat"><div class="val">${runningTotal >= 0 ? '+' : ''}$${runningTotal.toFixed(0)}</div><div class="lbl">Running P&L</div></div>
+<div class="stat"><div class="val">${targetPct}%</div><div class="lbl">of $3K target</div></div>
+<div class="stat"><div class="val blue">${actionable.length}</div><div class="lbl">Picks today</div></div>
+<div class="stat"><div class="val">${parlays.length}</div><div class="lbl">Parlays</div></div>
+<div class="stat"><div class="val">$${totalExposure.toFixed(0)}</div><div class="lbl">Exposure</div></div>
 </div>
 
-${topPicksHTML}
+<div class="tabs">
+<div class="tab active" onclick="switchTab('picks')">Picks</div>
+<div class="tab" onclick="switchTab('projections')">Projections</div>
+<div class="tab" onclick="switchTab('parlays')">Parlays</div>
+<div class="tab" onclick="switchTab('results')">Results</div>
+</div>
 
+<!-- PICKS TAB -->
+<div class="tab-content active" id="tab-picks">
+${topPicksHTML}
+${nbaHTML}
+</div>
+
+<!-- PROJECTIONS TAB -->
+<div class="tab-content" id="tab-projections">
+<div class="section">
+<div class="section-title">&#9918; MLB Full Projections &mdash; ${mlbPicks.length} Games</div>
+${mlbTableHTML}
+</div>
+</div>
+
+<!-- PARLAYS TAB -->
+<div class="tab-content" id="tab-parlays">
 <div class="section">
 <div class="section-title parlays">&#127922; Parlay Plays</div>
 ${parlaysHTML}
 </div>
+</div>
 
-${nbaHTML}
-
+<!-- RESULTS TAB -->
+<div class="tab-content" id="tab-results">
 <div class="section">
-<div class="section-title">&#9918; MLB Projections - ${mlbPicks.length} Games</div>
-${mlbTableHTML}
+<div class="section-title" style="color:#3fb950">&#9989; Recent Results</div>
+<div class="game-card">
+<p style="color:#8b949e;font-size:0.9em">Results are graded automatically at 2am CT and pushed to the tracker.</p>
+<p style="margin-top:10px"><a href="/tracker" style="color:#58a6ff;text-decoration:none;font-weight:600">View Full Tracker &rarr;</a></p>
+</div>
+</div>
 </div>
 
 <div class="nav-links">
@@ -455,9 +498,18 @@ ${mlbTableHTML}
 
 <footer>
 <p>Model: Ensemble v2.1 (Pythagorean + Elo + FIP + Market) | Data: ESPN/DraftKings + MLB Stats API</p>
-<p style="margin-top:6px">Auto-generated ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC</p>
+<p style="margin-top:4px">Auto-generated ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC</p>
 </footer>
 </div>
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
 </body>
 </html>`;
 }
