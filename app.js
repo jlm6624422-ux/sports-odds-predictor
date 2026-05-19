@@ -35,6 +35,10 @@ app.get('/mlb', (req, res) => {
   res.sendFile(path.join(__dirname, 'mlb-best-bets-tracker.html'));
 });
 
+app.get('/nba', (req, res) => {
+  res.sendFile(path.join(__dirname, 'nba-picks.html'));
+});
+
 // API: Health check
 app.get('/api/health', (req, res) => {
   res.json({

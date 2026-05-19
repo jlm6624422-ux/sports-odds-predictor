@@ -338,6 +338,10 @@ async function main() {
   fs.writeFileSync(path.join(dataDir, 'today.json'), JSON.stringify(output, null, 2));
   fs.writeFileSync(path.join(historyDir, `${today}.json`), JSON.stringify(output, null, 2));
 
+  // Generate NBA page
+  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today));
+  fs.writeFileSync(path.join(__dirname, 'nba-picks.html'), nbaPageHTML);
+
   const totalExposure = kellyBets.reduce((s, p) => s + (p.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0);
   console.log(`[generate] Done: ${actionable.length} picks, ${kellyBets.length} kelly bets, ${parlays.length} parlays, $${totalExposure} exposure`);
 }
@@ -455,7 +459,6 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <div class="tab active" onclick="switchTab('picks')">Picks</div>
 <div class="tab" onclick="switchTab('projections')">Projections</div>
 <div class="tab" onclick="switchTab('parlays')">Parlays</div>
-<div class="tab" onclick="switchTab('nba')">NBA</div>
 <div class="tab" onclick="switchTab('results')">Results</div>
 </div>
 
@@ -481,11 +484,6 @@ ${parlaysHTML}
 </div>
 </div>
 
-<!-- NBA TAB -->
-<div class="tab-content" id="tab-nba">
-${buildNBATab(nbaGames, today)}
-</div>
-
 <!-- RESULTS TAB -->
 <div class="tab-content" id="tab-results">
 <div class="section">
@@ -500,6 +498,7 @@ ${buildNBATab(nbaGames, today)}
 <div class="nav-links">
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
+<a href="/nba">NBA</a>
 </div>
 
 <footer>
@@ -572,114 +571,6 @@ async function refreshResults() {
   }
 }
 
-async function refreshNBA() {
-  const btn = document.getElementById('nba-refresh-btn');
-  if (!btn) return;
-  btn.textContent = 'Refreshing...';
-  btn.disabled = true;
-  try {
-    const today = '${today}';
-    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today.replace(/-/g,''));
-    const data = await res.json();
-    const events = data.events || [];
-
-    for (const event of events) {
-      const comp = event.competitions[0];
-      const home = comp.competitors?.find(c => c.homeAway === 'home');
-      const away = comp.competitors?.find(c => c.homeAway === 'away');
-      if (!home || !away) continue;
-
-      const homeScore = parseInt(home.score || 0);
-      const awayScore = parseInt(away.score || 0);
-      const total = homeScore + awayScore;
-      const margin = homeScore - awayScore;
-      const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
-      const isFinal = comp.status?.type?.completed;
-      const statusText = comp.status?.type?.shortDetail || '';
-
-      document.querySelectorAll('[data-nba-bet]').forEach(row => {
-        const betType = row.dataset.nbaBet;
-        const resultCell = row.querySelector('.nba-result');
-        if (!resultCell) return;
-
-        let won = null;
-        if (betType === 'spread') {
-          const team = row.dataset.team;
-          const line = parseFloat(row.dataset.line);
-          const isHome = home.team.displayName.includes(team.split(' ').pop());
-          const teamMargin = isHome ? margin : -margin;
-          won = (teamMargin + line) > 0;
-        } else if (betType === 'ml') {
-          const team = row.dataset.team;
-          won = winner.includes(team.split(' ').pop());
-        } else if (betType === 'over') {
-          const line = parseFloat(row.dataset.line);
-          won = total > line;
-        }
-
-        if (isFinal && won !== null) {
-          const badge = won
-            ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
-            : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
-          resultCell.innerHTML = badge + ' <span style=\\"color:#8b949e;font-size:0.75em\\">' + awayScore + '-' + homeScore + '</span>';
-        } else if (total > 0) {
-          resultCell.innerHTML = '<span style=\\"color:#f59e0b;font-size:0.8em\\">' + statusText + ' (' + awayScore + '-' + homeScore + ')</span>';
-        }
-      });
-
-      // Fetch box score for player props
-      const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-      const boxData = await boxRes.json();
-      const boxscore = boxData.boxscore;
-
-      if (boxscore?.players) {
-        let propsHTML = '';
-        for (const team of boxscore.players) {
-          for (const stat of team.statistics) {
-            const labels = stat.labels || [];
-            const ptsIdx = labels.indexOf('PTS');
-            const rebIdx = labels.indexOf('REB');
-            const astIdx = labels.indexOf('AST');
-            const minIdx = labels.indexOf('MIN');
-
-            for (const athlete of stat.athletes) {
-              const mins = parseInt(athlete.stats[minIdx]) || 0;
-              if (mins < 15) continue;
-              const pts = parseInt(athlete.stats[ptsIdx]) || 0;
-              const reb = parseInt(athlete.stats[rebIdx]) || 0;
-              const ast = parseInt(athlete.stats[astIdx]) || 0;
-
-              const ptsLine = Math.round(pts * 0.85) + 0.5;
-              const rebLine = Math.round(reb * 0.8) + 0.5;
-              const astLine = Math.round(ast * 0.8) + 0.5;
-
-              const mkBadge = (actual, line) => {
-                if (!isFinal) return '—';
-                return actual > line
-                  ? '<span style=\\"background:#064e3b;color:#34d399;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700\\">W</span>'
-                  : '<span style=\\"background:#7f1d1d;color:#f87171;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700\\">L</span>';
-              };
-
-              const teamShort = team.team.displayName.split(' ').pop();
-              propsHTML += '<tr><td style=\\"font-weight:600\\">' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Points</td><td>O ' + ptsLine + '</td><td style=\\"font-weight:700;color:#58a6ff\\">' + pts + '</td><td>' + (pts - ptsLine > 0 ? '+' : '') + (pts - ptsLine).toFixed(1) + '</td><td>' + mkBadge(pts, ptsLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Rebounds</td><td>O ' + rebLine + '</td><td style=\\"font-weight:700;color:#58a6ff\\">' + reb + '</td><td>' + (reb - rebLine > 0 ? '+' : '') + (reb - rebLine).toFixed(1) + '</td><td>' + mkBadge(reb, rebLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Assists</td><td>O ' + astLine + '</td><td style=\\"font-weight:700;color:#58a6ff\\">' + ast + '</td><td>' + (ast - astLine > 0 ? '+' : '') + (ast - astLine).toFixed(1) + '</td><td>' + mkBadge(ast, astLine) + '</td></tr>';
-            }
-          }
-        }
-        const propsBody = document.getElementById('nba-props-body');
-        if (propsBody && propsHTML) propsBody.innerHTML = propsHTML;
-      }
-    }
-
-    btn.textContent = '\\u2713 Updated';
-    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
-  } catch(e) {
-    console.error('NBA refresh:', e);
-    btn.textContent = 'Error';
-    btn.disabled = false;
-  }
-}
 </script>
 </body>
 </html>`;
@@ -776,6 +667,169 @@ function buildNBATab(nbaGames, today) {
 
   html += `</div></div>`;
   return html;
+}
+
+function buildNBAPage(nbaGames, today, formatDate) {
+  const nbaContent = buildNBATab(nbaGames, today);
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA Picks - ${today}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+header{text-align:center;padding:20px 0 16px;border-bottom:1px solid #21262d;margin-bottom:24px}
+header h1{font-size:2em;background:linear-gradient(135deg,#f0883e,#d2a8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+header .subtitle{color:#8b949e;font-size:1em}
+.section{margin-bottom:30px}
+.section-title{font-size:1.3em;color:#f0883e;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
+.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.game-matchup{font-size:1.1em;font-weight:600}
+.game-time{color:#8b949e;font-size:0.85em}
+.game-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.detail-label{font-size:0.7em;color:#8b949e;text-transform:uppercase}
+.detail-value{font-weight:600;margin-top:2px}
+.detail-value.green{color:#3fb950}
+.detail-value.orange{color:#f0883e}
+.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
+table{width:100%;border-collapse:collapse;font-size:0.85em}
+th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase}
+td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
+tr:hover td{background:rgba(240,136,62,0.03)}
+.nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
+.nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
+.nav-links a:hover{text-decoration:underline}
+footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>NBA Picks &amp; Props</h1>
+<div class="subtitle">${formatDate}</div>
+</header>
+
+${nbaContent}
+
+<div class="nav-links">
+<a href="/">Daily Picks</a>
+<a href="/tracker">Betting Tracker</a>
+<a href="/mlb">MLB Season</a>
+</div>
+
+<footer>
+<p>Data: ESPN Scoreboard + Box Scores | Props graded live via Refresh</p>
+</footer>
+</div>
+
+<script>
+async function refreshNBA() {
+  const btn = document.getElementById('nba-refresh-btn');
+  if (!btn) return;
+  btn.textContent = 'Refreshing...';
+  btn.disabled = true;
+  try {
+    const today = '${today}';
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today.replace(/-/g,''));
+    const data = await res.json();
+    const events = data.events || [];
+
+    for (const event of events) {
+      const comp = event.competitions[0];
+      const home = comp.competitors?.find(c => c.homeAway === 'home');
+      const away = comp.competitors?.find(c => c.homeAway === 'away');
+      if (!home || !away) continue;
+
+      const homeScore = parseInt(home.score || 0);
+      const awayScore = parseInt(away.score || 0);
+      const total = homeScore + awayScore;
+      const margin = homeScore - awayScore;
+      const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
+      const isFinal = comp.status?.type?.completed;
+      const statusText = comp.status?.type?.shortDetail || '';
+
+      document.querySelectorAll('[data-nba-bet]').forEach(row => {
+        const betType = row.dataset.nbaBet;
+        const resultCell = row.querySelector('.nba-result');
+        if (!resultCell) return;
+        let won = null;
+        if (betType === 'spread') {
+          const team = row.dataset.team;
+          const line = parseFloat(row.dataset.line);
+          const isHome = home.team.displayName.includes(team.split(' ').pop());
+          const teamMargin = isHome ? margin : -margin;
+          won = (teamMargin + line) > 0;
+        } else if (betType === 'ml') {
+          const team = row.dataset.team;
+          won = winner.includes(team.split(' ').pop());
+        } else if (betType === 'over') {
+          const line = parseFloat(row.dataset.line);
+          won = total > line;
+        }
+        if (isFinal && won !== null) {
+          const badge = won
+            ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+            : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+          resultCell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em">' + awayScore + '-' + homeScore + '</span>';
+        } else if (total > 0) {
+          resultCell.innerHTML = '<span style="color:#f59e0b;font-size:0.8em">' + statusText + ' (' + awayScore + '-' + homeScore + ')</span>';
+        }
+      });
+
+      const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
+      const boxData = await boxRes.json();
+      const boxscore = boxData.boxscore;
+
+      if (boxscore?.players) {
+        let propsHTML = '';
+        for (const team of boxscore.players) {
+          for (const stat of team.statistics) {
+            const labels = stat.labels || [];
+            const ptsIdx = labels.indexOf('PTS');
+            const rebIdx = labels.indexOf('REB');
+            const astIdx = labels.indexOf('AST');
+            const minIdx = labels.indexOf('MIN');
+            for (const athlete of stat.athletes) {
+              const mins = parseInt(athlete.stats[minIdx]) || 0;
+              if (mins < 15) continue;
+              const pts = parseInt(athlete.stats[ptsIdx]) || 0;
+              const reb = parseInt(athlete.stats[rebIdx]) || 0;
+              const ast = parseInt(athlete.stats[astIdx]) || 0;
+              const ptsLine = Math.round(pts * 0.85) + 0.5;
+              const rebLine = Math.round(reb * 0.8) + 0.5;
+              const astLine = Math.round(ast * 0.8) + 0.5;
+              const mkBadge = (actual, line) => {
+                if (!isFinal) return '—';
+                return actual > line
+                  ? '<span style="background:#064e3b;color:#34d399;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">W</span>'
+                  : '<span style="background:#7f1d1d;color:#f87171;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">L</span>';
+              };
+              const teamShort = team.team.displayName.split(' ').pop();
+              propsHTML += '<tr><td style="font-weight:600">' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Points</td><td>O ' + ptsLine + '</td><td style="font-weight:700;color:#58a6ff">' + pts + '</td><td>' + (pts - ptsLine > 0 ? '+' : '') + (pts - ptsLine).toFixed(1) + '</td><td>' + mkBadge(pts, ptsLine) + '</td></tr>';
+              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Rebounds</td><td>O ' + rebLine + '</td><td style="font-weight:700;color:#58a6ff">' + reb + '</td><td>' + (reb - rebLine > 0 ? '+' : '') + (reb - rebLine).toFixed(1) + '</td><td>' + mkBadge(reb, rebLine) + '</td></tr>';
+              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Assists</td><td>O ' + astLine + '</td><td style="font-weight:700;color:#58a6ff">' + ast + '</td><td>' + (ast - astLine > 0 ? '+' : '') + (ast - astLine).toFixed(1) + '</td><td>' + mkBadge(ast, astLine) + '</td></tr>';
+            }
+          }
+        }
+        const propsBody = document.getElementById('nba-props-body');
+        if (propsBody && propsHTML) propsBody.innerHTML = propsHTML;
+      }
+    }
+    btn.textContent = '\\u2713 Updated';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    console.error('NBA refresh:', e);
+    btn.textContent = 'Error';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>`;
 }
 
 function buildTopPicks(kellyBets, actionable, nbaGames, mlbPicks) {
