@@ -360,16 +360,137 @@ async function runPredictions() {
 }
 
 // Cron: auto-run predictions at 7am ET
+// Grade yesterday's results by fetching final scores from MLB API
+async function gradeResults() {
+  const historyDir = path.join(__dirname, 'data', 'history');
+  const resultsPath = path.join(__dirname, 'data', 'results.json');
+
+  if (!fs.existsSync(historyDir)) return;
+
+  let results = {};
+  if (fs.existsSync(resultsPath)) {
+    results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+  }
+
+  const TEAM_ABBREVS = {
+    'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
+    'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
+    'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
+    'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
+    'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
+    'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
+    'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
+    'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
+    'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
+    'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
+    'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
+    'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
+    'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
+    'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
+  };
+  const getAbbrev = (name) => TEAM_ABBREVS[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
+
+  // Grade the last 3 days of history that have ungraded picks
+  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 3);
+  let graded = 0;
+
+  for (const f of files) {
+    const date = f.replace('.json', '');
+    const dayResults = results[date] || {};
+
+    // Fetch final scores for this date
+    let games;
+    try {
+      const res = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}&hydrate=linescore`);
+      const data = await res.json();
+      games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+    } catch (e) { continue; }
+
+    if (games.length === 0) continue;
+
+    const historyData = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
+
+    for (const game of (historyData.mlb || [])) {
+      const prediction = game.prediction || {};
+      const edge = game.edge || {};
+      const ouLine = game.ouLine;
+      const expectedTotal = prediction.expectedTotal || 0;
+      const totalEdge = ouLine ? expectedTotal - ouLine : 0;
+      const confidence = game.confidence || 'low';
+      const matchupStr = `${getAbbrev(game.away)} @ ${getAbbrev(game.home)}`;
+
+      // Find the matching final game
+      const finalGame = games.find(g =>
+        getAbbrev(g.teams.away.team.name) === getAbbrev(game.away) &&
+        getAbbrev(g.teams.home.team.name) === getAbbrev(game.home)
+      );
+      if (!finalGame) continue;
+
+      const homeScore = finalGame.teams.home.score;
+      const awayScore = finalGame.teams.away.score;
+      const total = homeScore + awayScore;
+      const winner = homeScore > awayScore ? finalGame.teams.home.team.name : finalGame.teams.away.team.name;
+      const score = `${finalGame.teams.away.team.name.split(' ').pop()} ${awayScore}, ${finalGame.teams.home.team.name.split(' ').pop()} ${homeScore}`;
+
+      // Grade ML pick
+      if (confidence === 'high' && !game.coinFlip) {
+        const resultKey = `${matchupStr}-ml`;
+        if (!dayResults[resultKey]) {
+          const side = prediction.homeWinProb > prediction.awayWinProb ? 'home' : 'away';
+          const pickedTeam = side === 'home' ? game.home : game.away;
+          const won = winner === pickedTeam;
+          dayResults[resultKey] = { result: won ? 'win' : 'loss', score, recordedAt: new Date().toISOString() };
+          graded++;
+        }
+      }
+
+      // Grade O/U pick
+      if (ouLine && totalEdge >= 1.5) {
+        const resultKey = `${matchupStr}-over`;
+        if (!dayResults[resultKey]) {
+          const won = total > ouLine;
+          dayResults[resultKey] = { result: won ? 'win' : (total === ouLine ? 'push' : 'loss'), score: `${score} (${total} total)`, recordedAt: new Date().toISOString() };
+          graded++;
+        }
+      } else if (ouLine && totalEdge <= -1.5) {
+        const resultKey = `${matchupStr}-under`;
+        if (!dayResults[resultKey]) {
+          const won = total < ouLine;
+          dayResults[resultKey] = { result: won ? 'win' : (total === ouLine ? 'push' : 'loss'), score: `${score} (${total} total)`, recordedAt: new Date().toISOString() };
+          graded++;
+        }
+      }
+    }
+
+    results[date] = dayResults;
+  }
+
+  if (graded > 0) {
+    fs.writeFileSync(resultsPath, JSON.stringify(results, null, 2));
+    console.log(`[GRADE] Graded ${graded} picks across ${files.length} days`);
+  } else {
+    console.log('[GRADE] No new picks to grade');
+  }
+}
+
 function scheduleDailyRun() {
   const checkInterval = 60 * 1000; // Check every minute
   let lastRunDate = null;
+  let lastGradeDate = null;
 
   setInterval(() => {
     const now = new Date();
     const etHour = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' })).getHours();
     const todayStr = now.toISOString().split('T')[0];
 
-    // Run at 7am ET if we haven't run today
+    // 2am ET: grade yesterday's results
+    if (etHour === 2 && lastGradeDate !== todayStr) {
+      lastGradeDate = todayStr;
+      console.log(`[CRON] Auto-grading results for previous days`);
+      gradeResults().catch(e => console.error('[CRON] Grade failed:', e.message));
+    }
+
+    // 7am ET: run new predictions
     if (etHour === 7 && lastRunDate !== todayStr) {
       lastRunDate = todayStr;
       console.log(`[CRON] Auto-running predictions for ${todayStr}`);
@@ -377,7 +498,7 @@ function scheduleDailyRun() {
     }
   }, checkInterval);
 
-  console.log('[CRON] Scheduled daily predictions at 7:00 AM ET');
+  console.log('[CRON] Scheduled: grade results at 2:00 AM ET, predictions at 7:00 AM ET');
 }
 
 function getLastPredictionTime() {
