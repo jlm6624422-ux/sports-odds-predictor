@@ -283,11 +283,127 @@
 
     <script>
     // ============================================================
-    // DAILY PICKS DATA - Add new days at the TOP of this array
+    // DAILY PICKS DATA - Loaded from /api/bestbets on Railway,
+    // falls back to hardcoded data for local/static use.
     // Each day has: date, picks array
     // Each pick: type (ml/over/under), team, matchup, line, winProb, confidence, result (win/loss/push/pending), score
     // ============================================================
-    const PICKS_DATA = [
+    let PICKS_DATA = [
+        {
+            date: "2026-05-19",
+            picks: [
+                {
+                    type: "ml",
+                    team: "Tampa Bay Rays",
+                    matchup: "BAL @ TB",
+                    line: "TB -120",
+                    winProb: 58.7,
+                    confidence: "high",
+                    pitchers: "Bradish vs Jax",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Philadelphia Phillies",
+                    matchup: "CIN @ PHI",
+                    line: "PHI -149",
+                    winProb: 56.3,
+                    confidence: "high",
+                    pitchers: "Burns vs Luzardo",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Minnesota Twins",
+                    matchup: "HOU @ MIN",
+                    line: "MIN -137",
+                    winProb: 58.1,
+                    confidence: "high",
+                    pitchers: "McCullers vs Matthews",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Seattle Mariners",
+                    matchup: "CHW @ SEA",
+                    line: "SEA -156",
+                    winProb: 56.8,
+                    confidence: "high",
+                    pitchers: "Kay vs Miller",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "ml",
+                    team: "Arizona Diamondbacks",
+                    matchup: "SF @ ARI",
+                    line: "ARI -125",
+                    winProb: 55.5,
+                    confidence: "high",
+                    pitchers: "Roupp vs Nelson",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 8.0",
+                    matchup: "ATL @ MIA",
+                    line: "O 8.0 (+1.5 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Pérez vs Garrett",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 8.5",
+                    matchup: "HOU @ MIN",
+                    line: "O 8.5 (+2.2 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "McCullers vs Matthews",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 10.0",
+                    matchup: "TEX @ COL",
+                    line: "O 10.0 (+2.2 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Alexander vs Peralta",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.5",
+                    matchup: "BAL @ TB",
+                    line: "O 7.5 (+1.8 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Bradish vs Jax",
+                    result: "pending",
+                    score: ""
+                },
+                {
+                    type: "over",
+                    team: "OVER 7.5",
+                    matchup: "CHW @ SEA",
+                    line: "O 7.5 (+1.9 edge)",
+                    winProb: null,
+                    confidence: "high",
+                    pitchers: "Kay vs Miller",
+                    result: "pending",
+                    score: ""
+                }
+            ]
+        },
         {
             date: "2026-05-18",
             picks: [
@@ -868,11 +984,44 @@
         }
     }
 
-    // Initial render
-    renderStats();
-    renderDaily();
-    renderPerformance();
-    renderStreaks();
+    // Load from API, merge with hardcoded data, then render
+    async function loadFromAPI() {
+        try {
+            const res = await fetch('/api/bestbets');
+            if (!res.ok) throw new Error('API unavailable');
+            const data = await res.json();
+            if (data.days && data.days.length > 0) {
+                // Merge API days with hardcoded (API takes priority for same date)
+                const hardcodedDates = new Set(PICKS_DATA.map(d => d.date));
+                const apiDates = new Set(data.days.map(d => d.date));
+
+                // Add API days that aren't already hardcoded
+                for (const day of data.days) {
+                    if (!hardcodedDates.has(day.date)) {
+                        PICKS_DATA.unshift(day);
+                    } else {
+                        // Replace hardcoded with API version (has latest results)
+                        const idx = PICKS_DATA.findIndex(d => d.date === day.date);
+                        if (idx !== -1 && day.picks.some(p => p.result !== 'pending')) {
+                            PICKS_DATA[idx] = day;
+                        }
+                    }
+                }
+
+                // Sort by date descending
+                PICKS_DATA.sort((a, b) => b.date.localeCompare(a.date));
+            }
+        } catch (e) {
+            // API unavailable (local file viewing) — use hardcoded data
+        }
+
+        renderStats();
+        renderDaily();
+        renderPerformance();
+        renderStreaks();
+    }
+
+    loadFromAPI();
     </script>
 </body>
 </html>

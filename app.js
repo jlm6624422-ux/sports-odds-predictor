@@ -85,6 +85,106 @@ app.get('/api/predictions/history', (req, res) => {
   res.json({ days });
 });
 
+// API: Get best bets for the tracker (filtered picks with edges)
+app.get('/api/bestbets', (req, res) => {
+  const historyDir = path.join(__dirname, 'data', 'history');
+  const resultsPath = path.join(__dirname, 'data', 'results.json');
+
+  if (!fs.existsSync(historyDir)) {
+    return res.json({ days: [] });
+  }
+
+  let results = {};
+  if (fs.existsSync(resultsPath)) {
+    results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+  }
+
+  const abbrevTeam = (name) => {
+    const abbrevs = {
+      'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
+      'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
+      'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
+      'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
+      'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
+      'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
+      'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
+      'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
+      'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
+      'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
+      'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
+      'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
+      'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
+      'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
+    };
+    return abbrevs[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
+  };
+
+  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 14);
+  const days = [];
+
+  for (const f of files) {
+    const data = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
+    const date = f.replace('.json', '');
+    const dayResults = results[date] || {};
+    const picks = [];
+
+    for (const game of (data.mlb || [])) {
+      const edge = game.edge || {};
+      const prediction = game.prediction || {};
+      const ouLine = game.ouLine;
+      const expectedTotal = prediction.expectedTotal || 0;
+      const totalEdge = ouLine ? expectedTotal - ouLine : 0;
+      const confidence = game.confidence || 'low';
+      const matchupStr = `${abbrevTeam(game.away)} @ ${abbrevTeam(game.home)}`;
+
+      if (confidence === 'high' && !game.coinFlip) {
+        const side = prediction.homeWinProb > prediction.awayWinProb ? 'home' : 'away';
+        const team = side === 'home' ? game.home : game.away;
+        const ml = side === 'home' ? (game.homeML || '') : (game.awayML || '');
+        const lineStr = `${abbrevTeam(team)} ${ml > 0 ? '+' : ''}${ml}`;
+        const resultKey = `${matchupStr}-ml`;
+
+        picks.push({
+          type: 'ml', team, matchup: matchupStr, line: lineStr,
+          winProb: side === 'home' ? prediction.homeWinProb : prediction.awayWinProb,
+          confidence,
+          pitchers: `${game.awayPitcher || 'TBD'} vs ${game.homePitcher || 'TBD'}`,
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      }
+
+      if (ouLine && totalEdge >= 1.5) {
+        const resultKey = `${matchupStr}-over`;
+        picks.push({
+          type: 'over', team: `OVER ${ouLine}`, matchup: matchupStr,
+          line: `O ${ouLine} (+${totalEdge.toFixed(1)} edge)`,
+          winProb: null, confidence: totalEdge >= 2.0 ? 'high' : 'med',
+          pitchers: `${game.awayPitcher || 'TBD'} vs ${game.homePitcher || 'TBD'}`,
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      } else if (ouLine && totalEdge <= -1.5) {
+        const resultKey = `${matchupStr}-under`;
+        picks.push({
+          type: 'under', team: `UNDER ${ouLine}`, matchup: matchupStr,
+          line: `U ${ouLine} (${totalEdge.toFixed(1)} edge)`,
+          winProb: null, confidence: totalEdge <= -2.0 ? 'high' : 'med',
+          pitchers: `${game.awayPitcher || 'TBD'} vs ${game.homePitcher || 'TBD'}`,
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      }
+    }
+
+    if (picks.length > 0) {
+      days.push({ date, picks });
+    }
+  }
+
+  res.json({ days });
+});
+
 // API: Record result for a bet
 app.post('/api/results', (req, res) => {
   const { date, betId, result, score } = req.body;
