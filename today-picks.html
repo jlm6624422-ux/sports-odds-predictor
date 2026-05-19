@@ -94,7 +94,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <div class="stat"><div class="val">0%</div><div class="lbl">of $3K target</div></div>
 <div class="stat"><div class="val blue">7</div><div class="lbl">Picks today</div></div>
 <div class="stat"><div class="val">3</div><div class="lbl">Parlays</div></div>
-<div class="stat"><div class="val">$164</div><div class="lbl">Exposure</div></div>
+<div class="stat"><div class="val">$165</div><div class="lbl">Exposure</div></div>
 </div>
 
 <div class="tabs">
@@ -106,7 +106,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 
 <!-- PICKS TAB -->
 <div class="tab-content active" id="tab-picks">
-<div class="top-picks"><h2>&#127942; Today's Best Plays</h2><div class="pick-item kelly"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Moneyline (Kelly)</div><div class="pick-bet">Tampa Bay Rays ML (-120) &mdash; $20</div></div><div class="pick-edge">+3.6%</div><span class="pick-conf kelly">KELLY</span></div><div class="pick-item kelly"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Moneyline (Kelly)</div><div class="pick-bet">Seattle Mariners ML (-149) &mdash; $14</div></div><div class="pick-edge">+3.4%</div><span class="pick-conf kelly">KELLY</span></div><div class="pick-item over"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.3 runs</div></div><div class="pick-edge">+1.8</div><span class="pick-conf high">HIGH</span></div><div class="pick-item over"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Total</div><div class="pick-bet">OVER 8.5 (-110) &mdash; Proj 10.7 runs</div></div><div class="pick-edge">+2.2</div><span class="pick-conf high">HIGH</span></div><div class="pick-item over"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.4 runs</div></div><div class="pick-edge">+1.9</div><span class="pick-conf high">HIGH</span></div><div class="pick-item nba"><div class="pick-details"><div class="pick-game">NBA: Cleveland Cavaliers @ New York Knicks &bull; Spread</div><div class="pick-bet">Cleveland Cavaliers +7.5 (-115)</div></div><div class="pick-edge">+1.5</div><span class="pick-conf med">MED</span></div><div class="pick-item"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Lean</div><div class="pick-bet">Minnesota Twins ML (-137)</div></div><div class="pick-edge">58.1%</div><span class="pick-conf med">LEAN</span></div><div class="pick-item"><div class="pick-details"><div class="pick-game">Toronto Blue Jays @ New York Yankees &bull; Lean</div><div class="pick-bet">New York Yankees ML (-143)</div></div><div class="pick-edge">57.8%</div><span class="pick-conf med">LEAN</span></div><div class="pick-item"><div class="pick-details"><div class="pick-game">Cincinnati Reds @ Philadelphia Phillies &bull; Lean</div><div class="pick-bet">Philadelphia Phillies ML (-148)</div></div><div class="pick-edge">56.3%</div><span class="pick-conf med">LEAN</span></div></div>
+<div class="top-picks"><h2>&#127942; Today's Best Plays <button id="refresh-btn" onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></h2><div class="pick-item kelly" data-team="Tampa Bay Rays" data-type="ml" data-home="Tampa Bay Rays"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Moneyline (Kelly)</div><div class="pick-bet">Tampa Bay Rays ML (-120) &mdash; $20</div></div><div class="pick-edge">+3.6%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item kelly" data-team="Seattle Mariners" data-type="ml" data-home="Seattle Mariners"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Moneyline (Kelly)</div><div class="pick-bet">Seattle Mariners ML (-156) &mdash; $15</div></div><div class="pick-edge">+3.7%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="7.5" data-home="Tampa Bay Rays"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.3 runs</div></div><div class="pick-edge">+1.8</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="8.5" data-home="Minnesota Twins"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Total</div><div class="pick-bet">OVER 8.5 (-110) &mdash; Proj 10.7 runs</div></div><div class="pick-edge">+2.2</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="7.5" data-home="Seattle Mariners"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.4 runs</div></div><div class="pick-edge">+1.9</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item nba"><div class="pick-details"><div class="pick-game">NBA: Cleveland Cavaliers @ New York Knicks &bull; Spread</div><div class="pick-bet">Cleveland Cavaliers +7.5 (-115)</div></div><div class="pick-edge">+1.5</div><span class="pick-conf med">MED</span></div><div class="pick-item" data-team="Minnesota Twins" data-type="ml" data-home="Minnesota Twins"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Lean</div><div class="pick-bet">Minnesota Twins ML (-137)</div></div><div class="pick-edge">58.1%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="New York Yankees" data-type="ml" data-home="New York Yankees"><div class="pick-details"><div class="pick-game">Toronto Blue Jays @ New York Yankees &bull; Lean</div><div class="pick-bet">New York Yankees ML (-143)</div></div><div class="pick-edge">57.8%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="Philadelphia Phillies" data-type="ml" data-home="Philadelphia Phillies"><div class="pick-details"><div class="pick-game">Cincinnati Reds @ Philadelphia Phillies &bull; Lean</div><div class="pick-bet">Philadelphia Phillies ML (-149)</div></div><div class="pick-edge">56.3%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div></div>
 <div class="section"><div class="section-title nba">&#127936; NBA</div><div class="game-card" style="border-color:#f0883e"><div class="game-header"><div class="game-matchup">Cleveland Cavaliers (52-30) @ New York Knicks (53-29)</div><div class="game-time">5/19 - 8:00 PM EDT</div></div><div class="game-details"><div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">New York Knicks -7.5</div></div><div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">217.5</div></div><div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">New York Knicks -265 / Cleveland Cavaliers +215</div></div><div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Cleveland Cavaliers +7.5 (spread value)</div></div></div></div></div>
 </div>
 
@@ -114,7 +114,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <div class="tab-content" id="tab-projections">
 <div class="section">
 <div class="section-title">&#9918; MLB Full Projections &mdash; 15 Games</div>
-<div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>ML</th><th>O/U</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Proj Total</th><th>Signal</th></tr></thead><tbody><tr><td class="edge-positive">Orioles @ Rays</td><td>Bradish vs Jax</td><td>-120</td><td>7.5</td><td class="edge-positive">Rays</td><td class="edge-positive">58.7%</td><td class="edge-high">+3.6%</td><td class="edge-positive">9.3 (+1.8)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Astros @ Twins</td><td>Jr. vs Matthews</td><td>-137</td><td>8.5</td><td class="edge-positive">Twins</td><td class="edge-positive">58.1%</td><td>+0.2%</td><td class="edge-positive">10.7 (+2.2)</td><td>&#128064; LEAN</td></tr><tr><td>Jays @ Yankees</td><td>Cease vs Warren</td><td>-143</td><td>8.5</td><td class="edge-positive">Yankees</td><td class="edge-positive">57.8%</td><td>+0.4%</td><td>8.2 (-0.3)</td><td>&#128064; LEAN</td></tr><tr><td class="edge-positive">Sox @ Mariners</td><td>Kay vs Miller</td><td>-149</td><td>7.5</td><td class="edge-positive">Mariners</td><td class="edge-positive">56.6%</td><td class="edge-high">+3.4%</td><td class="edge-positive">9.4 (+1.9)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Reds @ Phillies</td><td>Burns vs Luzardo</td><td>-148</td><td>8.5</td><td class="edge-positive">Phillies</td><td class="edge-positive">56.3%</td><td>+2.4%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr><td>Giants @ Diamondbacks</td><td>Roupp vs Nelson</td><td>-123</td><td>8.5</td><td class="edge-positive">Diamondbacks</td><td class="edge-positive">55.4%</td><td>+0.5%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr><td>Braves @ Marlins</td><td>Pérez vs Garrett</td><td>-136</td><td>8.5</td><td class="edge-positive">Braves</td><td class="edge-positive">53.2%</td><td>+0.6%</td><td>9.5 (+1.0)</td><td>&#128064; LEAN</td></tr><tr class="skip"><td>Dodgers @ Padres</td><td>Sheehan vs Canning</td><td>—</td><td>8.5</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Athletics @ Angels</td><td>Lopez vs Detmers</td><td>—</td><td>9</td><td>—</td><td>52.7%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Pirates @ Cardinals</td><td>Keller vs Liberatore</td><td>—</td><td>8</td><td>—</td><td>52.4%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Sox @ Royals</td><td>Suarez vs Falter</td><td>—</td><td>7.5</td><td>—</td><td>51.8%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Brewers @ Cubs</td><td>Misiorowski vs Brown</td><td>—</td><td>7.5</td><td>—</td><td>51.5%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Guardians @ Tigers</td><td>Messick vs Montero</td><td>—</td><td>8</td><td>—</td><td>50.8%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Mets @ Nationals</td><td>McLean vs Griffin</td><td>—</td><td>9</td><td>—</td><td>50.7%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Rangers @ Rockies</td><td>Rocker vs Peralta</td><td>—</td><td>10</td><td>—</td><td>50.4%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr></tbody></table></div>
+<div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>ML</th><th>O/U</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Proj Total</th><th>Signal</th></tr></thead><tbody><tr><td class="edge-positive">Orioles @ Rays</td><td>Bradish vs Jax</td><td>-120</td><td>7.5</td><td class="edge-positive">Rays</td><td class="edge-positive">58.7%</td><td class="edge-high">+3.6%</td><td class="edge-positive">9.3 (+1.8)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Astros @ Twins</td><td>Jr. vs Matthews</td><td>-137</td><td>8.5</td><td class="edge-positive">Twins</td><td class="edge-positive">58.1%</td><td>+0.2%</td><td class="edge-positive">10.7 (+2.2)</td><td>&#128064; LEAN</td></tr><tr><td>Jays @ Yankees</td><td>Cease vs Warren</td><td>-143</td><td>9</td><td class="edge-positive">Yankees</td><td class="edge-positive">57.8%</td><td>+0.4%</td><td>8.2 (-0.8)</td><td>&#128064; LEAN</td></tr><tr><td class="edge-positive">Sox @ Mariners</td><td>Kay vs Miller</td><td>-156</td><td>7.5</td><td class="edge-positive">Mariners</td><td class="edge-positive">56.8%</td><td class="edge-high">+3.7%</td><td class="edge-positive">9.4 (+1.9)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Reds @ Phillies</td><td>Burns vs Luzardo</td><td>-149</td><td>8.5</td><td class="edge-positive">Phillies</td><td class="edge-positive">56.3%</td><td>+2.4%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr><td>Giants @ Diamondbacks</td><td>Roupp vs Nelson</td><td>-125</td><td>8.5</td><td class="edge-positive">Diamondbacks</td><td class="edge-positive">55.5%</td><td>+0.4%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr><td>Braves @ Marlins</td><td>Pérez vs Garrett</td><td>-136</td><td>8.5</td><td class="edge-positive">Braves</td><td class="edge-positive">53.2%</td><td>+0.6%</td><td>9.5 (+1.0)</td><td>&#128064; LEAN</td></tr><tr class="skip"><td>Athletics @ Angels</td><td>Lopez vs Detmers</td><td>—</td><td>9</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Dodgers @ Padres</td><td>Sheehan vs Canning</td><td>—</td><td>8.5</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Pirates @ Cardinals</td><td>Keller vs Liberatore</td><td>—</td><td>8</td><td>—</td><td>52.4%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Sox @ Royals</td><td>Suarez vs Falter</td><td>—</td><td>7.5</td><td>—</td><td>51.8%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Brewers @ Cubs</td><td>Misiorowski vs Brown</td><td>—</td><td>7.5</td><td>—</td><td>51.5%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Guardians @ Tigers</td><td>Messick vs Montero</td><td>—</td><td>8</td><td>—</td><td>51.1%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Mets @ Nationals</td><td>McLean vs Griffin</td><td>—</td><td>9</td><td>—</td><td>50.7%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Rangers @ Rockies</td><td>Alexander vs Peralta</td><td>—</td><td>10</td><td>—</td><td>50.4%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr></tbody></table></div>
 </div>
 </div>
 
@@ -144,7 +144,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 
 <footer>
 <p>Model: Ensemble v2.1 (Pythagorean + Elo + FIP + Market) | Data: ESPN/DraftKings + MLB Stats API</p>
-<p style="margin-top:4px">Auto-generated 2026-05-19 14:46:48 UTC</p>
+<p style="margin-top:4px">Auto-generated 2026-05-19 15:00:48 UTC</p>
 </footer>
 </div>
 
@@ -154,6 +154,62 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   event.target.classList.add('active');
+}
+
+async function refreshResults() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = 'Refreshing...';
+  btn.disabled = true;
+  try {
+    const today = '2026-05-19';
+    const res = await fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=' + today + '&hydrate=linescore');
+    const data = await res.json();
+    const games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+    if (games.length === 0) { btn.textContent = 'No finals yet'; btn.disabled = false; return; }
+
+    const results = new Map();
+    for (const g of games) {
+      results.set(g.teams.home.team.name, {
+        home: g.teams.home.team.name, away: g.teams.away.team.name,
+        homeScore: g.teams.home.score, awayScore: g.teams.away.score,
+        winner: g.teams.home.score > g.teams.away.score ? g.teams.home.team.name : g.teams.away.team.name,
+        total: g.teams.home.score + g.teams.away.score
+      });
+    }
+
+    document.querySelectorAll('.pick-item[data-home]').forEach(el => {
+      const home = el.dataset.home;
+      const type = el.dataset.type;
+      const game = results.get(home);
+      if (!game) return;
+
+      const resultEl = el.querySelector('.pick-result');
+      if (!resultEl) return;
+
+      let won = false;
+      let score = game.away.split(' ').pop() + ' ' + game.awayScore + ', ' + game.home.split(' ').pop() + ' ' + game.homeScore;
+
+      if (type === 'ml') {
+        const team = el.dataset.team;
+        won = game.winner.includes(team.split(' ').pop()) || team.includes(game.winner.split(' ').pop());
+      } else if (type === 'over') {
+        const line = parseFloat(el.dataset.line);
+        won = game.total > line;
+        score += ' (' + game.total + ' total)';
+      }
+
+      const badge = won
+        ? '<span style="background:#064e3b;color:#34d399;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+        : '<span style="background:#7f1d1d;color:#f87171;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+      resultEl.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em;margin-left:4px">' + score + '</span>';
+    });
+
+    btn.textContent = '\u2713 Updated';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.textContent = 'Error';
+    btn.disabled = false;
+  }
 }
 </script>
 </body>

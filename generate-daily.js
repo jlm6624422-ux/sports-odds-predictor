@@ -509,25 +509,81 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
   event.target.classList.add('active');
 }
+
+async function refreshResults() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = 'Refreshing...';
+  btn.disabled = true;
+  try {
+    const today = '${today}';
+    const res = await fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=' + today + '&hydrate=linescore');
+    const data = await res.json();
+    const games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+    if (games.length === 0) { btn.textContent = 'No finals yet'; btn.disabled = false; return; }
+
+    const results = new Map();
+    for (const g of games) {
+      results.set(g.teams.home.team.name, {
+        home: g.teams.home.team.name, away: g.teams.away.team.name,
+        homeScore: g.teams.home.score, awayScore: g.teams.away.score,
+        winner: g.teams.home.score > g.teams.away.score ? g.teams.home.team.name : g.teams.away.team.name,
+        total: g.teams.home.score + g.teams.away.score
+      });
+    }
+
+    document.querySelectorAll('.pick-item[data-home]').forEach(el => {
+      const home = el.dataset.home;
+      const type = el.dataset.type;
+      const game = results.get(home);
+      if (!game) return;
+
+      const resultEl = el.querySelector('.pick-result');
+      if (!resultEl) return;
+
+      let won = false;
+      let score = game.away.split(' ').pop() + ' ' + game.awayScore + ', ' + game.home.split(' ').pop() + ' ' + game.homeScore;
+
+      if (type === 'ml') {
+        const team = el.dataset.team;
+        won = game.winner.includes(team.split(' ').pop()) || team.includes(game.winner.split(' ').pop());
+      } else if (type === 'over') {
+        const line = parseFloat(el.dataset.line);
+        won = game.total > line;
+        score += ' (' + game.total + ' total)';
+      }
+
+      const badge = won
+        ? '<span style="background:#064e3b;color:#34d399;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+        : '<span style="background:#7f1d1d;color:#f87171;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+      resultEl.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em;margin-left:4px">' + score + '</span>';
+    });
+
+    btn.textContent = '\\u2713 Updated';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.textContent = 'Error';
+    btn.disabled = false;
+  }
+}
 </script>
 </body>
 </html>`;
 }
 
 function buildTopPicks(kellyBets, actionable, nbaGames, mlbPicks) {
-  let html = '<div class="top-picks"><h2>&#127942; Today\'s Best Plays</h2>';
+  let html = '<div class="top-picks"><h2>&#127942; Today\'s Best Plays <button id="refresh-btn" onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></h2>';
 
   for (const p of kellyBets) {
     const odds = p.pickSide === 'home' ? p.homeML : p.awayML;
     const oddsStr = odds ? ` (${odds > 0 ? '+' : ''}${odds})` : '';
-    html += `<div class="pick-item kelly"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Moneyline (Kelly)</div><div class="pick-bet">${p.pick} ML${oddsStr} &mdash; $${p.kelly.betSize.toFixed(0)}</div></div><div class="pick-edge">+${Math.max(Math.abs(p.edge?.home||0), Math.abs(p.edge?.away||0)).toFixed(1)}%</div><span class="pick-conf kelly">KELLY</span></div>`;
+    html += `<div class="pick-item kelly" data-team="${p.pick}" data-type="ml" data-home="${p.home}"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Moneyline (Kelly)</div><div class="pick-bet">${p.pick} ML${oddsStr} &mdash; $${p.kelly.betSize.toFixed(0)}</div></div><div class="pick-edge">+${Math.max(Math.abs(p.edge?.home||0), Math.abs(p.edge?.away||0)).toFixed(1)}%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div>`;
   }
 
   // Over/under plays
   const overPlays = mlbPicks.filter(p => !p.coinFlip && p.ouLine && (p.prediction.expectedTotal - p.ouLine) > 1.5).slice(0, 3);
   for (const p of overPlays) {
     const edge = (p.prediction.expectedTotal - p.ouLine).toFixed(1);
-    html += `<div class="pick-item over"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Total</div><div class="pick-bet">OVER ${p.ouLine} (-110) &mdash; Proj ${p.prediction.expectedTotal.toFixed(1)} runs</div></div><div class="pick-edge">+${edge}</div><span class="pick-conf high">HIGH</span></div>`;
+    html += `<div class="pick-item over" data-type="over" data-line="${p.ouLine}" data-home="${p.home}"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Total</div><div class="pick-bet">OVER ${p.ouLine} (-110) &mdash; Proj ${p.prediction.expectedTotal.toFixed(1)} runs</div></div><div class="pick-edge">+${edge}</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div>`;
   }
 
   // NBA pick
@@ -544,7 +600,7 @@ function buildTopPicks(kellyBets, actionable, nbaGames, mlbPicks) {
   for (const p of leans) {
     const odds = p.pickSide === 'home' ? p.homeML : p.awayML;
     const oddsStr = odds ? ` (${odds > 0 ? '+' : ''}${odds})` : '';
-    html += `<div class="pick-item"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Lean</div><div class="pick-bet">${p.pick} ML${oddsStr}</div></div><div class="pick-edge">${p.conf.toFixed(1)}%</div><span class="pick-conf med">LEAN</span></div>`;
+    html += `<div class="pick-item" data-team="${p.pick}" data-type="ml" data-home="${p.home}"><div class="pick-details"><div class="pick-game">${p.away} @ ${p.home} &bull; Lean</div><div class="pick-bet">${p.pick} ML${oddsStr}</div></div><div class="pick-edge">${p.conf.toFixed(1)}%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div>`;
   }
 
   html += '</div>';
