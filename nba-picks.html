@@ -80,6 +80,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <div class="section">
 <div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
 <div id="nba-daily-games"><p style="color:#8b949e;text-align:center;padding:20px">Loading predictions...</p></div>
+<div id="nba-parlays"></div>
 </div>
 
 <div class="section" style="margin-top:40px">
@@ -192,6 +193,86 @@ function renderDailyGames(nbaData) {
   container.innerHTML = html;
 }
 
+function renderParlays(nbaData) {
+  const container = document.getElementById('nba-parlays');
+  if (!nbaData || nbaData.length === 0) { container.innerHTML = ''; return; }
+
+  // Build parlays from high/med confidence props across games
+  const allProps = [];
+  for (const game of nbaData) {
+    for (const prop of (game.propPicks || [])) {
+      if (prop.confidence === 'HIGH' || prop.confidence === 'MED') {
+        allProps.push({ ...prop, game: `${game.away} @ ${game.home}` });
+      }
+    }
+  }
+
+  if (allProps.length < 2) { container.innerHTML = ''; return; }
+
+  // Sort by edge and build 2-3 parlays
+  allProps.sort((a, b) => b.absEdge - a.absEdge);
+  const parlays = [];
+
+  // 2-leg parlay: top 2 props
+  if (allProps.length >= 2) {
+    const legs = allProps.slice(0, 2);
+    const impliedProb = legs.reduce((p, l) => p * 0.6, 1); // ~60% each leg
+    const payout = (1 / impliedProb).toFixed(1);
+    parlays.push({ name: '2-Leg Power Play', legs, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
+  }
+
+  // 3-leg parlay: top 3
+  if (allProps.length >= 3) {
+    const legs = allProps.slice(0, 3);
+    const impliedProb = legs.reduce((p, l) => p * 0.58, 1);
+    const payout = (1 / impliedProb).toFixed(1);
+    parlays.push({ name: '3-Leg Value Parlay', legs, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
+  }
+
+  // 4-leg long shot: mix stats
+  if (allProps.length >= 4) {
+    // Pick diverse stats: 1 PTS, 1 REB/AST, 1 PRA, 1 other
+    const byType = {};
+    for (const p of allProps) { if (!byType[p.stat]) byType[p.stat] = p; }
+    const diverse = Object.values(byType).slice(0, 4);
+    if (diverse.length >= 4) {
+      const impliedProb = diverse.reduce((p, l) => p * 0.55, 1);
+      const payout = (1 / impliedProb).toFixed(1);
+      parlays.push({ name: '4-Leg Long Shot', legs: diverse, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
+    }
+  }
+
+  let html = `
+  <div class="nba-day-section" style="margin-top:20px" id="parlays-section">
+    <div class="nba-day-header" onclick="document.getElementById('parlays-section').classList.toggle('collapsed')" style="padding:12px 16px;background:#1a2332">
+      <h3 style="color:#58a6ff">&#127922; Today's Parlays (${parlays.length})</h3>
+      <span class="chevron">&#9660;</span>
+    </div>
+    <div class="nba-day-body" style="padding:16px">`;
+
+  for (const parlay of parlays) {
+    html += `
+      <div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px;margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span style="font-weight:700;color:#58a6ff">${parlay.name}</span>
+          <span style="background:#1f3a5f;color:#58a6ff;padding:4px 10px;border-radius:4px;font-weight:700;font-size:0.9em">${parlay.payout}</span>
+        </div>
+        <div style="font-size:0.8em;color:#8b949e;margin-bottom:8px">Est. probability: ${parlay.impliedOdds}</div>
+        ${parlay.legs.map((leg, i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i > 0 ? 'border-top:1px solid #21262d' : ''}">
+          <span style="color:#f0883e;font-weight:600;width:18px">${i+1}.</span>
+          <span style="font-weight:600">${leg.name}</span>
+          <span style="color:#8b949e">${leg.stat}</span>
+          <span style="color:${leg.edge > 0 ? '#3fb950' : '#f85149'};font-weight:600">${leg.direction} ${leg.line}</span>
+          <span style="color:#8b949e;font-size:0.85em;margin-left:auto">edge: ${leg.edge > 0 ? '+' : ''}${leg.edge}</span>
+        </div>`).join('')}
+      </div>`;
+  }
+
+  html += `</div></div>`;
+  container.innerHTML = html;
+}
+
 async function loadDailyGames() {
   try {
     const res = await fetch('/api/today');
@@ -203,6 +284,7 @@ async function loadDailyGames() {
         subtitle.textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
       }
       renderDailyGames(data.nba || []);
+      renderParlays(data.nba || []);
     } else {
       document.getElementById('nba-daily-games').innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No predictions yet today &mdash; run generates at 7am ET</p>';
     }
@@ -270,6 +352,104 @@ let NBA_TRACKER_DATA = [
         ]
     }
 ];
+
+// Auto-grade all pending days on page load
+async function autoGradePendingDays() {
+    for (const day of NBA_TRACKER_DATA) {
+        const hasPending = day.picks.some(p => p.result === 'pending');
+        if (!hasPending) continue;
+
+        try {
+            const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
+            const data = await res.json();
+            const events = data.events || [];
+
+            for (const event of events) {
+                const comp = event.competitions[0];
+                const home = comp.competitors?.find(c => c.homeAway === 'home');
+                const away = comp.competitors?.find(c => c.homeAway === 'away');
+                if (!home || !away || !comp.status?.type?.completed) continue;
+
+                const homeScore = parseInt(home.score || 0);
+                const awayScore = parseInt(away.score || 0);
+                const total = homeScore + awayScore;
+                const margin = homeScore - awayScore;
+                const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
+                const scoreStr = `${away.team.shortDisplayName} ${awayScore}, ${home.team.shortDisplayName} ${homeScore}`;
+
+                for (const pick of day.picks) {
+                    if (pick.result !== 'pending') continue;
+
+                    if (pick.type === 'ml') {
+                        const pickedTeam = pick.team.split(' ').slice(-1)[0].toLowerCase();
+                        const won = winner.toLowerCase().includes(pickedTeam);
+                        pick.result = won ? 'win' : 'loss';
+                        pick.score = scoreStr;
+                    } else if (pick.type === 'spread') {
+                        const lineMatch = pick.line.match(/([+-]?\d+\.?\d*)/);
+                        if (lineMatch) {
+                            const spread = parseFloat(lineMatch[1]);
+                            const pickedTeam = pick.team;
+                            const isHome = home.team.displayName.includes(pickedTeam.split(' ').pop());
+                            const teamMargin = isHome ? margin : -margin;
+                            pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss';
+                            pick.score = scoreStr;
+                        }
+                    } else if (pick.type === 'over') {
+                        const lineMatch = pick.line.match(/([\d.]+)/);
+                        if (lineMatch) {
+                            const line = parseFloat(lineMatch[1]);
+                            pick.result = total > line ? 'win' : total === line ? 'push' : 'loss';
+                            pick.score = `${scoreStr} (${total} total)`;
+                        }
+                    } else if (pick.type === 'under') {
+                        const lineMatch = pick.line.match(/([\d.]+)/);
+                        if (lineMatch) {
+                            const line = parseFloat(lineMatch[1]);
+                            pick.result = total < line ? 'win' : 'loss';
+                            pick.score = `${scoreStr} (${total} total)`;
+                        }
+                    } else if (pick.type === 'prop') {
+                        try {
+                            const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
+                            const boxData = await boxRes.json();
+                            const lineMatch = pick.line.match(/O\s*([\d.]+)/);
+                            if (!lineMatch) continue;
+                            const propLine = parseFloat(lineMatch[1]);
+                            const playerName = pick.team.split(' O ')[0].split(' U ')[0];
+
+                            for (const team of (boxData.boxscore?.players || [])) {
+                                for (const stat of team.statistics) {
+                                    const labels = stat.labels || [];
+                                    const ptsIdx = labels.indexOf('PTS');
+                                    const rebIdx = labels.indexOf('REB');
+                                    const astIdx = labels.indexOf('AST');
+                                    for (const athlete of stat.athletes) {
+                                        if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
+                                        const pts = parseInt(athlete.stats[ptsIdx]) || 0;
+                                        const reb = parseInt(athlete.stats[rebIdx]) || 0;
+                                        const ast = parseInt(athlete.stats[astIdx]) || 0;
+
+                                        let actual = null;
+                                        if (pick.team.includes('PRA')) actual = pts + reb + ast;
+                                        else if (pick.team.includes('REB')) actual = reb;
+                                        else if (pick.team.includes('AST')) actual = ast;
+                                        else if (pick.team.includes('PTS')) actual = pts;
+
+                                        if (actual !== null) {
+                                            pick.result = actual > propLine ? 'win' : 'loss';
+                                            pick.score = `${actual} actual`;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+}
 
 function calcNBAStats() {
     let wins = 0, losses = 0, pending = 0;
@@ -486,21 +666,71 @@ async function refreshTrackerResults() {
 }
 
 async function loadNBATracker() {
+    // Add today's picks from API if not already in tracker
+    try {
+        const todayRes = await fetch('/api/today');
+        if (todayRes.ok) {
+            const todayData = await todayRes.json();
+            const todayDate = todayData.date;
+            const existingDates = new Set(NBA_TRACKER_DATA.map(d => d.date));
+
+            if (todayDate && !existingDates.has(todayDate) && todayData.nba?.length > 0) {
+                const todayPicks = [];
+                for (const game of todayData.nba) {
+                    // Add game bets
+                    if (game.spread) {
+                        const favHome = game.spread && !game.spread.includes('+');
+                        const dog = favHome ? game.away : game.home;
+                        const spreadVal = game.spread.match(/([+-]?\d+\.?\d*)/)?.[1] || '0';
+                        todayPicks.push({ type: 'spread', team: dog, matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`, line: `${dog.split(' ').pop()} +${Math.abs(parseFloat(spreadVal))}`, odds: '-110', confidence: 'med', thesis: 'Playoff games run tight', result: 'pending', score: '' });
+                    }
+                    if (game.ou) {
+                        todayPicks.push({ type: 'over', team: `OVER ${game.ou}`, matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`, line: `O ${game.ou}`, odds: '-110', confidence: 'med', thesis: 'Pace projection', result: 'pending', score: '' });
+                    }
+                    // Add top prop picks
+                    if (game.propPicks) {
+                        for (const prop of game.propPicks.slice(0, 5)) {
+                            todayPicks.push({
+                                type: 'prop',
+                                team: `${prop.name} ${prop.direction} ${prop.line} ${prop.stat}`,
+                                matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`,
+                                line: `${prop.direction === 'OVER' ? 'O' : 'U'} ${prop.line} (${prop.edge > 0 ? '+' : ''}${prop.edge} edge)`,
+                                odds: '-110',
+                                confidence: prop.confidence?.toLowerCase() || 'med',
+                                thesis: `Avg ${prop.seasonAvg} → Proj ${prop.projected}`,
+                                result: 'pending',
+                                score: '',
+                            });
+                        }
+                    }
+                }
+                if (todayPicks.length > 0) {
+                    NBA_TRACKER_DATA.unshift({ date: todayDate, picks: todayPicks });
+                }
+            }
+        }
+    } catch (e) {}
+
+    // Merge any additional history days from API
     try {
         const res = await fetch('/api/nba-bestbets');
         if (res.ok) {
             const data = await res.json();
             if (data.days && data.days.length > 0) {
-                const hardcodedDates = new Set(NBA_TRACKER_DATA.map(d => d.date));
+                const existingDates = new Set(NBA_TRACKER_DATA.map(d => d.date));
                 for (const day of data.days) {
-                    if (!hardcodedDates.has(day.date)) {
-                        NBA_TRACKER_DATA.unshift(day);
+                    if (!existingDates.has(day.date)) {
+                        NBA_TRACKER_DATA.push(day);
                     }
                 }
-                NBA_TRACKER_DATA.sort((a, b) => b.date.localeCompare(a.date));
             }
         }
     } catch (e) {}
+
+    NBA_TRACKER_DATA.sort((a, b) => b.date.localeCompare(a.date));
+
+    // Auto-grade any pending results from completed games
+    await autoGradePendingDays();
 
     renderNBAStats();
     renderNBATracker();

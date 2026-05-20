@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Today's Picks - 2026-05-19</title>
+<title>Today's Picks</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
@@ -30,22 +30,6 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 .section-title{font-size:1.3em;color:#58a6ff;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
 .section-title.nba{color:#f0883e}
 .section-title.parlays{color:#a371f7}
-
-.top-picks{background:linear-gradient(135deg,#1a2332,#161b22);border:2px solid #3fb950;border-radius:12px;padding:20px;margin-bottom:20px}
-.top-picks h2{color:#3fb950;margin-bottom:12px;font-size:1.2em}
-.pick-item{display:flex;align-items:center;padding:10px 14px;background:rgba(63,185,80,0.05);border-radius:8px;margin-bottom:6px;border-left:3px solid #3fb950}
-.pick-item.nba{border-left-color:#f0883e;background:rgba(240,136,62,0.05)}
-.pick-item.kelly{border-left-color:#ff7b72;background:rgba(255,123,114,0.05)}
-.pick-item.over{border-left-color:#a371f7;background:rgba(163,113,247,0.05)}
-.pick-details{flex:1}
-.pick-game{font-size:0.8em;color:#8b949e}
-.pick-bet{font-weight:600;font-size:1.05em;margin-top:2px}
-.pick-edge{font-weight:700;font-size:1.1em;color:#3fb950;margin:0 12px}
-.pick-conf{font-size:0.7em;padding:2px 7px;border-radius:4px;font-weight:600;text-transform:uppercase}
-.pick-conf.high{background:rgba(63,185,80,0.2);color:#3fb950}
-.pick-conf.med{background:rgba(210,153,34,0.2);color:#d29922}
-.pick-conf.kelly{background:rgba(255,123,114,0.2);color:#ff7b72}
-
 .game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
 .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .game-matchup{font-size:1.1em;font-weight:600}
@@ -54,9 +38,26 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 .detail-label{font-size:0.7em;color:#8b949e;text-transform:uppercase}
 .detail-value{font-weight:600;margin-top:2px}
 .detail-value.green{color:#3fb950}
-.detail-value.blue{color:#58a6ff}
 .detail-value.orange{color:#f0883e}
-
+.pick-item{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:12px;border-left:3px solid #3fb950}
+.pick-item.nba{border-left-color:#f0883e;background:rgba(240,136,62,0.05)}
+.pick-item.kelly{border-left-color:#3fb950;background:rgba(63,185,80,0.05)}
+.pick-item.over{border-left-color:#58a6ff;background:rgba(88,166,255,0.05)}
+.pick-details{flex:1}
+.pick-game{font-size:0.8em;color:#8b949e}
+.pick-bet{font-weight:600;margin-top:2px}
+.pick-edge{font-weight:700;color:#3fb950;font-size:0.9em;min-width:50px;text-align:right}
+.pick-conf{padding:3px 8px;border-radius:4px;font-size:0.7em;font-weight:700}
+.pick-conf.kelly{background:#064e3b;color:#34d399}
+.pick-conf.high{background:#1f3a5f;color:#58a6ff}
+.pick-conf.med{background:#2d2a1f;color:#d29922}
+.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
+table{width:100%;border-collapse:collapse;font-size:0.82em}
+th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase}
+td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
+td.edge-positive{color:#3fb950;font-weight:600}
+td.edge-high{color:#f0883e;font-weight:700}
+tr.skip td{color:#484f58}
 .parlay-card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:18px;margin-bottom:10px;border-left:3px solid #a371f7}
 .parlay-card.best{border-color:#3fb950;border-width:2px}
 .parlay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -65,16 +66,6 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 .parlay-legs{color:#8b949e;font-size:0.85em;margin-bottom:6px}
 .parlay-footer{display:flex;gap:16px;font-size:0.8em;color:#8b949e;flex-wrap:wrap}
 .parlay-footer .ev{color:#3fb950;font-weight:600}
-
-.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
-table{width:100%;border-collapse:collapse;font-size:0.85em}
-th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;position:sticky;top:0}
-td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
-tr:hover td{background:rgba(88,166,255,0.03)}
-.edge-positive{color:#3fb950;font-weight:600}
-.edge-high{color:#3fb950;font-weight:700}
-.skip{color:#484f58}
-
 .nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
 .nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
 .nav-links a:hover{text-decoration:underline}
@@ -84,57 +75,32 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <body>
 <div class="container">
 <header>
-<h1>Daily Picks &amp; Projections</h1>
-<div class="subtitle">Tuesday, May 19, 2026</div>
-<div class="model-badge">Ensemble v2.1 | 4/4 Models | ESPN/DK Odds</div>
+<h1>Today's Picks</h1>
+<div class="subtitle" id="page-date">Loading...</div>
+<div class="model-badge">Ensemble v2.1 — Pythagorean + Elo + FIP + Market</div>
 </header>
 
-<div class="stats-bar">
-<div class="stat"><div class="val">+$0</div><div class="lbl">Running P&L</div></div>
-<div class="stat"><div class="val">0%</div><div class="lbl">of $3K target</div></div>
-<div class="stat"><div class="val blue">6</div><div class="lbl">Picks today</div></div>
-<div class="stat"><div class="val">3</div><div class="lbl">Parlays</div></div>
-<div class="stat"><div class="val">$165</div><div class="lbl">Exposure</div></div>
-</div>
+<div class="stats-bar" id="stats-bar"></div>
 
 <div class="tabs">
 <div class="tab active" onclick="switchTab('picks')">Picks</div>
 <div class="tab" onclick="switchTab('projections')">Projections</div>
 <div class="tab" onclick="switchTab('parlays')">Parlays</div>
-<div class="tab" onclick="switchTab('results')">Results</div>
 </div>
 
 <!-- PICKS TAB -->
 <div class="tab-content active" id="tab-picks">
-<div class="top-picks"><h2>&#127942; Today's Best Plays <button id="refresh-btn" onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></h2><div class="pick-item kelly" data-team="Tampa Bay Rays" data-type="ml" data-home="Tampa Bay Rays"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Moneyline (Kelly)</div><div class="pick-bet">Tampa Bay Rays ML (-120) &mdash; $20</div></div><div class="pick-edge">+3.6%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item kelly" data-team="Seattle Mariners" data-type="ml" data-home="Seattle Mariners"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Moneyline (Kelly)</div><div class="pick-bet">Seattle Mariners ML (-156) &mdash; $15</div></div><div class="pick-edge">+3.7%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="7.5" data-home="Tampa Bay Rays"><div class="pick-details"><div class="pick-game">Baltimore Orioles @ Tampa Bay Rays &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.3 runs</div></div><div class="pick-edge">+1.8</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="8.5" data-home="Minnesota Twins"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Total</div><div class="pick-bet">OVER 8.5 (-110) &mdash; Proj 10.7 runs</div></div><div class="pick-edge">+2.2</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item over" data-type="over" data-line="7.5" data-home="Seattle Mariners"><div class="pick-details"><div class="pick-game">Chicago White Sox @ Seattle Mariners &bull; Total</div><div class="pick-bet">OVER 7.5 (-110) &mdash; Proj 9.4 runs</div></div><div class="pick-edge">+1.9</div><span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item nba"><div class="pick-details"><div class="pick-game">NBA: Cleveland Cavaliers @ New York Knicks &bull; Spread</div><div class="pick-bet">Cleveland Cavaliers +7.5 (-115)</div></div><div class="pick-edge">+1.5</div><span class="pick-conf med">MED</span></div><div class="pick-item" data-team="Minnesota Twins" data-type="ml" data-home="Minnesota Twins"><div class="pick-details"><div class="pick-game">Houston Astros @ Minnesota Twins &bull; Lean</div><div class="pick-bet">Minnesota Twins ML (-137)</div></div><div class="pick-edge">58.1%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="New York Yankees" data-type="ml" data-home="New York Yankees"><div class="pick-details"><div class="pick-game">Toronto Blue Jays @ New York Yankees &bull; Lean</div><div class="pick-bet">New York Yankees ML (-143)</div></div><div class="pick-edge">57.8%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="Philadelphia Phillies" data-type="ml" data-home="Philadelphia Phillies"><div class="pick-details"><div class="pick-game">Cincinnati Reds @ Philadelphia Phillies &bull; Lean</div><div class="pick-bet">Philadelphia Phillies ML (-149)</div></div><div class="pick-edge">56.3%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div></div>
-<div class="section"><div class="section-title nba">&#127936; NBA</div><div class="game-card" style="border-color:#f0883e"><div class="game-header"><div class="game-matchup">Cleveland Cavaliers (52-30) @ New York Knicks (53-29)</div><div class="game-time">5/19 - 8:00 PM EDT</div></div><div class="game-details"><div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">New York Knicks -7.5</div></div><div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">217.5</div></div><div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">New York Knicks -265 / Cleveland Cavaliers +215</div></div><div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Cleveland Cavaliers +7.5 (spread value)</div></div></div></div></div>
+<div id="picks-content"><p style="color:#8b949e;text-align:center;padding:40px">Loading predictions...</p></div>
 </div>
 
 <!-- PROJECTIONS TAB -->
 <div class="tab-content" id="tab-projections">
-<div class="section">
-<div class="section-title">&#9918; MLB Full Projections &mdash; 15 Games</div>
-<div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>ML</th><th>O/U</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Proj Total</th><th>Signal</th></tr></thead><tbody><tr><td class="edge-positive">Orioles @ Rays</td><td>Bradish vs Jax</td><td>-120</td><td>7.5</td><td class="edge-positive">Rays</td><td class="edge-positive">58.7%</td><td class="edge-high">+3.6%</td><td class="edge-positive">9.3 (+1.8)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Astros @ Twins</td><td>Jr. vs Matthews</td><td>-137</td><td>8.5</td><td class="edge-positive">Twins</td><td class="edge-positive">58.1%</td><td>+0.2%</td><td class="edge-positive">10.7 (+2.2)</td><td>&#128064; LEAN</td></tr><tr><td>Jays @ Yankees</td><td>Cease vs Warren</td><td>-143</td><td>8.5</td><td class="edge-positive">Yankees</td><td class="edge-positive">57.8%</td><td>+0.4%</td><td>8.2 (-0.3)</td><td>&#128064; LEAN</td></tr><tr><td class="edge-positive">Sox @ Mariners</td><td>Kay vs Miller</td><td>-156</td><td>7.5</td><td class="edge-positive">Mariners</td><td class="edge-positive">56.8%</td><td class="edge-high">+3.7%</td><td class="edge-positive">9.4 (+1.9)</td><td class="edge-high">&#128293; KELLY</td></tr><tr><td>Reds @ Phillies</td><td>Burns vs Luzardo</td><td>-149</td><td>8.5</td><td class="edge-positive">Phillies</td><td class="edge-positive">56.3%</td><td>+2.4%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr><td>Giants @ Diamondbacks</td><td>Roupp vs Nelson</td><td>-125</td><td>8.5</td><td class="edge-positive">Diamondbacks</td><td class="edge-positive">55.5%</td><td>+0.4%</td><td>9.3 (+0.8)</td><td>&#128064; LEAN</td></tr><tr class="skip"><td>Braves @ Marlins</td><td>Pérez vs Garrett</td><td>—</td><td>8</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Athletics @ Angels</td><td>Lopez vs Detmers</td><td>—</td><td>9</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Dodgers @ Padres</td><td>Sheehan vs Canning</td><td>—</td><td>8.5</td><td>—</td><td>52.9%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Pirates @ Cardinals</td><td>Keller vs Liberatore</td><td>—</td><td>8</td><td>—</td><td>52.4%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Sox @ Royals</td><td>Suarez vs Falter</td><td>—</td><td>7.5</td><td>—</td><td>51.8%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Brewers @ Cubs</td><td>Misiorowski vs Brown</td><td>—</td><td>7.5</td><td>—</td><td>51.5%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Guardians @ Tigers</td><td>Messick vs Montero</td><td>—</td><td>8</td><td>—</td><td>51.1%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Mets @ Nationals</td><td>McLean vs Griffin</td><td>—</td><td>9</td><td>—</td><td>50.7%</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr><tr class="skip"><td>Rangers @ Rockies</td><td>Alexander vs Peralta</td><td>—</td><td>10</td><td>—</td><td>50.2%</td><td>—</td><td class="edge-positive">—</td><td>&#8709; SKIP</td></tr></tbody></table></div>
-</div>
+<div id="projections-content"></div>
 </div>
 
 <!-- PARLAYS TAB -->
 <div class="tab-content" id="tab-parlays">
-<div class="section">
-<div class="section-title parlays">&#127922; Parlay Plays</div>
-<div class="parlay-card best"><div class="parlay-header"><div class="parlay-type">&#9733; Parlay A — Safe 2-Leg</div><div class="parlay-odds" class="green">2.53x</div></div><div class="parlay-legs">New York Knicks ML + Tampa Bay Rays ML</div><div class="parlay-footer"><span>Stake: $50</span><span>Payout: $126</span><span>Win%: 42.6%</span><span class="ev">EV: +$3.81</span></div></div><div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay B — SGP Value</div><div class="parlay-odds" style="color:#f0883e">3.57x</div></div><div class="parlay-legs">Cleveland Cavaliers +7.5 + Over 217.5</div><div class="parlay-footer"><span>Stake: $50</span><span>Payout: $178</span><span>Win%: 26.5%</span><span class="ev">EV: $-2.71</span></div></div><div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay C — Cross-Sport 3-Leg</div><div class="parlay-odds" style="color:#f85149">5.93x</div></div><div class="parlay-legs">Cleveland Cavaliers +7.5 + Tampa Bay Rays ML + Minnesota Twins ML</div><div class="parlay-footer"><span>Stake: $30</span><span>Payout: $178</span><span>Win%: 18.1%</span><span class="ev">EV: +$2.15</span></div></div>
-</div>
-</div>
-
-<!-- RESULTS TAB -->
-<div class="tab-content" id="tab-results">
-<div class="section">
-<div class="section-title" style="color:#3fb950">&#9989; Recent Results</div>
-<div class="game-card">
-<p style="color:#8b949e;font-size:0.9em">Results are graded automatically at 2am CT and pushed to the tracker.</p>
-<p style="margin-top:10px"><a href="/tracker" style="color:#58a6ff;text-decoration:none;font-weight:600">View Full Tracker &rarr;</a></p>
-</div>
-</div>
+<div id="parlays-content"></div>
 </div>
 
 <div class="nav-links">
@@ -145,7 +111,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 
 <footer>
 <p>Model: Ensemble v2.1 (Pythagorean + Elo + FIP + Market) | Data: ESPN/DraftKings + MLB Stats API</p>
-<p style="margin-top:4px">Auto-generated 2026-05-19 15:25:13 UTC</p>
+<p style="margin-top:4px" id="gen-time"></p>
 </footer>
 </div>
 
@@ -157,16 +123,192 @@ function switchTab(name) {
   event.target.classList.add('active');
 }
 
+function renderPicks(data) {
+  const mlb = data.mlb || [];
+  const nba = data.nba || [];
+  const actionable = mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+  const leans = mlb.filter(g => !g.coinFlip && g.confidence !== 'coin-flip' && (!g.kelly || g.kelly.betSize === 0));
+
+  let html = `<h2 style="margin-bottom:16px">&#127942; Today's Best Plays <button id="refresh-btn" onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></h2>`;
+
+  // Kelly-sized bets
+  for (const g of actionable) {
+    const team = g.kelly.team;
+    const odds = g.kelly.side === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb;
+    html += `<div class="pick-item kelly" data-team="${team}" data-type="ml" data-home="${g.home}">
+      <div class="pick-details"><div class="pick-game">${g.away} @ ${g.home} &bull; Moneyline (Kelly)</div><div class="pick-bet">${team} ML &mdash; $${g.kelly.betSize}</div></div>
+      <div class="pick-edge">+${Math.abs(g.edge?.home || g.edge?.away || 0).toFixed(1)}%</div>
+      <span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span>
+    </div>`;
+  }
+
+  // O/U picks with edge
+  for (const g of mlb) {
+    if (!g.ouLine || !g.totalEdge || Math.abs(g.totalEdge) < 1.5) continue;
+    const dir = g.totalEdge > 0 ? 'OVER' : 'UNDER';
+    html += `<div class="pick-item over" data-type="${dir.toLowerCase()}" data-line="${g.ouLine}" data-home="${g.home}">
+      <div class="pick-details"><div class="pick-game">${g.away} @ ${g.home} &bull; Total</div><div class="pick-bet">${dir} ${g.ouLine} (-110) &mdash; Proj ${g.prediction.expectedTotal} runs</div></div>
+      <div class="pick-edge">${g.totalEdge > 0 ? '+' : ''}${g.totalEdge}</div>
+      <span class="pick-conf high">HIGH</span><span class="pick-result" style="margin-left:8px"></span>
+    </div>`;
+  }
+
+  // NBA picks
+  for (const game of nba) {
+    if (!game.spread) continue;
+    html += `<div class="pick-item nba">
+      <div class="pick-details"><div class="pick-game">NBA: ${game.away} @ ${game.home} &bull; Game</div><div class="pick-bet">${game.spread} | O/U ${game.ou}</div></div>
+      <div class="pick-edge" style="color:#f0883e">${game.propPicks?.length || 0} props</div>
+      <span class="pick-conf med">NBA</span>
+    </div>`;
+  }
+
+  // MLB leans
+  for (const g of leans.slice(0, 5)) {
+    const side = g.prediction.homeWinProb > g.prediction.awayWinProb ? 'home' : 'away';
+    const team = side === 'home' ? g.home : g.away;
+    html += `<div class="pick-item" data-team="${team}" data-type="ml" data-home="${g.home}">
+      <div class="pick-details"><div class="pick-game">${g.away} @ ${g.home} &bull; Lean</div><div class="pick-bet">${team} ML</div></div>
+      <div class="pick-edge">${Math.max(g.prediction.homeWinProb, g.prediction.awayWinProb).toFixed(1)}%</div>
+      <span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span>
+    </div>`;
+  }
+
+  document.getElementById('picks-content').innerHTML = html;
+}
+
+function renderProjections(data) {
+  const mlb = data.mlb || [];
+  const nba = data.nba || [];
+
+  let html = `<div class="section"><div class="section-title">&#9918; MLB Full Projections &mdash; ${mlb.length} Games</div>
+  <div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>Pick</th><th>Win%</th><th>Conf</th><th>Proj Total</th><th>O/U Edge</th></tr></thead><tbody>`;
+
+  const sorted = [...mlb].sort((a, b) => Math.max(b.prediction.homeWinProb, b.prediction.awayWinProb) - Math.max(a.prediction.homeWinProb, a.prediction.awayWinProb));
+
+  for (const g of sorted) {
+    const isCoin = g.confidence === 'coin-flip';
+    const side = g.prediction.homeWinProb > g.prediction.awayWinProb ? g.home : g.away;
+    const pct = Math.max(g.prediction.homeWinProb, g.prediction.awayWinProb);
+    const ouEdge = g.totalEdge ? (g.totalEdge > 0 ? '+' : '') + g.totalEdge : '—';
+    const confClass = g.confidence === 'high' ? 'edge-high' : g.confidence === 'medium' ? 'edge-positive' : '';
+
+    html += `<tr class="${isCoin ? 'skip' : ''}">
+      <td>${g.away.split(' ').pop()} @ ${g.home.split(' ').pop()}</td>
+      <td>${g.awayPitcher || 'TBD'} vs ${g.homePitcher || 'TBD'}</td>
+      <td class="${isCoin ? '' : 'edge-positive'}">${isCoin ? '—' : side.split(' ').pop()}</td>
+      <td class="${isCoin ? '' : 'edge-positive'}">${pct.toFixed(1)}%</td>
+      <td class="${confClass}">${g.confidence?.toUpperCase() || '—'}</td>
+      <td>${g.prediction.expectedTotal}</td>
+      <td class="${Math.abs(g.totalEdge || 0) >= 1.5 ? 'edge-positive' : ''}">${ouEdge}</td>
+    </tr>`;
+  }
+  html += `</tbody></table></div></div>`;
+
+  // NBA projections
+  if (nba.length > 0) {
+    html += `<div class="section"><div class="section-title nba">&#127936; NBA Player Projections</div>`;
+    for (const game of nba) {
+      if (!game.projections || game.projections.length === 0) continue;
+      html += `<div class="game-card" style="border-color:#f0883e"><div class="game-header"><div class="game-matchup">${game.away} @ ${game.home}</div><div class="game-time">${game.status || ''}</div></div>
+      <div class="table-wrapper" style="margin-top:12px"><table><thead><tr><th>Player</th><th>Team</th><th>Proj PTS</th><th>Proj REB</th><th>Proj AST</th><th>PRA</th></tr></thead><tbody>`;
+      for (const p of game.projections) {
+        html += `<tr><td style="font-weight:600">${p.name}</td><td>${p.team}</td><td>${p.projPts}</td><td>${p.projReb}</td><td>${p.projAst}</td><td style="font-weight:700;color:#d2a8ff">${p.pra}</td></tr>`;
+      }
+      html += `</tbody></table></div></div>`;
+    }
+    html += `</div>`;
+  }
+
+  document.getElementById('projections-content').innerHTML = html;
+}
+
+function renderParlays(data) {
+  const mlb = data.mlb || [];
+  const nba = data.nba || [];
+  const actionable = mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+
+  let html = `<div class="section"><div class="section-title parlays">&#127922; Parlay Plays</div>`;
+
+  const parlayLegs = [];
+  for (const g of actionable) {
+    parlayLegs.push({ name: g.kelly.team + ' ML', prob: (g.kelly.side === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100 });
+  }
+  // Add top NBA props
+  for (const game of nba) {
+    if (game.propPicks) {
+      for (const prop of game.propPicks.slice(0, 3)) {
+        if (prop.confidence === 'HIGH' || prop.confidence === 'MED') {
+          parlayLegs.push({ name: `${prop.name} ${prop.direction} ${prop.line} ${prop.stat}`, prob: 0.58 });
+        }
+      }
+    }
+  }
+
+  if (parlayLegs.length >= 2) {
+    // 2-leg safe
+    const safe2 = parlayLegs.slice(0, 2);
+    const safe2Prob = safe2.reduce((p, l) => p * l.prob, 1);
+    const safe2Payout = (1 / safe2Prob).toFixed(2);
+    html += `<div class="parlay-card best"><div class="parlay-header"><div class="parlay-type">&#9733; Parlay A &mdash; Safe 2-Leg</div><div class="parlay-odds" style="color:#3fb950">${safe2Payout}x</div></div>
+      <div class="parlay-legs">${safe2.map(l => l.name).join(' + ')}</div>
+      <div class="parlay-footer"><span>Win%: ${(safe2Prob * 100).toFixed(1)}%</span><span>Stake: $50</span><span>Payout: $${(50 * safe2Payout).toFixed(0)}</span></div></div>`;
+
+    // 3-leg value
+    if (parlayLegs.length >= 3) {
+      const val3 = parlayLegs.slice(0, 3);
+      const val3Prob = val3.reduce((p, l) => p * l.prob, 1);
+      const val3Payout = (1 / val3Prob).toFixed(2);
+      html += `<div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay B &mdash; 3-Leg Value</div><div class="parlay-odds" style="color:#f0883e">${val3Payout}x</div></div>
+        <div class="parlay-legs">${val3.map(l => l.name).join(' + ')}</div>
+        <div class="parlay-footer"><span>Win%: ${(val3Prob * 100).toFixed(1)}%</span><span>Stake: $30</span><span>Payout: $${(30 * val3Payout).toFixed(0)}</span></div></div>`;
+    }
+
+    // Cross-sport 4-leg
+    if (parlayLegs.length >= 4) {
+      const cross4 = [parlayLegs[0], parlayLegs[1], ...parlayLegs.slice(-2)];
+      const cross4Prob = cross4.reduce((p, l) => p * l.prob, 1);
+      const cross4Payout = (1 / cross4Prob).toFixed(2);
+      html += `<div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay C &mdash; Cross-Sport 4-Leg</div><div class="parlay-odds" style="color:#f85149">${cross4Payout}x</div></div>
+        <div class="parlay-legs">${cross4.map(l => l.name).join(' + ')}</div>
+        <div class="parlay-footer"><span>Win%: ${(cross4Prob * 100).toFixed(1)}%</span><span>Stake: $20</span><span>Payout: $${(20 * cross4Payout).toFixed(0)}</span></div></div>`;
+    }
+  } else {
+    html += `<p style="color:#8b949e">Not enough actionable bets for parlays today.</p>`;
+  }
+
+  html += `</div>`;
+  document.getElementById('parlays-content').innerHTML = html;
+}
+
+function renderStats(data) {
+  const mlb = data.mlb || [];
+  const nba = data.nba || [];
+  const actionable = mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+  const nbaProps = data.nbaProps || [];
+  const exposure = actionable.reduce((s, g) => s + (g.kelly?.betSize || 0), 0);
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat"><div class="val">${mlb.length}</div><div class="lbl">MLB Games</div></div>
+    <div class="stat"><div class="val" style="color:#f0883e">${nba.length}</div><div class="lbl">NBA Games</div></div>
+    <div class="stat"><div class="val blue">${actionable.length + nbaProps.length}</div><div class="lbl">Total Picks</div></div>
+    <div class="stat"><div class="val">$${exposure.toFixed(0)}</div><div class="lbl">MLB Exposure</div></div>
+  `;
+}
+
 async function refreshResults() {
   const btn = document.getElementById('refresh-btn');
+  if (!btn) return;
   btn.textContent = 'Refreshing...';
   btn.disabled = true;
   try {
-    const today = '2026-05-19';
+    const todayRes = await fetch('/api/today');
+    const todayData = todayRes.ok ? await todayRes.json() : null;
+    const today = todayData?.date || new Date().toISOString().slice(0, 10);
+
     const res = await fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=' + today + '&hydrate=linescore');
     const data = await res.json();
     const games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
-    if (games.length === 0) { btn.textContent = 'No finals yet'; btn.disabled = false; return; }
 
     const results = new Map();
     for (const g of games) {
@@ -197,6 +339,10 @@ async function refreshResults() {
         const line = parseFloat(el.dataset.line);
         won = game.total > line;
         score += ' (' + game.total + ' total)';
+      } else if (type === 'under') {
+        const line = parseFloat(el.dataset.line);
+        won = game.total < line;
+        score += ' (' + game.total + ' total)';
       }
 
       const badge = won
@@ -205,7 +351,7 @@ async function refreshResults() {
       resultEl.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em;margin-left:4px">' + score + '</span>';
     });
 
-    btn.textContent = '\u2713 Updated';
+    btn.textContent = '✓ Updated';
     setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
   } catch(e) {
     btn.textContent = 'Error';
@@ -213,6 +359,33 @@ async function refreshResults() {
   }
 }
 
+async function loadPage() {
+  try {
+    const res = await fetch('/api/today');
+    if (!res.ok) {
+      document.getElementById('picks-content').innerHTML = '<p style="color:#8b949e;text-align:center;padding:40px">No predictions yet today &mdash; generates at 7am ET</p>';
+      return;
+    }
+    const data = await res.json();
+
+    // Update header
+    if (data.date) {
+      const d = new Date(data.date + 'T12:00:00');
+      document.getElementById('page-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      document.title = "Today's Picks - " + data.date;
+    }
+    document.getElementById('gen-time').textContent = 'Generated ' + (data.generatedAt || '');
+
+    renderStats(data);
+    renderPicks(data);
+    renderProjections(data);
+    renderParlays(data);
+  } catch (e) {
+    document.getElementById('picks-content').innerHTML = '<p style="color:#f85149;text-align:center;padding:40px">Failed to load predictions</p>';
+  }
+}
+
+loadPage();
 </script>
 </body>
 </html>
