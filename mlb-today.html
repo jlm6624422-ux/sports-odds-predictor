@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLB Today</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+header{text-align:center;padding:20px 0 16px;border-bottom:1px solid #21262d;margin-bottom:24px}
+header h1{font-size:2em;background:linear-gradient(135deg,#3fb950,#58a6ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+header .subtitle{color:#8b949e;font-size:1em}
+.section{margin-bottom:30px}
+.section-title{font-size:1.3em;color:#3fb950;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d;display:flex;justify-content:space-between;align-items:center}
+.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.game-matchup{font-size:1.1em;font-weight:600}
+.game-time{color:#8b949e;font-size:0.85em}
+.game-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.detail-label{font-size:0.7em;color:#8b949e;text-transform:uppercase}
+.detail-value{font-weight:600;margin-top:2px}
+.detail-value.green{color:#3fb950}
+.detail-value.orange{color:#f0883e}
+.detail-value.blue{color:#58a6ff}
+
+.day-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.day-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;border-bottom:1px solid #21262d;cursor:pointer;user-select:none;transition:background 0.2s}
+.day-header:hover{background:#22272e}
+.day-header h3{font-size:1em}
+.day-header .chevron{font-size:1.2em;color:#8b949e;transition:transform 0.3s ease;margin-left:10px}
+.day-section.collapsed .chevron{transform:rotate(-90deg)}
+.day-section.collapsed .day-body{display:none}
+.day-section.collapsed .day-header{border-bottom:none}
+
+.picks-table{width:100%;border-collapse:collapse;font-size:0.85em}
+.picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d}
+.picks-table td{padding:10px 14px;border-bottom:1px solid #21262d}
+.picks-table tr:last-child td{border-bottom:none}
+
+.conf-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.75em;font-weight:700}
+.conf-badge.high{background:#064e3b;color:#34d399}
+.conf-badge.medium{background:#1f3a5f;color:#58a6ff}
+.conf-badge.low{background:#21262d;color:#8b949e}
+.conf-badge.kelly{background:#064e3b;color:#34d399}
+
+.parlay-card{background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid #a371f7}
+.parlay-card.best{border-left-color:#3fb950;border-left-width:4px}
+.parlay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.parlay-name{font-weight:700;color:#a371f7;font-size:1em}
+.parlay-odds{font-weight:700;font-size:1.2em;color:#3fb950}
+.parlay-leg{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #21262d}
+.parlay-leg:first-child{border-top:none}
+.parlay-footer{display:flex;gap:16px;font-size:0.8em;color:#8b949e;margin-top:10px;padding-top:8px;border-top:1px solid #21262d}
+
+.nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
+.nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
+.nav-links a:hover{text-decoration:underline}
+footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>MLB Today's Games</h1>
+<div class="subtitle" id="page-date">Loading...</div>
+</header>
+
+<div class="section">
+<div class="section-title"><span>&#128293; Actionable Bets</span><button id="refresh-btn" onclick="refreshResults()" style="padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
+<div id="action-bets"></div>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#a371f7"><span>&#127922; Today's Parlays</span></div>
+<div id="parlays-section"></div>
+</div>
+
+<div class="section">
+<div class="section-title" style="color:#58a6ff"><span>&#9918; Full Projections</span></div>
+<div id="projections-section"></div>
+</div>
+
+<div class="nav-links">
+<a href="/">Daily Picks</a>
+<a href="/mlb">MLB Tracker</a>
+<a href="/nba">NBA</a>
+</div>
+
+<footer>
+<p>Model: Ensemble v2.1 (Pythagorean + Elo + FIP + Market) | Data: ESPN + MLB Stats API</p>
+</footer>
+</div>
+
+<script>
+async function loadPage() {
+  try {
+    const res = await fetch('/api/today');
+    if (!res.ok) { document.getElementById('action-bets').innerHTML = '<p style="color:#8b949e;padding:20px;text-align:center">No predictions yet — generates at 7am ET</p>'; return; }
+    const data = await res.json();
+
+    if (data.date) {
+      const d = new Date(data.date + 'T12:00:00');
+      document.getElementById('page-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    const mlb = data.mlb || [];
+    renderActionBets(mlb);
+    renderParlays(mlb);
+    renderProjections(mlb);
+  } catch (e) {
+    document.getElementById('action-bets').innerHTML = '<p style="color:#f85149;padding:20px;text-align:center">Failed to load</p>';
+  }
+}
+
+function renderActionBets(mlb) {
+  const kelly = mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+  const ouPicks = mlb.filter(g => g.totalEdge && Math.abs(g.totalEdge) >= 1.5);
+
+  let html = '';
+
+  // Kelly ML bets
+  if (kelly.length > 0) {
+    html += `<div class="day-section" id="kelly-section">
+      <div class="day-header" onclick="document.getElementById('kelly-section').classList.toggle('collapsed')">
+        <h3 style="color:#3fb950">&#128176; Kelly-Sized ML Bets (${kelly.length})</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="day-body" style="padding:0">
+        <table class="picks-table">
+          <thead><tr><th>Game</th><th>Pitchers</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Bet Size</th><th>Conf</th><th>Result</th></tr></thead>
+          <tbody>`;
+    for (const g of kelly) {
+      const edge = Math.abs(g.edge?.home || g.edge?.away || 0);
+      const pct = g.kelly.side === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb;
+      html += `<tr data-home="${g.home}" data-type="ml" data-team="${g.kelly.team}">
+        <td>${g.away.split(' ').pop()} @ ${g.home.split(' ').pop()}</td>
+        <td style="color:#8b949e;font-size:0.85em">${g.awayPitcher || 'TBD'} vs ${g.homePitcher || 'TBD'}</td>
+        <td style="font-weight:700;color:#3fb950">${g.kelly.team.split(' ').pop()}</td>
+        <td style="font-weight:600">${pct.toFixed(1)}%</td>
+        <td style="color:#3fb950;font-weight:600">+${edge.toFixed(1)}%</td>
+        <td style="font-weight:700">$${g.kelly.betSize.toFixed(0)}</td>
+        <td><span class="conf-badge ${g.confidence}">${g.confidence?.toUpperCase()}</span></td>
+        <td class="result-cell">—</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div></div>`;
+  }
+
+  // O/U picks
+  if (ouPicks.length > 0) {
+    html += `<div class="day-section" id="ou-section" style="margin-top:10px">
+      <div class="day-header" onclick="document.getElementById('ou-section').classList.toggle('collapsed')">
+        <h3 style="color:#58a6ff">&#128200; Over/Under Picks (${ouPicks.length})</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="day-body" style="padding:0">
+        <table class="picks-table">
+          <thead><tr><th>Game</th><th>Pitchers</th><th>Line</th><th>Projected</th><th>Edge</th><th>Pick</th><th>Result</th></tr></thead>
+          <tbody>`;
+    const ouSorted = [...ouPicks].sort((a, b) => Math.abs(b.totalEdge) - Math.abs(a.totalEdge));
+    for (const g of ouSorted) {
+      const dir = g.totalEdge > 0 ? 'OVER' : 'UNDER';
+      const dirColor = dir === 'OVER' ? '#3fb950' : '#f85149';
+      html += `<tr data-home="${g.home}" data-type="${dir.toLowerCase()}" data-line="${g.ouLine}">
+        <td>${g.away.split(' ').pop()} @ ${g.home.split(' ').pop()}</td>
+        <td style="color:#8b949e;font-size:0.85em">${g.awayPitcher || 'TBD'} vs ${g.homePitcher || 'TBD'}</td>
+        <td>${g.ouLine}</td>
+        <td style="font-weight:700;color:#58a6ff">${g.prediction.expectedTotal}</td>
+        <td style="color:${dirColor};font-weight:700">${g.totalEdge > 0 ? '+' : ''}${g.totalEdge}</td>
+        <td style="font-weight:700;color:${dirColor}">${dir} ${g.ouLine}</td>
+        <td class="result-cell">—</td>
+      </tr>`;
+    }
+    html += `</tbody></table></div></div>`;
+  }
+
+  document.getElementById('action-bets').innerHTML = html || '<p style="color:#8b949e;padding:20px;text-align:center">No actionable bets today</p>';
+}
+
+function renderParlays(mlb) {
+  const kelly = mlb.filter(g => g.kelly && g.kelly.betSize > 0);
+  const ouPicks = mlb.filter(g => g.totalEdge && Math.abs(g.totalEdge) >= 1.5);
+  const medPlus = mlb.filter(g => g.confidence === 'high' || g.confidence === 'medium');
+
+  // Build leg candidates
+  const legs = [];
+
+  // High confidence ML
+  for (const g of medPlus) {
+    const side = g.prediction.homeWinProb > g.prediction.awayWinProb ? 'home' : 'away';
+    const team = side === 'home' ? g.home : g.away;
+    const prob = Math.max(g.prediction.homeWinProb, g.prediction.awayWinProb) / 100;
+    const edge = Math.abs(g.edge?.home || g.edge?.away || 0);
+    legs.push({ name: team.split(' ').pop() + ' ML', full: team + ' ML', prob, edge, type: 'ml' });
+  }
+
+  // O/U with biggest edges
+  const ouSorted = [...ouPicks].sort((a, b) => Math.abs(b.totalEdge) - Math.abs(a.totalEdge));
+  for (const g of ouSorted.slice(0, 4)) {
+    const dir = g.totalEdge > 0 ? 'OVER' : 'UNDER';
+    legs.push({ name: g.away.split(' ').pop() + '@' + g.home.split(' ').pop() + ' ' + dir + ' ' + g.ouLine, full: g.away + ' @ ' + g.home + ' ' + dir + ' ' + g.ouLine, prob: 0.56, edge: Math.abs(g.totalEdge), type: 'ou' });
+  }
+
+  legs.sort((a, b) => b.edge - a.edge);
+
+  let html = '';
+
+  if (legs.length >= 2) {
+    // Parlay A: 2-leg conservative (top ML + top O/U)
+    const mlLegs = legs.filter(l => l.type === 'ml');
+    const ouLegs = legs.filter(l => l.type === 'ou');
+    const parlay2 = [mlLegs[0], ouLegs[0] || mlLegs[1]].filter(Boolean);
+    if (parlay2.length === 2) {
+      const prob2 = parlay2.reduce((p, l) => p * l.prob, 1);
+      const payout2 = (1 / prob2).toFixed(2);
+      html += renderParlayCard('Parlay A — 2-Leg Safe', parlay2, prob2, payout2, 50, true);
+    }
+
+    // Parlay B: 3-leg value
+    if (legs.length >= 3) {
+      const parlay3 = [mlLegs[0], ouLegs[0], ouLegs[1] || mlLegs[1]].filter(Boolean).slice(0, 3);
+      const prob3 = parlay3.reduce((p, l) => p * l.prob, 1);
+      const payout3 = (1 / prob3).toFixed(2);
+      html += renderParlayCard('Parlay B — 3-Leg Value', parlay3, prob3, payout3, 30, false);
+    }
+
+    // Parlay C: 3-leg long shot (underdogs + overs)
+    if (ouLegs.length >= 2) {
+      const parlay3b = ouLegs.slice(0, 3);
+      if (parlay3b.length >= 2) {
+        const prob3b = parlay3b.reduce((p, l) => p * l.prob, 1);
+        const payout3b = (1 / prob3b).toFixed(2);
+        html += renderParlayCard('Parlay C — All Overs', parlay3b, prob3b, payout3b, 20, false);
+      }
+    }
+  }
+
+  document.getElementById('parlays-section').innerHTML = html || '<p style="color:#8b949e;padding:20px;text-align:center">Not enough edges for parlays</p>';
+}
+
+function renderParlayCard(name, legs, prob, payout, stake, isBest) {
+  return `
+  <div class="parlay-card ${isBest ? 'best' : ''}">
+    <div class="parlay-header">
+      <span class="parlay-name">${isBest ? '&#9733; ' : ''}${name}</span>
+      <span class="parlay-odds" style="color:${payout > 5 ? '#f85149' : payout > 3 ? '#f0883e' : '#3fb950'}">${payout}x</span>
+    </div>
+    ${legs.map((l, i) => `
+    <div class="parlay-leg">
+      <span style="color:#f0883e;font-weight:600;width:20px">${i+1}.</span>
+      <span style="font-weight:600">${l.full || l.name}</span>
+      <span style="color:#8b949e;margin-left:auto;font-size:0.85em">${(l.prob*100).toFixed(0)}% | edge +${l.edge.toFixed(1)}</span>
+    </div>`).join('')}
+    <div class="parlay-footer">
+      <span>Win prob: ${(prob*100).toFixed(1)}%</span>
+      <span>Stake: $${stake}</span>
+      <span style="color:#3fb950;font-weight:600">Payout: $${(stake * payout).toFixed(0)}</span>
+    </div>
+  </div>`;
+}
+
+function renderProjections(mlb) {
+  const sorted = [...mlb].sort((a, b) => {
+    const confOrder = { 'high': 0, 'medium': 1, 'low': 2, 'coin-flip': 3 };
+    return (confOrder[a.confidence] || 3) - (confOrder[b.confidence] || 3);
+  });
+
+  let html = `<div class="day-section" id="full-proj">
+    <div class="day-header" onclick="document.getElementById('full-proj').classList.toggle('collapsed')">
+      <h3>All ${mlb.length} Games</h3>
+      <span class="chevron">&#9660;</span>
+    </div>
+    <div class="day-body" style="padding:0">
+      <table class="picks-table">
+        <thead><tr><th>Game</th><th>Pitchers</th><th>Pick</th><th>Win%</th><th>Proj Total</th><th>O/U Line</th><th>Edge</th><th>Conf</th></tr></thead>
+        <tbody>`;
+
+  for (const g of sorted) {
+    const isCoin = g.confidence === 'coin-flip';
+    const side = g.prediction.homeWinProb > g.prediction.awayWinProb ? g.home : g.away;
+    const pct = Math.max(g.prediction.homeWinProb, g.prediction.awayWinProb);
+    const ouEdge = g.totalEdge ? (g.totalEdge > 0 ? '+' : '') + g.totalEdge : '—';
+    const edgeColor = g.totalEdge > 1.5 ? '#3fb950' : g.totalEdge < -1.5 ? '#f85149' : '#8b949e';
+
+    html += `<tr style="${isCoin ? 'opacity:0.5' : ''}">
+      <td>${g.away.split(' ').pop()} @ ${g.home.split(' ').pop()}</td>
+      <td style="color:#8b949e;font-size:0.85em">${(g.awayPitcher || 'TBD').split(' ').pop()} vs ${(g.homePitcher || 'TBD').split(' ').pop()}</td>
+      <td style="font-weight:${isCoin ? '400' : '700'};color:${isCoin ? '#8b949e' : '#3fb950'}">${isCoin ? '—' : side.split(' ').pop()}</td>
+      <td style="font-weight:600">${pct.toFixed(1)}%</td>
+      <td style="font-weight:700;color:#58a6ff">${g.prediction.expectedTotal}</td>
+      <td>${g.ouLine || '—'}</td>
+      <td style="color:${edgeColor};font-weight:600">${ouEdge}</td>
+      <td><span class="conf-badge ${g.confidence}">${g.confidence === 'coin-flip' ? 'SKIP' : g.confidence?.toUpperCase()}</span></td>
+    </tr>`;
+  }
+
+  html += `</tbody></table></div></div>`;
+  document.getElementById('projections-section').innerHTML = html;
+}
+
+async function refreshResults() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = 'Refreshing...';
+  btn.disabled = true;
+  try {
+    const todayRes = await fetch('/api/today');
+    const todayData = todayRes.ok ? await todayRes.json() : null;
+    const today = todayData?.date || new Date().toISOString().slice(0, 10);
+
+    const res = await fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=' + today + '&hydrate=linescore');
+    const sched = await res.json();
+    const games = (sched.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+
+    const results = new Map();
+    for (const g of games) {
+      results.set(g.teams.home.team.name, {
+        homeScore: g.teams.home.score, awayScore: g.teams.away.score,
+        winner: g.teams.home.score > g.teams.away.score ? g.teams.home.team.name : g.teams.away.team.name,
+        total: g.teams.home.score + g.teams.away.score
+      });
+    }
+
+    document.querySelectorAll('[data-home]').forEach(row => {
+      const home = row.dataset.home;
+      const type = row.dataset.type;
+      const game = results.get(home);
+      if (!game) return;
+
+      const cell = row.querySelector('.result-cell');
+      if (!cell) return;
+
+      let won = false;
+      let info = '';
+      if (type === 'ml') {
+        const team = row.dataset.team;
+        won = game.winner.includes(team.split(' ').pop());
+        info = game.awayScore + '-' + game.homeScore;
+      } else if (type === 'over') {
+        const line = parseFloat(row.dataset.line);
+        won = game.total > line;
+        info = game.total + ' total';
+      } else if (type === 'under') {
+        const line = parseFloat(row.dataset.line);
+        won = game.total < line;
+        info = game.total + ' total';
+      }
+
+      const badge = won
+        ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+        : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+      cell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.8em">' + info + '</span>';
+    });
+
+    btn.textContent = '✓ Updated';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  } catch (e) {
+    btn.textContent = 'Error';
+    btn.disabled = false;
+  }
+}
+
+loadPage();
+</script>
+</body>
+</html>

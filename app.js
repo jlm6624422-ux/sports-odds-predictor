@@ -39,6 +39,10 @@ app.get('/nba', (req, res) => {
   res.sendFile(path.join(__dirname, 'nba-picks.html'));
 });
 
+app.get('/mlb/today', (req, res) => {
+  res.sendFile(path.join(__dirname, 'mlb-today.html'));
+});
+
 // API: Health check
 app.get('/api/health', (req, res) => {
   res.json({
