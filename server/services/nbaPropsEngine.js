@@ -1,0 +1,205 @@
+/**
+ * NBA Props Engine — Player projections and prop bet evaluation
+ * Extracted from run-nba-props.js for use in the cron pipeline.
+ */
+
+const PLAYOFF_PACE_ADJ = 0.98;
+const STAR_USAGE_BOOST = 1.05;
+const GAME1_CONSERVATIVE = 0.97;
+const AVG_NBA_TOTAL = 225;
+const PLAYOFF_MINUTES_BOOST = 1.08; // Stars play ~8% more minutes in playoffs
+const PLAYOFF_AST_DISCOUNT = 0.82; // Assists drop ~18% in playoffs (more iso-heavy)
+
+// Teams that run heavy iso in playoffs (assists will drop more)
+const ISO_HEAVY_TEAMS = ['CLE', 'DAL', 'BOS', 'DEN', 'MIL'];
+
+const PLAYER_DB = {
+  // OKC Thunder
+  'Shai Gilgeous-Alexander': { team: 'OKC', pos: 'G', pts: 31.1, reb: 5.4, ast: 6.6, min: 35.2 },
+  'Chet Holmgren': { team: 'OKC', pos: 'C', pts: 17.8, reb: 8.9, ast: 2.5, min: 32.1 },
+  'Jalen Williams': { team: 'OKC', pos: 'F', pts: 21.5, reb: 5.8, ast: 5.2, min: 33.8 },
+  'Lu Dort': { team: 'OKC', pos: 'G', pts: 10.2, reb: 3.8, ast: 1.5, min: 28.5 },
+  'Isaiah Hartenstein': { team: 'OKC', pos: 'C', pts: 11.5, reb: 9.2, ast: 3.1, min: 28.0 },
+  'Alex Caruso': { team: 'OKC', pos: 'G', pts: 8.5, reb: 3.8, ast: 3.5, min: 26.0 },
+
+  // San Antonio Spurs
+  'Victor Wembanyama': { team: 'SA', pos: 'C', pts: 25.0, reb: 11.5, ast: 3.9, min: 34.5 },
+  'Stephon Castle': { team: 'SA', pos: 'G', pts: 15.8, reb: 4.2, ast: 7.4, min: 33.0 },
+  'Devin Vassell': { team: 'SA', pos: 'G', pts: 17.2, reb: 3.5, ast: 3.8, min: 30.5 },
+  'Keldon Johnson': { team: 'SA', pos: 'F', pts: 12.5, reb: 4.8, ast: 2.1, min: 26.4 },
+  'Harrison Barnes': { team: 'SA', pos: 'F', pts: 11.8, reb: 4.5, ast: 1.8, min: 25.2 },
+  'Chris Paul': { team: 'SA', pos: 'G', pts: 8.2, reb: 3.5, ast: 7.8, min: 24.0 },
+
+  // Minnesota Timberwolves
+  'Anthony Edwards': { team: 'MIN', pos: 'G', pts: 27.5, reb: 5.8, ast: 5.2, min: 35.5 },
+  'Julius Randle': { team: 'MIN', pos: 'F', pts: 20.2, reb: 8.5, ast: 4.1, min: 33.0 },
+  'Rudy Gobert': { team: 'MIN', pos: 'C', pts: 11.8, reb: 11.2, ast: 1.5, min: 30.5 },
+  'Jaden McDaniels': { team: 'MIN', pos: 'F', pts: 13.5, reb: 4.2, ast: 2.1, min: 32.0 },
+  'Mike Conley': { team: 'MIN', pos: 'G', pts: 9.5, reb: 2.8, ast: 5.8, min: 25.5 },
+
+  // Cleveland Cavaliers
+  'Donovan Mitchell': { team: 'CLE', pos: 'G', pts: 26.8, reb: 4.5, ast: 5.5, min: 34.0 },
+  'Evan Mobley': { team: 'CLE', pos: 'C', pts: 18.5, reb: 9.2, ast: 3.2, min: 33.5 },
+  'Darius Garland': { team: 'CLE', pos: 'G', pts: 21.2, reb: 2.8, ast: 7.5, min: 33.0 },
+  'Jarrett Allen': { team: 'CLE', pos: 'C', pts: 13.5, reb: 10.5, ast: 1.8, min: 30.0 },
+
+  // Detroit Pistons
+  'Cade Cunningham': { team: 'DET', pos: 'G', pts: 24.5, reb: 6.2, ast: 9.1, min: 35.5 },
+  'Jaden Ivey': { team: 'DET', pos: 'G', pts: 18.5, reb: 4.0, ast: 4.5, min: 31.0 },
+  'Ausar Thompson': { team: 'DET', pos: 'F', pts: 14.2, reb: 7.5, ast: 2.8, min: 32.5 },
+
+  // Boston Celtics
+  'Jayson Tatum': { team: 'BOS', pos: 'F', pts: 27.8, reb: 8.5, ast: 5.2, min: 35.5 },
+  'Jaylen Brown': { team: 'BOS', pos: 'G', pts: 23.5, reb: 5.8, ast: 3.8, min: 34.0 },
+  'Derrick White': { team: 'BOS', pos: 'G', pts: 15.5, reb: 4.2, ast: 4.5, min: 30.0 },
+  'Kristaps Porzingis': { team: 'BOS', pos: 'C', pts: 19.5, reb: 7.2, ast: 2.0, min: 28.5 },
+
+  // New York Knicks
+  'Jalen Brunson': { team: 'NYK', pos: 'G', pts: 26.5, reb: 3.5, ast: 7.2, min: 35.0 },
+  'Karl-Anthony Towns': { team: 'NYK', pos: 'C', pts: 22.5, reb: 10.8, ast: 3.2, min: 34.0 },
+  'Mikal Bridges': { team: 'NYK', pos: 'F', pts: 17.5, reb: 4.2, ast: 3.5, min: 33.5 },
+  'OG Anunoby': { team: 'NYK', pos: 'F', pts: 14.8, reb: 4.5, ast: 2.0, min: 30.0 },
+
+  // Indiana Pacers
+  'Tyrese Haliburton': { team: 'IND', pos: 'G', pts: 20.5, reb: 3.8, ast: 9.5, min: 34.0 },
+  'Pascal Siakam': { team: 'IND', pos: 'F', pts: 21.2, reb: 7.5, ast: 3.8, min: 34.5 },
+  'Myles Turner': { team: 'IND', pos: 'C', pts: 15.8, reb: 7.2, ast: 1.5, min: 30.0 },
+
+  // Dallas Mavericks
+  'Luka Doncic': { team: 'DAL', pos: 'G', pts: 28.5, reb: 8.2, ast: 8.8, min: 36.0 },
+  'Kyrie Irving': { team: 'DAL', pos: 'G', pts: 24.2, reb: 4.5, ast: 5.2, min: 34.5 },
+  'PJ Washington': { team: 'DAL', pos: 'F', pts: 14.5, reb: 7.8, ast: 2.2, min: 32.0 },
+
+  // Denver Nuggets
+  'Nikola Jokic': { team: 'DEN', pos: 'C', pts: 29.5, reb: 13.2, ast: 10.5, min: 36.5 },
+  'Jamal Murray': { team: 'DEN', pos: 'G', pts: 21.5, reb: 4.2, ast: 6.5, min: 33.5 },
+  'Michael Porter Jr.': { team: 'DEN', pos: 'F', pts: 16.5, reb: 7.5, ast: 1.8, min: 30.0 },
+  'Aaron Gordon': { team: 'DEN', pos: 'F', pts: 14.2, reb: 6.5, ast: 3.5, min: 31.0 },
+};
+
+function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false) {
+  const player = PLAYER_DB[name];
+  if (!player) return null;
+
+  const paceMultiplier = projectedTotal / AVG_NBA_TOTAL;
+  const isStar = player.pts >= 20;
+  const ptsAdj = isStar ? STAR_USAGE_BOOST : 1.0;
+  const g1Adj = isGame1 ? GAME1_CONSERVATIVE : 1.0;
+
+  // Playoff minutes boost: stars stay in longer during playoffs
+  const minBoost = (isPlayoffs && isStar) ? PLAYOFF_MINUTES_BOOST : 1.0;
+
+  // Playoff assists discount: teams go iso-heavy in postseason
+  const isIsoTeam = ISO_HEAVY_TEAMS.includes(player.team);
+  const astAdj = isPlayoffs ? (isIsoTeam ? PLAYOFF_AST_DISCOUNT * 0.9 : PLAYOFF_AST_DISCOUNT) : 1.0;
+
+  const projPts = player.pts * paceMultiplier * ptsAdj * g1Adj * minBoost;
+  const projReb = player.reb * paceMultiplier * g1Adj * minBoost;
+  const projAst = player.ast * paceMultiplier * g1Adj * astAdj;
+  const pra = projPts + projReb + projAst;
+
+  return { ...player, name, projPts, projReb, projAst, pra };
+}
+
+function evaluateProp(playerProj, stat, line) {
+  if (!playerProj) return null;
+
+  let projected, seasonAvg;
+  if (stat === 'PTS') { projected = playerProj.projPts; seasonAvg = playerProj.pts; }
+  else if (stat === 'REB') { projected = playerProj.projReb; seasonAvg = playerProj.reb; }
+  else if (stat === 'AST') { projected = playerProj.projAst; seasonAvg = playerProj.ast; }
+  else if (stat === 'PRA') { projected = playerProj.pra; seasonAvg = playerProj.pts + playerProj.reb + playerProj.ast; }
+  else return null;
+
+  const edge = projected - line;
+  const direction = edge > 0 ? 'OVER' : 'UNDER';
+  const absEdge = Math.abs(edge);
+  const conf = absEdge >= 3 ? 'HIGH' : absEdge >= 1.5 ? 'MED' : absEdge >= 0.5 ? 'LOW' : 'SKIP';
+
+  return { name: playerProj.name, team: playerProj.team, stat, line, projected: parseFloat(projected.toFixed(1)), seasonAvg, edge: parseFloat(edge.toFixed(1)), direction, confidence: conf, absEdge: parseFloat(absEdge.toFixed(1)) };
+}
+
+function generateNBAProps(espnEvents) {
+  const games = [];
+  const props = [];
+
+  for (const event of espnEvents) {
+    const comp = event.competitions[0];
+    const home = comp.competitors.find(c => c.homeAway === 'home');
+    const away = comp.competitors.find(c => c.homeAway === 'away');
+    const odds = (comp.odds || [])[0] || {};
+    const series = comp.series?.summary || '';
+    const isGame1 = series.toLowerCase().includes('start') || series.includes('0-0');
+    const ou = odds.overUnder || 220;
+    const projTotal = ou ? parseFloat(ou) - 2 : 218;
+
+    const homeAbbrev = home.team.abbreviation;
+    const awayAbbrev = away.team.abbreviation;
+
+    const gameInfo = {
+      home: home.team.displayName,
+      away: away.team.displayName,
+      homeAbbrev,
+      awayAbbrev,
+      homeRecord: (home.records || [{}])[0]?.summary,
+      awayRecord: (away.records || [{}])[0]?.summary,
+      spread: odds.details,
+      homeML: odds.homeTeamOdds?.moneyLine || null,
+      awayML: odds.awayTeamOdds?.moneyLine || null,
+      ou,
+      series,
+      status: comp.status?.type?.shortDetail,
+      homeHomeRecord: (home.records || [])[1]?.summary || null,
+      awayRoadRecord: (away.records || [])[2]?.summary || null,
+    };
+
+    // Find players and generate projections
+    const gamePlayers = Object.entries(PLAYER_DB)
+      .filter(([_, p]) => p.team === homeAbbrev || p.team === awayAbbrev)
+      .map(([name]) => name);
+
+    const projections = gamePlayers
+      .map(name => projectPlayer(name, projTotal, true, isGame1))
+      .filter(Boolean)
+      .sort((a, b) => b.projPts - a.projPts);
+
+    gameInfo.projections = projections.map(p => ({
+      name: p.name, team: p.team, pos: p.pos,
+      projPts: parseFloat(p.projPts.toFixed(1)),
+      projReb: parseFloat(p.projReb.toFixed(1)),
+      projAst: parseFloat(p.projAst.toFixed(1)),
+      pra: parseFloat(p.pra.toFixed(1)),
+    }));
+
+    // Generate prop evaluations
+    const propLines = [];
+    for (const p of projections) {
+      const isStar = p.pts >= 20;
+      const ptsLine = Math.round(p.pts * 2 - 1) / 2 - (isStar ? 1 : 0.5);
+      const rebLine = Math.round(p.reb * 2 - 1) / 2;
+      const astLine = Math.round(p.ast * 2 - 1) / 2;
+      const praLine = Math.round((p.pts + p.reb + p.ast) * 2 - 1) / 2;
+
+      propLines.push({ name: p.name, stat: 'PTS', line: ptsLine });
+      if (p.reb >= 7) propLines.push({ name: p.name, stat: 'REB', line: rebLine });
+      if (p.ast >= 5) propLines.push({ name: p.name, stat: 'AST', line: astLine });
+      if (isStar) propLines.push({ name: p.name, stat: 'PRA', line: praLine });
+    }
+
+    const evaluated = propLines
+      .map(prop => {
+        const playerProj = projections.find(p => p.name === prop.name);
+        return evaluateProp(playerProj, prop.stat, prop.line);
+      })
+      .filter(e => e && e.confidence !== 'SKIP')
+      .sort((a, b) => b.absEdge - a.absEdge);
+
+    gameInfo.propPicks = evaluated.slice(0, 10);
+    props.push(...evaluated.slice(0, 10).map(p => ({ ...p, game: `${gameInfo.away} @ ${gameInfo.home}` })));
+    games.push(gameInfo);
+  }
+
+  return { games, props };
+}
+
+module.exports = { generateNBAProps, projectPlayer, evaluateProp, PLAYER_DB };

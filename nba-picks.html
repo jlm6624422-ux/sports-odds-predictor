@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBA Picks - 2026-05-19</title>
+<title>NBA Picks &amp; Props</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
@@ -13,7 +13,7 @@ header h1{font-size:2em;background:linear-gradient(135deg,#f0883e,#d2a8ff);-webk
 header .subtitle{color:#8b949e;font-size:1em}
 .section{margin-bottom:30px}
 .section-title{font-size:1.3em;color:#f0883e;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
-.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
+.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:16px}
 .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .game-matchup{font-size:1.1em;font-weight:600}
 .game-time{color:#8b949e;font-size:0.85em}
@@ -32,7 +32,6 @@ tr:hover td{background:rgba(240,136,62,0.03)}
 .nav-links a:hover{text-decoration:underline}
 footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
 
-/* NBA Best Bets Tracker */
 .nba-tracker-stat{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center}
 .nba-tracker-stat .val{font-size:1.8em;font-weight:700;color:#d2a8ff}
 .nba-tracker-stat .val.green{color:#3fb950}
@@ -40,10 +39,10 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 .nba-tracker-stat .val.pct{color:#f0883e}
 .nba-tracker-stat .lbl{font-size:0.8em;color:#8b949e;margin-top:4px}
 
-.nba-day-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:16px;overflow:hidden}
-.nba-day-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#1c2128;border-bottom:1px solid #21262d;cursor:pointer;user-select:none;transition:background 0.2s}
+.nba-day-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden}
+.nba-day-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;border-bottom:1px solid #21262d;cursor:pointer;user-select:none;transition:background 0.2s}
 .nba-day-header:hover{background:#22272e}
-.nba-day-header h3{font-size:1.05em}
+.nba-day-header h3{font-size:1em}
 .nba-day-header .record{display:flex;gap:12px;font-size:0.85em;align-items:center}
 .nba-day-header .record .w{color:#3fb950}
 .nba-day-header .record .l{color:#f85149}
@@ -75,31 +74,13 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <div class="container">
 <header>
 <h1>NBA Picks &amp; Props</h1>
-<div class="subtitle">Tuesday, May 19, 2026</div>
+<div class="subtitle" id="page-subtitle">Loading...</div>
 </header>
 
-<div class="section"><div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div><div class="game-card" style="border-color:#f0883e" data-nba-game="New York Knicks">
-<div class="game-header"><div class="game-matchup">Cleveland Cavaliers (52-30) @ New York Knicks (53-29)</div><div class="game-time">5/19 - 8:00 PM EDT</div></div>
-<div class="game-details">
-<div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">New York Knicks -7.5</div></div>
-<div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">217.5</div></div>
-<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">New York Knicks -265 / Cleveland Cavaliers +215</div></div>
-<div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Cleveland Cavaliers +7.5</div></div>
+<div class="section">
+<div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
+<div id="nba-daily-games"><p style="color:#8b949e;text-align:center;padding:20px">Loading predictions...</p></div>
 </div>
-<div style="margin-top:12px;padding-top:10px;border-top:1px solid #21262d">
-<div style="font-size:0.85em;font-weight:600;margin-bottom:8px;color:#f0883e">Game Bets</div>
-<table style="width:100%;font-size:0.85em">
-<thead><tr><th>Bet</th><th>Line</th><th>Thesis</th><th>Result</th></tr></thead>
-<tbody>
-<tr data-nba-bet="spread" data-team="Cleveland Cavaliers" data-line="7.5"><td style="font-weight:600">Cleveland Cavaliers +7.5</td><td>-115</td><td>Playoff games run tight</td><td class="nba-result">—</td></tr>
-<tr data-nba-bet="ml" data-team="New York Knicks"><td style="font-weight:600">New York Knicks ML</td><td>-265</td><td>Home court + better record</td><td class="nba-result">—</td></tr>
-<tr data-nba-bet="over" data-line="217.5"><td style="font-weight:600">Over 217.5</td><td>-110</td><td>Competitive series = pace</td><td class="nba-result">—</td></tr>
-</tbody></table>
-</div>
-</div><div style="margin-top:20px"><div style="font-size:1.1em;font-weight:700;color:#f0883e;margin-bottom:4px">&#127942; Player Prop Best Bets</div>
-<p style="color:#8b949e;font-size:0.8em;margin-bottom:12px">Top 10 props ranked by edge vs. projected line. Hit Refresh after game for actual results.</p><div class="table-wrapper" style="margin-bottom:16px"><table>
-<thead><tr><th>Player</th><th>Team</th><th>Prop</th><th>Line</th><th>Season Avg</th><th>Edge</th><th>Confidence</th><th>Result</th></tr></thead>
-<tbody id="nba-props-body"><tr data-prop-player="Jalen Brunson" data-prop-type="PTS+REB+AST" data-prop-line="30.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>PTS+REB+AST</td><td>O 30.5</td><td style="font-weight:700;color:#58a6ff">32.8</td><td style="color:#3fb950;font-weight:600">+2.3</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="PTS+REB+AST" data-prop-line="31.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>PTS+REB+AST</td><td>O 31.5</td><td style="font-weight:700;color:#58a6ff">33.6</td><td style="color:#3fb950;font-weight:600">+2.1</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Jalen Brunson" data-prop-type="Points" data-prop-line="24.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>Points</td><td>O 24.5</td><td style="font-weight:700;color:#58a6ff">26.0</td><td style="color:#3fb950;font-weight:600">+1.5</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Karl-Anthony Towns" data-prop-type="Rebounds" data-prop-line="10.5"><td style="font-weight:600">Karl-Anthony Towns</td><td>Knicks</td><td>Rebounds</td><td>O 10.5</td><td style="font-weight:700;color:#58a6ff">11.9</td><td style="color:#3fb950;font-weight:600">+1.4</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="Points" data-prop-line="26.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>Points</td><td>O 26.5</td><td style="font-weight:700;color:#58a6ff">27.9</td><td style="color:#3fb950;font-weight:600">+1.4</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Jalen Brunson" data-prop-type="Assists" data-prop-line="5.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>Assists</td><td>O 5.5</td><td style="font-weight:700;color:#58a6ff">6.8</td><td style="color:#3fb950;font-weight:600">+1.3</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="Assists" data-prop-line="4.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>Assists</td><td>O 4.5</td><td style="font-weight:700;color:#58a6ff">5.7</td><td style="color:#3fb950;font-weight:600">+1.2</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Evan Mobley" data-prop-type="Rebounds" data-prop-line="8.5"><td style="font-weight:600">Evan Mobley</td><td>Cavaliers</td><td>Rebounds</td><td>O 8.5</td><td style="font-weight:700;color:#58a6ff">9.0</td><td style="color:#3fb950;font-weight:600">+0.5</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr></tbody></table></div></div></div>
 
 <div class="section" style="margin-top:40px">
 <div class="section-title" style="color:#d2a8ff;display:flex;justify-content:space-between;align-items:center">
@@ -123,16 +104,126 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 </div>
 
 <script>
+// ============================================================
+// DAILY GAMES — Dynamic with collapsible projections & props
+// ============================================================
+
+function renderDailyGames(nbaData) {
+  const container = document.getElementById('nba-daily-games');
+  if (!nbaData || nbaData.length === 0) {
+    container.innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No NBA games today</p>';
+    return;
+  }
+
+  let html = '';
+  nbaData.forEach((game, idx) => {
+    const gameId = (game.home || '').replace(/[^a-zA-Z]/g, '') + idx;
+    const projections = game.projections || [];
+    const propPicks = game.propPicks || [];
+
+    html += `
+    <div class="game-card" style="border-color:#f0883e" data-nba-game="${game.home}">
+      <div class="game-header">
+        <div class="game-matchup">${game.away} (${game.awayRecord || '?'}) @ ${game.home} (${game.homeRecord || '?'})</div>
+        <div class="game-time">${game.status || ''}</div>
+      </div>
+      <div class="game-details">
+        <div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">${game.spread || 'N/A'}</div></div>
+        <div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">${game.ou || 'N/A'}</div></div>
+        ${game.homeML ? `<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">${game.home} ${game.homeML} / ${game.away} ${game.awayML}</div></div>` : ''}
+        ${game.series ? `<div class="detail-item"><div class="detail-label">Series</div><div class="detail-value">${game.series}</div></div>` : ''}
+      </div>`;
+
+    // Collapsible Projections
+    if (projections.length > 0) {
+      html += `
+      <div class="nba-day-section" style="margin-top:14px" id="proj-${gameId}">
+        <div class="nba-day-header" onclick="document.getElementById('proj-${gameId}').classList.toggle('collapsed')" style="padding:10px 16px">
+          <h3 style="color:#d2a8ff">&#128202; Player Projections (${projections.length})</h3>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="nba-day-body" style="padding:0">
+          <table class="nba-picks-table">
+            <thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Proj PTS</th><th>Proj REB</th><th>Proj AST</th><th>PRA</th></tr></thead>
+            <tbody>
+              ${projections.map(p => `<tr><td style="font-weight:600">${p.name}</td><td>${p.team}</td><td>${p.pos || ''}</td><td>${p.projPts}</td><td>${p.projReb}</td><td>${p.projAst}</td><td style="font-weight:700;color:#d2a8ff">${p.pra}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    }
+
+    // Collapsible Props
+    if (propPicks.length > 0) {
+      html += `
+      <div class="nba-day-section" style="margin-top:8px" id="props-${gameId}">
+        <div class="nba-day-header" onclick="document.getElementById('props-${gameId}').classList.toggle('collapsed')" style="padding:10px 16px">
+          <h3 style="color:#f0883e">&#127942; Prop Picks (${propPicks.length})</h3>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="nba-day-body" style="padding:0">
+          <table class="nba-picks-table">
+            <thead><tr><th>Player</th><th>Team</th><th>Stat</th><th>Pick</th><th>Line</th><th>Projected</th><th>Edge</th><th>Conf</th></tr></thead>
+            <tbody>
+              ${propPicks.map(p => {
+                const edgeColor = p.edge > 0 ? '#3fb950' : '#f85149';
+                const confColor = p.confidence === 'HIGH' ? '#3fb950' : p.confidence === 'MED' ? '#d29922' : '#8b949e';
+                const confBg = p.confidence === 'HIGH' ? '#1a4023' : p.confidence === 'MED' ? '#2d2a1f' : '#21262d';
+                return `<tr>
+                  <td style="font-weight:600">${p.name}</td>
+                  <td>${p.team}</td>
+                  <td>${p.stat}</td>
+                  <td style="font-weight:600;color:${edgeColor}">${p.direction}</td>
+                  <td>${p.line}</td>
+                  <td style="font-weight:700;color:#58a6ff">${p.projected}</td>
+                  <td style="color:${edgeColor};font-weight:600">${p.edge > 0 ? '+' : ''}${p.edge}</td>
+                  <td><span style="background:${confBg};color:${confColor};padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">${p.confidence}</span></td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    }
+
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+async function loadDailyGames() {
+  try {
+    const res = await fetch('/api/today');
+    if (res.ok) {
+      const data = await res.json();
+      const subtitle = document.getElementById('page-subtitle');
+      if (subtitle && data.date) {
+        const d = new Date(data.date + 'T12:00:00');
+        subtitle.textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      }
+      renderDailyGames(data.nba || []);
+    } else {
+      document.getElementById('nba-daily-games').innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No predictions yet today &mdash; run generates at 7am ET</p>';
+    }
+  } catch (e) {
+    document.getElementById('nba-daily-games').innerHTML = '<p style="color:#f85149;text-align:center;padding:20px">Failed to load daily games</p>';
+  }
+}
+
 async function refreshNBA() {
   const btn = document.getElementById('nba-refresh-btn');
   if (!btn) return;
   btn.textContent = 'Refreshing...';
   btn.disabled = true;
   try {
-    const today = '2026-05-19';
-    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today.replace(/-/g,''));
-    const data = await res.json();
-    const events = data.events || [];
+    const res = await fetch('/api/today');
+    const data = res.ok ? await res.json() : null;
+    const today = data?.date?.replace(/-/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
+
+    const scoreRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today);
+    const scoreData = await scoreRes.json();
+    const events = scoreData.events || [];
 
     for (const event of events) {
       const comp = event.competitions[0];
@@ -142,82 +233,20 @@ async function refreshNBA() {
 
       const homeScore = parseInt(home.score || 0);
       const awayScore = parseInt(away.score || 0);
-      const total = homeScore + awayScore;
-      const margin = homeScore - awayScore;
-      const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
       const isFinal = comp.status?.type?.completed;
-      const statusText = comp.status?.type?.shortDetail || '';
 
-      document.querySelectorAll('[data-nba-bet]').forEach(row => {
-        const betType = row.dataset.nbaBet;
-        const resultCell = row.querySelector('.nba-result');
-        if (!resultCell) return;
-        let won = null;
-        if (betType === 'spread') {
-          const team = row.dataset.team;
-          const line = parseFloat(row.dataset.line);
-          const isHome = home.team.displayName.includes(team.split(' ').pop());
-          const teamMargin = isHome ? margin : -margin;
-          won = (teamMargin + line) > 0;
-        } else if (betType === 'ml') {
-          const team = row.dataset.team;
-          won = winner.includes(team.split(' ').pop());
-        } else if (betType === 'over') {
-          const line = parseFloat(row.dataset.line);
-          won = total > line;
-        }
-        if (isFinal && won !== null) {
-          const badge = won
-            ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
-            : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
-          resultCell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em">' + awayScore + '-' + homeScore + '</span>';
-        } else if (total > 0) {
-          resultCell.innerHTML = '<span style="color:#f59e0b;font-size:0.8em">' + statusText + ' (' + awayScore + '-' + homeScore + ')</span>';
-        }
-      });
+      if (!isFinal) continue;
 
-      const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-      const boxData = await boxRes.json();
-      const boxscore = boxData.boxscore;
+      const gameCard = document.querySelector(`[data-nba-game="${home.team.displayName}"]`);
+      if (!gameCard) continue;
 
-      if (boxscore?.players) {
-        let propsHTML = '';
-        for (const team of boxscore.players) {
-          for (const stat of team.statistics) {
-            const labels = stat.labels || [];
-            const ptsIdx = labels.indexOf('PTS');
-            const rebIdx = labels.indexOf('REB');
-            const astIdx = labels.indexOf('AST');
-            const minIdx = labels.indexOf('MIN');
-            for (const athlete of stat.athletes) {
-              const mins = parseInt(athlete.stats[minIdx]) || 0;
-              if (mins < 15) continue;
-              const pts = parseInt(athlete.stats[ptsIdx]) || 0;
-              const reb = parseInt(athlete.stats[rebIdx]) || 0;
-              const ast = parseInt(athlete.stats[astIdx]) || 0;
-              const ptsLine = Math.round(pts * 0.85) + 0.5;
-              const rebLine = Math.round(reb * 0.8) + 0.5;
-              const astLine = Math.round(ast * 0.8) + 0.5;
-              const mkBadge = (actual, line) => {
-                if (!isFinal) return '—';
-                return actual > line
-                  ? '<span style="background:#064e3b;color:#34d399;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">W</span>'
-                  : '<span style="background:#7f1d1d;color:#f87171;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">L</span>';
-              };
-              const teamShort = team.team.displayName.split(' ').pop();
-              propsHTML += '<tr><td style="font-weight:600">' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Points</td><td>O ' + ptsLine + '</td><td style="font-weight:700;color:#58a6ff">' + pts + '</td><td>' + (pts - ptsLine > 0 ? '+' : '') + (pts - ptsLine).toFixed(1) + '</td><td>' + mkBadge(pts, ptsLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Rebounds</td><td>O ' + rebLine + '</td><td style="font-weight:700;color:#58a6ff">' + reb + '</td><td>' + (reb - rebLine > 0 ? '+' : '') + (reb - rebLine).toFixed(1) + '</td><td>' + mkBadge(reb, rebLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Assists</td><td>O ' + astLine + '</td><td style="font-weight:700;color:#58a6ff">' + ast + '</td><td>' + (ast - astLine > 0 ? '+' : '') + (ast - astLine).toFixed(1) + '</td><td>' + mkBadge(ast, astLine) + '</td></tr>';
-            }
-          }
-        }
-        const propsBody = document.getElementById('nba-props-body');
-        if (propsBody && propsHTML) propsBody.innerHTML = propsHTML;
-      }
+      const timeEl = gameCard.querySelector('.game-time');
+      if (timeEl) timeEl.innerHTML = `<span style="color:#3fb950;font-weight:600">Final: ${away.team.shortDisplayName} ${awayScore}, ${home.team.shortDisplayName} ${homeScore}</span>`;
     }
-    btn.textContent = '\u2713 Updated';
+
+    btn.textContent = '✓ Updated';
     setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
-  } catch(e) {
+  } catch (e) {
     console.error('NBA refresh:', e);
     btn.textContent = 'Error';
     btn.disabled = false;
@@ -317,7 +346,7 @@ function renderNBATracker() {
                     <span class="w">${dayW}W</span>
                     <span class="l">${dayL}L</span>
                     ${dayP > 0 ? `<span class="p">${dayP} pending</span>` : ''}
-                    <span class="chevron">▼</span>
+                    <span class="chevron">&#9660;</span>
                 </div>
             </div>
             <div class="nba-day-body">
@@ -406,7 +435,6 @@ async function refreshTrackerResults() {
                             pick.score = `${scoreStr} (${total} total)`;
                         }
                     } else if (pick.type === 'prop') {
-                        // Props need box score — fetch separately
                         try {
                             const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
                             const boxData = await boxRes.json();
@@ -457,7 +485,6 @@ async function refreshTrackerResults() {
     }
 }
 
-// Load from API if available, then render
 async function loadNBATracker() {
     try {
         const res = await fetch('/api/nba-bestbets');
@@ -479,6 +506,8 @@ async function loadNBATracker() {
     renderNBATracker();
 }
 
+// Boot
+loadDailyGames();
 loadNBATracker();
 </script>
 </body>

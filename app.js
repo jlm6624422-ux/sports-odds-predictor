@@ -60,6 +60,51 @@ app.get('/api/predictions/today', (req, res) => {
   }
 });
 
+app.get('/api/today', (req, res) => {
+  const cachePath = path.join(__dirname, 'data', 'today.json');
+  if (fs.existsSync(cachePath)) {
+    res.json(JSON.parse(fs.readFileSync(cachePath, 'utf8')));
+  } else {
+    res.status(404).json({ error: 'No predictions yet' });
+  }
+});
+
+app.get('/api/nba-bestbets', (req, res) => {
+  const historyDir = path.join(__dirname, 'data', 'history');
+  if (!fs.existsSync(historyDir)) return res.json({ days: [] });
+
+  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 14);
+  const days = [];
+  for (const f of files) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
+      if (!data.nba || data.nba.length === 0) continue;
+      const picks = [];
+      for (const game of data.nba) {
+        if (game.propPicks) {
+          for (const prop of game.propPicks) {
+            picks.push({
+              type: 'prop',
+              team: `${prop.name} ${prop.direction} ${prop.line} ${prop.stat}`,
+              matchup: `${game.away} @ ${game.home}`,
+              line: `${prop.direction} ${prop.line} (${prop.edge > 0 ? '+' : ''}${prop.edge} edge)`,
+              odds: '-110',
+              confidence: prop.confidence?.toLowerCase() || 'med',
+              thesis: `Avg ${prop.seasonAvg} → Proj ${prop.projected}`,
+              result: 'pending',
+              score: '',
+            });
+          }
+        }
+      }
+      if (picks.length > 0) {
+        days.push({ date: f.replace('.json', ''), picks });
+      }
+    } catch (e) {}
+  }
+  res.json({ days });
+});
+
 // API: Run predictions now
 app.post('/api/predictions/run', async (req, res) => {
   try {
@@ -309,22 +354,35 @@ async function runPredictions() {
 
   // NBA (fetch from ESPN)
   let nbaGames = [];
+  let nbaProps = [];
   try {
     const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
     const nbaData = await nbaRes.json();
-    nbaGames = (nbaData.events || []).map(e => {
-      const comp = e.competitions[0];
-      const home = comp.competitors.find(c => c.homeAway === 'home');
-      const away = comp.competitors.find(c => c.homeAway === 'away');
-      const odds = (comp.odds || [])[0] || {};
-      return {
-        home: home.team.displayName, away: away.team.displayName,
-        homeRecord: (home.records||[{}])[0]?.summary, awayRecord: (away.records||[{}])[0]?.summary,
-        spread: odds.details, ou: odds.overUnder,
-        status: comp.status?.type?.shortDetail,
-      };
-    });
-  } catch(e) {}
+    const nbaEvents = nbaData.events || [];
+
+    const { generateNBAProps } = require('./server/services/nbaPropsEngine');
+    const propsResult = generateNBAProps(nbaEvents);
+    nbaGames = propsResult.games;
+    nbaProps = propsResult.props;
+  } catch(e) {
+    console.log('[NBA] Props generation failed, falling back to basic game info:', e.message);
+    try {
+      const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
+      const nbaData = await nbaRes.json();
+      nbaGames = (nbaData.events || []).map(e => {
+        const comp = e.competitions[0];
+        const home = comp.competitors.find(c => c.homeAway === 'home');
+        const away = comp.competitors.find(c => c.homeAway === 'away');
+        const odds = (comp.odds || [])[0] || {};
+        return {
+          home: home.team.displayName, away: away.team.displayName,
+          homeRecord: (home.records||[{}])[0]?.summary, awayRecord: (away.records||[{}])[0]?.summary,
+          spread: odds.details, ou: odds.overUnder,
+          status: comp.status?.type?.shortDetail,
+        };
+      });
+    } catch(e2) {}
+  }
 
   // Build parlays from actionable bets
   const actionable = mlbResults.filter(g => g.kelly && g.kelly.betSize > 0);
@@ -335,10 +393,12 @@ async function runPredictions() {
     generatedAt: new Date().toISOString(),
     mlb: mlbResults,
     nba: nbaGames,
+    nbaProps,
     actionableBets: actionable.length,
     summary: {
       mlbGames: mlbResults.length,
       nbaGames: nbaGames.length,
+      nbaProps: nbaProps.length,
       actionableBets: actionable.length,
       totalExposure: actionable.reduce((s, g) => s + (g.kelly?.betSize || 0), 0),
     },
@@ -477,6 +537,28 @@ function scheduleDailyRun() {
   const checkInterval = 60 * 1000; // Check every minute
   let lastRunDate = null;
   let lastGradeDate = null;
+
+  // Startup catch-up: if past 7am ET and today's predictions don't exist, run immediately
+  const startupNow = new Date();
+  const etNow = new Date(startupNow.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const etHourNow = etNow.getHours();
+  const todayDate = startupNow.toISOString().split('T')[0];
+  const historyPath = path.join(__dirname, 'data', 'history', `${todayDate}.json`);
+
+  if (etHourNow >= 7 && !fs.existsSync(historyPath)) {
+    console.log(`[CRON] Startup catch-up: it's ${etHourNow}:00 ET and no predictions for ${todayDate}, running now...`);
+    runPredictions().catch(e => console.error('[CRON] Startup catch-up failed:', e.message));
+    lastRunDate = todayDate;
+  } else if (fs.existsSync(historyPath)) {
+    lastRunDate = todayDate;
+  }
+
+  if (etHourNow >= 2) {
+    lastGradeDate = todayDate;
+    if (etHourNow >= 2 && etHourNow < 7) {
+      gradeResults().catch(e => console.error('[CRON] Startup grade failed:', e.message));
+    }
+  }
 
   setInterval(() => {
     const now = new Date();

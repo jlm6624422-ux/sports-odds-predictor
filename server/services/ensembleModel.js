@@ -140,6 +140,15 @@ function ensembleMLB(params) {
     const leagueAvg = 4.00;
     expectedAwayRuns *= (subModels.pitcher.homeFIP / leagueAvg);
     expectedHomeRuns *= (subModels.pitcher.awayFIP / leagueAvg);
+
+    // Pitcher dominance discount: when both starters are elite/above-avg,
+    // apply additional under-lean (model over-projects in ace duels)
+    const bothElite = subModels.pitcher.homeFIP <= 3.50 && subModels.pitcher.awayFIP <= 3.50;
+    if (bothElite) {
+      const dominanceFactor = 0.92; // ~8% reduction for elite matchups
+      expectedHomeRuns *= dominanceFactor;
+      expectedAwayRuns *= dominanceFactor;
+    }
   }
 
   // Bullpen adjustment
@@ -215,12 +224,20 @@ function ensembleMLB(params) {
 
   // --- CONFIDENCE ---
   const modelsUsed = Object.keys(subModels).length;
-  const isCoinFlip = Math.abs(finalHomeProb - 0.5) < 0.03;
+  const probEdge = Math.abs(finalHomeProb - 0.5);
+  const isCoinFlip = probEdge < 0.03;
+
+  // Check model agreement: do most sub-models agree on the same side?
+  const modelSides = Object.values(subModels).map(m => m.homeProb > 0.5 ? 'home' : 'away');
+  const homeVotes = modelSides.filter(s => s === 'home').length;
+  const modelAgreement = Math.max(homeVotes, modelSides.length - homeVotes) / modelSides.length;
+
   let confidence;
   if (isCoinFlip) confidence = 'coin-flip';
-  else if (modelsUsed >= 4) confidence = 'high';
-  else if (modelsUsed >= 3) confidence = 'medium';
-  else confidence = 'low';
+  else if (modelsUsed >= 4 && probEdge >= 0.10 && modelAgreement >= 0.75) confidence = 'high';
+  else if (modelsUsed >= 3 && probEdge >= 0.06 && modelAgreement >= 0.67) confidence = 'medium';
+  else if (probEdge >= 0.03) confidence = 'low';
+  else confidence = 'coin-flip';
 
   return {
     game: { home: homeTeam.name, away: awayTeam.name, venue },
