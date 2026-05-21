@@ -29,7 +29,7 @@
         .gray { color: #6b7280; }
 
         .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.82em; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82em; min-width: 800px; }
         th { text-align: left; padding: 8px 12px; background: #111827; color: #6b7280; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; position: sticky; top: 0; white-space: nowrap; }
         td { padding: 8px 12px; border-bottom: 1px solid #1a1f2e; white-space: nowrap; }
         tr:hover td { background: rgba(96, 165, 250, 0.03); }
@@ -339,7 +339,7 @@ function renderStraights(days, today) {
 
         html += `<div class="day-group">`;
         html += `<div class="day-header" onclick="toggleDay(this)"><h4>${dateLabel}${isToday ? ' (Today)' : ''}</h4><div class="day-summary"><span>${summaryStr}</span><span class="day-pnl ${pnlCls}">${pnlDisplay}</span><span class="chevron ${isToday ? 'open' : ''}">&#9660;</span></div></div>`;
-        html += `<div class="day-body ${isToday ? 'open' : ''}">`;
+        html += `<div class="day-body ${isToday ? 'open' : ''}"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch">`;
         html += `<table><thead><tr><th>Sport</th><th>Pick</th><th>Matchup</th><th>Odds</th><th>Stake</th><th>Model%</th><th>Edge</th><th>Signal</th><th>Result</th><th>P&L</th></tr></thead><tbody>`;
 
         for (const p of day.picks) {
@@ -350,7 +350,7 @@ function renderStraights(days, today) {
             html += `<tr class="${rowCls}"><td>MLB</td><td style="font-weight:600">${p.team} ${p.type === 'ml' ? 'ML' : ''}</td><td>${p.matchup}</td><td>${oddsStr}</td><td>$${p.stake}</td><td>${p.winProb ? p.winProb.toFixed(1) + '%' : '—'}</td><td>+${p.edge?.toFixed(1) || '0'}%</td><td style="font-size:0.75em;font-weight:600">${signal}</td><td>${resultBadge(p.result)}</td><td>${p.result === 'pending' ? '—' : pnlStr(pnl)}</td></tr>`;
         }
 
-        html += `</tbody></table></div></div>`;
+        html += `</tbody></table></div></div></div>`;
     }
 
     container.innerHTML = html || '<div class="loading">No straight bets found</div>';
@@ -378,16 +378,16 @@ function renderParlays(days, today) {
 
         html += `<div class="day-group">`;
         html += `<div class="day-header" onclick="toggleDay(this)"><h4>${dateLabel}</h4><div class="day-summary"><span>${summaryStr}</span><span class="day-pnl ${pnlCls}">${pnlDisplay}</span><span class="chevron ${isToday ? 'open' : ''}">&#9660;</span></div></div>`;
-        html += `<div class="day-body ${isToday ? 'open' : ''}">`;
+        html += `<div class="day-body ${isToday ? 'open' : ''}"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch">`;
         html += `<table><thead><tr><th>Type</th><th>Legs</th><th>Stake</th><th>Odds</th><th>Payout</th><th>Win%</th><th>EV</th><th>Result</th><th>P&L</th></tr></thead><tbody>`;
 
         for (const p of day.parlays) {
             const pnl = p.result === 'win' ? (p.stake * p.odds) - p.stake : p.result === 'loss' ? -p.stake : 0;
             const rowCls = p.result === 'win' ? 'win' : p.result === 'loss' ? 'loss' : 'pending';
-            html += `<tr class="${rowCls}"><td>${p.label}</td><td style="max-width:250px">${p.legs}</td><td>$${p.stake}</td><td>${p.odds?.toFixed(2) || '—'}x</td><td>$${p.payout || '—'}</td><td>${p.prob || '—'}%</td><td>${p.ev ? (parseFloat(p.ev) >= 0 ? '+' : '') + '$' + p.ev : '—'}</td><td>${resultBadge(p.result)}</td><td>${p.result === 'pending' ? '—' : pnlStr(pnl)}</td></tr>`;
+            html += `<tr class="${rowCls}"><td>${p.label}</td><td style="min-width:180px">${p.legs}</td><td>$${p.stake}</td><td>${p.odds?.toFixed(2) || '—'}x</td><td>$${p.payout || '—'}</td><td>${p.prob || '—'}%</td><td>${p.ev ? (parseFloat(p.ev) >= 0 ? '+' : '') + '$' + p.ev : '—'}</td><td>${resultBadge(p.result)}</td><td>${p.result === 'pending' ? '—' : pnlStr(pnl)}</td></tr>`;
         }
 
-        html += `</tbody></table></div></div>`;
+        html += `</tbody></table></div></div></div>`;
     }
 
     container.innerHTML = html || '<div class="loading">No parlays found</div>';
