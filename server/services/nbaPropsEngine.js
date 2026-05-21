@@ -131,9 +131,65 @@ function evaluateProp(playerProj, stat, line) {
   return { name: playerProj.name, team: playerProj.team, stat, line, projected: parseFloat(projected.toFixed(1)), seasonAvg, edge: parseFloat(edge.toFixed(1)), direction, confidence: conf, absEdge: parseFloat(absEdge.toFixed(1)) };
 }
 
-function generateNBAProps(espnEvents) {
+const ODDS_API_KEY = process.env.ODDS_API_KEY || '';
+const PROP_MARKETS = ['player_points', 'player_rebounds', 'player_assists', 'player_points_rebounds_assists'];
+const STAT_MAP = { 'player_points': 'PTS', 'player_rebounds': 'REB', 'player_assists': 'AST', 'player_points_rebounds_assists': 'PRA' };
+
+async function fetchRealPropLines(eventId) {
+  if (!ODDS_API_KEY) return [];
+  try {
+    const url = `https://api.the-odds-api.com/v4/sports/basketball_nba/events/${eventId}/odds?apiKey=${ODDS_API_KEY}&regions=us&markets=${PROP_MARKETS.join(',')}&oddsFormat=american`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const lines = [];
+    for (const bk of (data.bookmakers || [])) {
+      for (const market of (bk.markets || [])) {
+        const stat = STAT_MAP[market.key];
+        if (!stat) continue;
+        for (const outcome of (market.outcomes || [])) {
+          if (outcome.name !== 'Over') continue;
+          lines.push({
+            player: outcome.description,
+            stat,
+            line: outcome.point,
+            odds: outcome.price,
+            book: bk.title,
+          });
+        }
+      }
+    }
+    return lines;
+  } catch (e) {
+    return [];
+  }
+}
+
+async function getOddsApiEvents() {
+  if (!ODDS_API_KEY) return [];
+  try {
+    const res = await fetch(`https://api.the-odds-api.com/v4/sports/basketball_nba/events?apiKey=${ODDS_API_KEY}`);
+    if (!res.ok) return [];
+    return res.json();
+  } catch (e) {
+    return [];
+  }
+}
+
+function consensusLine(allLines, playerName, stat) {
+  const matching = allLines.filter(l => l.player === playerName && l.stat === stat);
+  if (matching.length === 0) return null;
+  const avg = matching.reduce((s, l) => s + l.line, 0) / matching.length;
+  const bestOdds = Math.max(...matching.map(l => l.odds));
+  return { line: parseFloat(avg.toFixed(1)), odds: bestOdds, books: matching.length };
+}
+
+async function generateNBAProps(espnEvents) {
   const games = [];
   const props = [];
+
+  // Get Odds API event IDs for prop line fetching
+  const oddsEvents = await getOddsApiEvents();
 
   for (const event of espnEvents) {
     const comp = event.competitions[0];
@@ -165,6 +221,16 @@ function generateNBAProps(espnEvents) {
       awayRoadRecord: (away.records || [])[2]?.summary || null,
     };
 
+    // Find matching Odds API event for real prop lines
+    const oddsEvent = oddsEvents.find(e =>
+      e.home_team === home.team.displayName && e.away_team === away.team.displayName
+    );
+
+    let realLines = [];
+    if (oddsEvent) {
+      realLines = await fetchRealPropLines(oddsEvent.id);
+    }
+
     // Find players and generate projections
     const gamePlayers = Object.entries(PLAYER_DB)
       .filter(([_, p]) => p.team === homeAbbrev || p.team === awayAbbrev)
@@ -183,29 +249,54 @@ function generateNBAProps(espnEvents) {
       pra: parseFloat(p.pra.toFixed(1)),
     }));
 
-    // Generate prop evaluations
-    const propLines = [];
+    // Evaluate props against REAL market lines
+    const evaluated = [];
     for (const p of projections) {
-      const isStar = p.pts >= 20;
-      const ptsLine = Math.round(p.pts * 2 - 1) / 2 - (isStar ? 1 : 0.5);
-      const rebLine = Math.round(p.reb * 2 - 1) / 2;
-      const astLine = Math.round(p.ast * 2 - 1) / 2;
-      const praLine = Math.round((p.pts + p.reb + p.ast) * 2 - 1) / 2;
+      const stats = [
+        { stat: 'PTS', projected: p.projPts, seasonAvg: p.pts },
+        { stat: 'REB', projected: p.projReb, seasonAvg: p.reb },
+        { stat: 'AST', projected: p.projAst, seasonAvg: p.ast },
+        { stat: 'PRA', projected: p.pra, seasonAvg: p.pts + p.reb + p.ast },
+      ];
 
-      propLines.push({ name: p.name, stat: 'PTS', line: ptsLine });
-      if (p.reb >= 7) propLines.push({ name: p.name, stat: 'REB', line: rebLine });
-      if (p.ast >= 5) propLines.push({ name: p.name, stat: 'AST', line: astLine });
-      if (isStar) propLines.push({ name: p.name, stat: 'PRA', line: praLine });
+      for (const s of stats) {
+        const market = consensusLine(realLines, p.name, s.stat);
+        if (!market) continue;
+
+        const edge = s.projected - market.line;
+        const direction = edge > 0 ? 'OVER' : 'UNDER';
+        const absEdge = Math.abs(edge);
+        const conf = absEdge >= 3 ? 'HIGH' : absEdge >= 1.5 ? 'MED' : absEdge >= 0.8 ? 'LOW' : 'SKIP';
+        if (conf === 'SKIP') continue;
+
+        evaluated.push({
+          name: p.name, team: p.team, stat: s.stat,
+          line: market.line, projected: parseFloat(s.projected.toFixed(1)),
+          seasonAvg: s.seasonAvg, edge: parseFloat(edge.toFixed(1)),
+          direction, confidence: conf, absEdge: parseFloat(absEdge.toFixed(1)),
+          odds: market.odds, books: market.books,
+        });
+      }
     }
 
-    const evaluated = propLines
-      .map(prop => {
-        const playerProj = projections.find(p => p.name === prop.name);
-        return evaluateProp(playerProj, prop.stat, prop.line);
-      })
-      .filter(e => e && e.confidence !== 'SKIP')
-      .sort((a, b) => b.absEdge - a.absEdge);
+    // If no real lines available, fall back to synthetic
+    if (evaluated.length === 0) {
+      for (const p of projections) {
+        const isStar = p.pts >= 20;
+        const propLines = [
+          { stat: 'PTS', line: Math.round(p.pts * 2 - 1) / 2 - (isStar ? 1 : 0.5) },
+          ...(p.reb >= 7 ? [{ stat: 'REB', line: Math.round(p.reb * 2 - 1) / 2 }] : []),
+          ...(p.ast >= 5 ? [{ stat: 'AST', line: Math.round(p.ast * 2 - 1) / 2 }] : []),
+          ...(isStar ? [{ stat: 'PRA', line: Math.round((p.pts + p.reb + p.ast) * 2 - 1) / 2 }] : []),
+        ];
+        for (const prop of propLines) {
+          const result = evaluateProp(p, prop.stat, prop.line);
+          if (result && result.confidence !== 'SKIP') evaluated.push(result);
+        }
+      }
+    }
 
+    evaluated.sort((a, b) => b.absEdge - a.absEdge);
     gameInfo.propPicks = evaluated.slice(0, 10);
     props.push(...evaluated.slice(0, 10).map(p => ({ ...p, game: `${gameInfo.away} @ ${gameInfo.home}` })));
     games.push(gameInfo);
@@ -214,4 +305,4 @@ function generateNBAProps(espnEvents) {
   return { games, props };
 }
 
-module.exports = { generateNBAProps, projectPlayer, evaluateProp, PLAYER_DB };
+module.exports = { generateNBAProps, projectPlayer, evaluateProp, PLAYER_DB, fetchRealPropLines };
