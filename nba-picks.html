@@ -288,7 +288,7 @@ async function loadDailyGames() {
       renderDailyGames(data.nba || []);
       renderParlays(data.nba || []);
     } else {
-      document.getElementById('nba-daily-games').innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No predictions yet today &mdash; run generates at 7am ET</p>';
+      document.getElementById('nba-daily-games').innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No predictions yet today &mdash; run generates at 5am ET</p>';
     }
   } catch (e) {
     document.getElementById('nba-daily-games').innerHTML = '<p style="color:#f85149;text-align:center;padding:20px">Failed to load daily games</p>';
@@ -342,6 +342,16 @@ async function refreshNBA() {
 // ============================================================
 
 let NBA_TRACKER_DATA = [
+    {
+        date: "2026-05-20",
+        picks: [
+            { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
+            { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
+            { type: "prop", team: "Shai Gilgeous-Alexander O 34.5 PRA", matchup: "SA @ OKC", line: "O 34.5 (+3.1 edge)", odds: "-115", confidence: "high", thesis: "Avg 37.7 PRA", result: "pending", score: "" },
+            { type: "prop", team: "Victor Wembanyama O 36.5 PRA", matchup: "SA @ OKC", line: "O 36.5 (+2.9 edge)", odds: "-110", confidence: "high", thesis: "Avg 39.4 PRA", result: "pending", score: "" },
+            { type: "prop", team: "Jalen Williams O 28.5 PRA", matchup: "SA @ OKC", line: "O 28.5 (+2.5 edge)", odds: "-110", confidence: "med", thesis: "Avg 31.0 PRA", result: "pending", score: "" }
+        ]
+    },
     {
         date: "2026-05-19",
         picks: [
