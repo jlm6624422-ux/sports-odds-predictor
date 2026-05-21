@@ -28,10 +28,10 @@
         .orange { color: #f59e0b; }
         .gray { color: #6b7280; }
 
-        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 16px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
-        th { text-align: left; padding: 8px 12px; background: #111827; color: #6b7280; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; position: sticky; top: 0; }
-        td { padding: 8px 12px; border-bottom: 1px solid #1a1f2e; }
+        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82em; min-width: 700px; }
+        th { text-align: left; padding: 8px 12px; background: #111827; color: #6b7280; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; position: sticky; top: 0; white-space: nowrap; }
+        td { padding: 8px 12px; border-bottom: 1px solid #1a1f2e; white-space: nowrap; }
         tr:hover td { background: rgba(96, 165, 250, 0.03); }
         .badge-win { background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
         .badge-loss { background: #7f1d1d; color: #f87171; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
@@ -46,7 +46,7 @@
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
         .bar-value { font-size: 0.75em; font-weight: 600; min-width: 50px; }
 
-        .day-group { margin-bottom: 16px; border: 1px solid #1f2937; border-radius: 10px; overflow: hidden; }
+        .day-group { margin-bottom: 16px; border: 1px solid #1f2937; border-radius: 10px; }
         .day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #111827; cursor: pointer; user-select: none; }
         .day-header:hover { background: #1a2332; }
         .day-header h4 { font-size: 0.9em; color: #e5e7eb; }
@@ -54,7 +54,7 @@
         .day-header .day-summary .day-pnl { font-weight: 600; }
         .day-header .chevron { color: #6b7280; transition: transform 0.2s; font-size: 0.8em; }
         .day-header .chevron.open { transform: rotate(180deg); }
-        .day-body { display: none; padding: 0; }
+        .day-body { display: none; padding: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .day-body.open { display: block; }
 
         .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
