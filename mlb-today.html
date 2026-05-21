@@ -33,9 +33,10 @@ header .subtitle{color:#8b949e;font-size:1em}
 .day-section.collapsed .day-body{display:none}
 .day-section.collapsed .day-header{border-bottom:none}
 
-.picks-table{width:100%;border-collapse:collapse;font-size:0.85em}
-.picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d}
-.picks-table td{padding:10px 14px;border-bottom:1px solid #21262d}
+.day-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.picks-table{width:100%;border-collapse:collapse;font-size:0.85em;min-width:700px}
+.picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d;white-space:nowrap}
+.picks-table td{padding:10px 14px;border-bottom:1px solid #21262d;white-space:nowrap}
 .picks-table tr:last-child td{border-bottom:none}
 
 .conf-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.75em;font-weight:700}
@@ -72,12 +73,12 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 </div>
 
 <div class="section">
-<div class="section-title" style="color:#a371f7"><span>&#127922; Today's Parlays</span></div>
+<div class="section-title" style="color:#a371f7"><span>&#127922; Today's Parlays</span><button onclick="refreshResults()" style="padding:6px 14px;background:#7c3aed;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
 <div id="parlays-section"></div>
 </div>
 
 <div class="section">
-<div class="section-title" style="color:#58a6ff"><span>&#9918; Full Projections</span></div>
+<div class="section-title" style="color:#58a6ff"><span>&#9918; Full Projections</span><button onclick="refreshResults()" style="padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
 <div id="projections-section"></div>
 </div>
 
@@ -96,7 +97,7 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 async function loadPage() {
   try {
     const res = await fetch('/api/today');
-    if (!res.ok) { document.getElementById('action-bets').innerHTML = '<p style="color:#8b949e;padding:20px;text-align:center">No predictions yet — generates at 7am ET</p>'; return; }
+    if (!res.ok) { document.getElementById('action-bets').innerHTML = '<p style="color:#8b949e;padding:20px;text-align:center">No predictions yet — generates at 5am ET</p>'; return; }
     const data = await res.json();
 
     if (data.date) {
@@ -273,7 +274,7 @@ function renderProjections(mlb) {
     </div>
     <div class="day-body" style="padding:0">
       <table class="picks-table">
-        <thead><tr><th>Game</th><th>Pitchers</th><th>Pick</th><th>Win%</th><th>Proj Total</th><th>O/U Line</th><th>Edge</th><th>Conf</th></tr></thead>
+        <thead><tr><th>Game</th><th>Pitchers</th><th>Pick</th><th>Win%</th><th>Proj Total</th><th>O/U Line</th><th>Edge</th><th>Conf</th><th>Result</th></tr></thead>
         <tbody>`;
 
   for (const g of sorted) {
@@ -283,7 +284,7 @@ function renderProjections(mlb) {
     const ouEdge = g.totalEdge ? (g.totalEdge > 0 ? '+' : '') + g.totalEdge : '—';
     const edgeColor = g.totalEdge > 1.5 ? '#3fb950' : g.totalEdge < -1.5 ? '#f85149' : '#8b949e';
 
-    html += `<tr style="${isCoin ? 'opacity:0.5' : ''}">
+    html += `<tr style="${isCoin ? 'opacity:0.5' : ''}" data-home="${g.home}" data-type="ml" data-team="${isCoin ? '' : side}">
       <td>${g.away.split(' ').pop()} @ ${g.home.split(' ').pop()}</td>
       <td style="color:#8b949e;font-size:0.85em">${(g.awayPitcher || 'TBD').split(' ').pop()} vs ${(g.homePitcher || 'TBD').split(' ').pop()}</td>
       <td style="font-weight:${isCoin ? '400' : '700'};color:${isCoin ? '#8b949e' : '#3fb950'}">${isCoin ? '—' : side.split(' ').pop()}</td>
@@ -292,6 +293,7 @@ function renderProjections(mlb) {
       <td>${g.ouLine || '—'}</td>
       <td style="color:${edgeColor};font-weight:600">${ouEdge}</td>
       <td><span class="conf-badge ${g.confidence}">${g.confidence === 'coin-flip' ? 'SKIP' : g.confidence?.toUpperCase()}</span></td>
+      <td class="result-cell">—</td>
     </tr>`;
   }
 
@@ -321,9 +323,12 @@ async function refreshResults() {
       });
     }
 
+    let wins = 0, losses = 0;
+
     document.querySelectorAll('[data-home]').forEach(row => {
       const home = row.dataset.home;
       const type = row.dataset.type;
+      const team = row.dataset.team;
       const game = results.get(home);
       if (!game) return;
 
@@ -333,7 +338,7 @@ async function refreshResults() {
       let won = false;
       let info = '';
       if (type === 'ml') {
-        const team = row.dataset.team;
+        if (!team) return;
         won = game.winner.includes(team.split(' ').pop());
         info = game.awayScore + '-' + game.homeScore;
       } else if (type === 'over') {
@@ -346,13 +351,21 @@ async function refreshResults() {
         info = game.total + ' total';
       }
 
+      if (won) wins++; else losses++;
+
+      row.style.background = won ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)';
+      row.style.borderLeft = won ? '3px solid #34d399' : '3px solid #f87171';
+
       const badge = won
         ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
         : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
       cell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.8em">' + info + '</span>';
     });
 
-    btn.textContent = '✓ Updated';
+    // Persist server-side
+    try { await fetch('/api/grade', { method: 'POST' }); } catch(e) {}
+
+    btn.textContent = '✓ ' + wins + 'W-' + losses + 'L';
     setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
   } catch (e) {
     btn.textContent = 'Error';

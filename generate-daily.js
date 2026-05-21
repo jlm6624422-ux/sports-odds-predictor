@@ -459,10 +459,10 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 .parlay-footer{display:flex;gap:16px;font-size:0.8em;color:#8b949e;flex-wrap:wrap}
 .parlay-footer .ev{color:#3fb950;font-weight:600}
 
-.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
-table{width:100%;border-collapse:collapse;font-size:0.85em}
-th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;position:sticky;top:0}
-td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
+.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:0.85em;min-width:750px}
+th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;position:sticky;top:0;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #1a1f2e;white-space:nowrap}
 tr:hover td{background:rgba(88,166,255,0.03)}
 .edge-positive{color:#3fb950;font-weight:600}
 .edge-high{color:#3fb950;font-weight:700}
@@ -509,7 +509,7 @@ ${nbaHTML}
 <!-- PROJECTIONS TAB -->
 <div class="tab-content" id="tab-projections">
 <div class="section">
-<div class="section-title">&#9918; MLB Full Projections &mdash; ${mlbPicks.length} Games</div>
+<div class="section-title" style="display:flex;justify-content:space-between;align-items:center">&#9918; MLB Full Projections &mdash; ${mlbPicks.length} Games <button onclick="refreshResults()" style="padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
 ${mlbTableHTML}
 </div>
 </div>
@@ -517,7 +517,7 @@ ${mlbTableHTML}
 <!-- PARLAYS TAB -->
 <div class="tab-content" id="tab-parlays">
 <div class="section">
-<div class="section-title parlays">&#127922; Parlay Plays</div>
+<div class="section-title parlays" style="display:flex;justify-content:space-between;align-items:center">&#127922; Parlay Plays <button onclick="refreshResults()" style="padding:6px 14px;background:#7c3aed;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
 ${parlaysHTML}
 </div>
 </div>
