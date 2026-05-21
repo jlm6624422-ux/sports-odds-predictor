@@ -20,6 +20,7 @@ const weatherImpact = require('./weatherImpact');
 const platoonSplits = require('./platoonSplits');
 const ensembleModel = require('./ensembleModel');
 const nbaFourFactors = require('./nbaFourFactors');
+const rosterImpact = require('./rosterImpact');
 
 // Supported sports (baseball, basketball, football only)
 const SUPPORTED_SPORTS = ['NFL', 'NCAAF', 'NBA', 'NCAAB', 'MLB'];
@@ -59,4 +60,5 @@ module.exports = {
   platoonSplits,
   ensembleModel,
   nbaFourFactors,
+  rosterImpact,
 };

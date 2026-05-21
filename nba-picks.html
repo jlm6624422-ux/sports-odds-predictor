@@ -22,10 +22,10 @@ header .subtitle{color:#8b949e;font-size:1em}
 .detail-value{font-weight:600;margin-top:2px}
 .detail-value.green{color:#3fb950}
 .detail-value.orange{color:#f0883e}
-.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d}
-table{width:100%;border-collapse:collapse;font-size:0.85em}
-th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase}
-td{padding:8px 10px;border-bottom:1px solid #1a1f2e}
+.table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:0.85em;min-width:600px}
+th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #1a1f2e;white-space:nowrap}
 tr:hover td{background:rgba(240,136,62,0.03)}
 .nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
 .nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
@@ -52,9 +52,10 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 .nba-day-section.collapsed .nba-day-body{display:none}
 .nba-day-section.collapsed .nba-day-header{border-bottom:none}
 
-.nba-picks-table{width:100%;border-collapse:collapse}
-.nba-picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d}
-.nba-picks-table td{padding:10px 14px;border-bottom:1px solid #21262d;font-size:0.88em}
+.nba-day-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nba-picks-table{width:100%;border-collapse:collapse;min-width:650px}
+.nba-picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d;white-space:nowrap}
+.nba-picks-table td{padding:10px 14px;border-bottom:1px solid #21262d;font-size:0.88em;white-space:nowrap}
 .nba-picks-table tr:last-child td{border-bottom:none}
 
 .nba-pick-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:600}

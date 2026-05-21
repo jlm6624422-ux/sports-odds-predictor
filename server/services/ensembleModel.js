@@ -43,7 +43,8 @@ const { calculateBetSize } = require('./kellyCriterion');
  */
 function ensembleMLB(params) {
   const { homeTeam, awayTeam, homePitcher, awayPitcher, homeElo, awayElo,
-    bookmakers, venue, weather, homeBullpen, awayBullpen, bankroll } = params;
+    bookmakers, venue, weather, homeBullpen, awayBullpen, bankroll,
+    homeRosterImpact, awayRosterImpact } = params;
 
   const subModels = {};
 
@@ -125,6 +126,18 @@ function ensembleMLB(params) {
   if (!hasMarket && Math.abs(finalHomeProb - 0.5) < 0.04) {
     finalHomeProb = 0.5 + (finalHomeProb - 0.5) * 0.5;
   }
+
+  // --- ROSTER IMPACT ADJUSTMENT ---
+  let rosterAdj = 0;
+  if (homeRosterImpact && homeRosterImpact.adjustment !== 0) {
+    finalHomeProb += homeRosterImpact.adjustment / 100;
+    rosterAdj += homeRosterImpact.adjustment;
+  }
+  if (awayRosterImpact && awayRosterImpact.adjustment !== 0) {
+    finalHomeProb -= awayRosterImpact.adjustment / 100;
+    rosterAdj -= awayRosterImpact.adjustment;
+  }
+  finalHomeProb = Math.min(0.85, Math.max(0.15, finalHomeProb));
 
   // --- TOTALS MODEL (separate from sides) ---
   const homeRPG = homeGames > 0 ? (homeTeam.runsScored || 0) / homeGames : 4.5;
@@ -259,6 +272,12 @@ function ensembleMLB(params) {
       weather: weatherAdj,
       bullpen: parseFloat(bullpenAdj.toFixed(2)),
       platoon: parseFloat(platoonAdj.toFixed(2)),
+      roster: parseFloat(rosterAdj.toFixed(1)),
+    },
+
+    rosterImpact: {
+      home: homeRosterImpact || null,
+      away: awayRosterImpact || null,
     },
 
     edge: mlEdge,

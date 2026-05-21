@@ -1,6 +1,6 @@
 #!/bin/bash
 # Daily prediction + full page build + deploy
-# Cron: 0 11 * * * (11 UTC = 7am ET)
+# Cron: 0 9 * * * (9 UTC = 5am ET)
 # Generates MLB picks, NBA analysis, parlays, and pushes to Railway
 
 set -e

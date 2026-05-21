@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Betting Tracker — May 2026</title>
+    <title>Betting Tracker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0e14; color: #d4d4d4; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif; line-height: 1.5; padding: 20px; }
@@ -11,7 +11,6 @@
         h1 { font-size: 1.8em; background: linear-gradient(135deg, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; margin-bottom: 8px; }
         .subtitle { text-align: center; color: #6b7280; margin-bottom: 24px; }
 
-        /* Tabs */
         .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid #1f2937; }
         .tab { padding: 10px 20px; cursor: pointer; color: #6b7280; font-weight: 600; font-size: 0.9em; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
         .tab:hover { color: #d4d4d4; }
@@ -19,7 +18,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Summary cards */
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
         .summary-card { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 16px; text-align: center; }
         .summary-card .value { font-size: 1.8em; font-weight: 800; }
@@ -30,31 +28,50 @@
         .orange { color: #f59e0b; }
         .gray { color: #6b7280; }
 
-        /* Tables */
-        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 24px; }
+        .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #1f2937; margin-bottom: 16px; }
         table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
         th { text-align: left; padding: 8px 12px; background: #111827; color: #6b7280; font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1f2937; position: sticky; top: 0; }
         td { padding: 8px 12px; border-bottom: 1px solid #1a1f2e; }
         tr:hover td { background: rgba(96, 165, 250, 0.03); }
-        tr.win td { border-left: 3px solid #34d399; }
-        tr.loss td { border-left: 3px solid #f87171; }
-        tr.push td { border-left: 3px solid #6b7280; }
-        tr.pending td { border-left: 3px solid #f59e0b; }
         .badge-win { background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
         .badge-loss { background: #7f1d1d; color: #f87171; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
         .badge-pending { background: #78350f; color: #f59e0b; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
         .badge-push { background: #1f2937; color: #6b7280; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; }
 
-        /* Chart placeholder */
         .chart { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
         .chart h3 { color: #e5e7eb; margin-bottom: 12px; font-size: 1em; }
         .bar-row { display: flex; align-items: center; margin-bottom: 6px; gap: 10px; }
         .bar-label { width: 60px; font-size: 0.75em; color: #6b7280; text-align: right; }
-        .bar-track { flex: 1; height: 20px; background: #1f2937; border-radius: 4px; overflow: hidden; position: relative; }
+        .bar-track { flex: 1; height: 20px; background: #1f2937; border-radius: 4px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
         .bar-value { font-size: 0.75em; font-weight: 600; min-width: 50px; }
 
+        .day-group { margin-bottom: 16px; border: 1px solid #1f2937; border-radius: 10px; overflow: hidden; }
+        .day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #111827; cursor: pointer; user-select: none; }
+        .day-header:hover { background: #1a2332; }
+        .day-header h4 { font-size: 0.9em; color: #e5e7eb; }
+        .day-header .day-summary { font-size: 0.8em; color: #6b7280; display: flex; gap: 12px; }
+        .day-header .day-summary .day-pnl { font-weight: 600; }
+        .day-header .chevron { color: #6b7280; transition: transform 0.2s; font-size: 0.8em; }
+        .day-header .chevron.open { transform: rotate(180deg); }
+        .day-body { display: none; padding: 0; }
+        .day-body.open { display: block; }
+
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 0.8em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-success:hover { background: #047857; }
+
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .header-row h3 { color: #e5e7eb; font-size: 1.1em; }
+
         footer { text-align: center; padding: 20px 0; color: #4b5563; font-size: 0.75em; border-top: 1px solid #1e2530; margin-top: 30px; }
+        .nav-links { text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #1f2937; }
+        .nav-links a { color: #60a5fa; text-decoration: none; margin: 0 12px; font-size: 0.9em; }
+        .nav-links a:hover { text-decoration: underline; }
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -71,16 +88,19 @@
 
     <!-- DASHBOARD TAB -->
     <div class="tab-content active" id="tab-dashboard">
+        <div class="header-row">
+            <h3>Dashboard</h3>
+            <button class="btn btn-primary" onclick="refreshResults()">Refresh Results</button>
+        </div>
         <div class="summary-grid">
-            <div class="summary-card"><div class="value green" id="net-pnl">$0.00</div><div class="label">Net P&L</div></div>
-            <div class="summary-card"><div class="value blue" id="total-wagered">$0.00</div><div class="label">Total Wagered</div></div>
-            <div class="summary-card"><div class="value" id="roi">0.0%</div><div class="label">ROI</div></div>
-            <div class="summary-card"><div class="value green" id="straight-record">0-0</div><div class="label">Straights W-L</div></div>
-            <div class="summary-card"><div class="value orange" id="parlay-record">0-0</div><div class="label">Parlays W-L</div></div>
-            <div class="summary-card"><div class="value" id="target-pct">0%</div><div class="label">Monthly Target</div></div>
+            <div class="summary-card"><div class="value green" id="net-pnl">—</div><div class="label">Net P&L</div></div>
+            <div class="summary-card"><div class="value blue" id="total-wagered">—</div><div class="label">Total Wagered</div></div>
+            <div class="summary-card"><div class="value" id="roi">—</div><div class="label">ROI</div></div>
+            <div class="summary-card"><div class="value green" id="straight-record">—</div><div class="label">Straights W-L</div></div>
+            <div class="summary-card"><div class="value orange" id="parlay-record">—</div><div class="label">Parlays W-L</div></div>
+            <div class="summary-card"><div class="value" id="target-pct">—</div><div class="label">Monthly Target</div></div>
         </div>
 
-        <!-- Progress to target -->
         <div class="chart">
             <h3>Progress to $3,000 Target</h3>
             <div class="bar-row">
@@ -90,146 +110,66 @@
             </div>
         </div>
 
-        <!-- Daily summary -->
         <div class="chart">
             <h3>Daily Results</h3>
-            <div id="daily-bars"></div>
+            <div id="daily-bars"><div class="loading">Loading...</div></div>
         </div>
     </div>
 
     <!-- STRAIGHT BETS TAB -->
     <div class="tab-content" id="tab-straights">
+        <div class="header-row">
+            <h3>Straight Bets</h3>
+            <button class="btn btn-primary" id="refresh-btn" onclick="refreshResults()">Refresh Results</button>
+        </div>
         <div class="summary-grid">
-            <div class="summary-card"><div class="value green" id="str-pnl">$0.00</div><div class="label">Straight P&L</div></div>
-            <div class="summary-card"><div class="value" id="str-record">0-0</div><div class="label">Record</div></div>
-            <div class="summary-card"><div class="value" id="str-roi">0.0%</div><div class="label">ROI</div></div>
-            <div class="summary-card"><div class="value" id="str-avg-edge">0.0%</div><div class="label">Avg Edge</div></div>
+            <div class="summary-card"><div class="value green" id="str-pnl">—</div><div class="label">Straight P&L</div></div>
+            <div class="summary-card"><div class="value" id="str-record">—</div><div class="label">Record</div></div>
+            <div class="summary-card"><div class="value" id="str-roi">—</div><div class="label">ROI</div></div>
+            <div class="summary-card"><div class="value" id="str-avg-edge">—</div><div class="label">Avg Edge</div></div>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Date</th><th>Sport</th><th>Pick</th><th>Matchup</th><th>Odds</th><th>Stake</th><th>Model%</th><th>Edge</th><th>Result</th><th>P&L</th></tr></thead>
-                <tbody id="straights-body">
-                    <!-- May 17 results -->
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>TB ML</td><td>MIA @ TB</td><td>-155</td><td>$50</td><td>57.2%</td><td>+5.1%</td><td><span class="badge-win">W</span></td><td class="green">+$32.26</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>ATL ML</td><td>BOS @ ATL</td><td>-145</td><td>$50</td><td>56.8%</td><td>+4.8%</td><td><span class="badge-win">W</span></td><td class="green">+$34.48</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>CLE ML</td><td>CIN @ CLE</td><td>-138</td><td>$40</td><td>55.4%</td><td>+3.2%</td><td><span class="badge-win">W</span></td><td class="green">+$28.99</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>LAD ML</td><td>LAD @ LAA</td><td>-165</td><td>$50</td><td>58.1%</td><td>+5.8%</td><td><span class="badge-win">W</span></td><td class="green">+$30.30</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>TEX ML</td><td>TEX @ HOU</td><td>-140</td><td>$40</td><td>55.8%</td><td>+3.5%</td><td><span class="badge-win">W</span></td><td class="green">+$28.57</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>OVER 8.0</td><td>SD @ SEA</td><td>-110</td><td>$30</td><td>—</td><td>+2.1</td><td><span class="badge-win">W</span></td><td class="green">+$27.27</td></tr>
-                    <tr class="win"><td>05-17</td><td>MLB</td><td>OVER 8.5</td><td>ARI @ COL</td><td>-110</td><td>$30</td><td>—</td><td>+1.8</td><td><span class="badge-win">W</span></td><td class="green">+$27.27</td></tr>
-                    <!-- May 18 results -->
-                    <tr class="win"><td>05-18</td><td>MLB</td><td>Guardians ML</td><td>CLE @ DET</td><td>+130</td><td>$25</td><td>45.9%</td><td>+5.9%</td><td><span class="badge-win">W</span></td><td class="green">+$32.50</td></tr>
-                    <tr class="win"><td>05-18</td><td>MLB</td><td>Mariners ML</td><td>CHW @ SEA</td><td>+140</td><td>$22</td><td>43.6%</td><td>+5.4%</td><td><span class="badge-win">W</span></td><td class="green">+$30.80</td></tr>
-                    <tr class="loss"><td>05-18</td><td>MLB</td><td>Cubs ML</td><td>MIL @ CHC</td><td>+136</td><td>$21</td><td>43.5%</td><td>+5.3%</td><td><span class="badge-loss">L</span></td><td class="red">-$21.00</td></tr>
-                    <tr class="loss"><td>05-18</td><td>MLB</td><td>Braves ML</td><td>ATL @ MIA</td><td>-102</td><td>$22</td><td>51.5%</td><td>+4.8%</td><td><span class="badge-loss">L</span></td><td class="red">-$22.00</td></tr>
-                    <tr class="loss"><td>05-18</td><td>MLB</td><td>Nationals ML</td><td>NYM @ WSH</td><td>+108</td><td>$21</td><td>51.9%</td><td>+4.3%</td><td><span class="badge-loss">L</span></td><td class="red">-$21.00</td></tr>
-                    <tr class="loss"><td>05-18</td><td>MLB</td><td>Rangers ML</td><td>TEX @ COL</td><td>+126</td><td>$15</td><td>52.5%</td><td>+3.3%</td><td><span class="badge-loss">L</span></td><td class="red">-$15.00</td></tr>
-                    <!-- May 19 results -->
-                    <tr class="win"><td>05-19</td><td>MLB</td><td>Rays ML</td><td>BAL @ TB</td><td>-120</td><td>$20</td><td>58.7%</td><td>+3.6%</td><td><span class="badge-win">W</span></td><td class="green">+$16.67</td></tr>
-                    <tr class="win"><td>05-19</td><td>MLB</td><td>White Sox ML</td><td>CHW @ SEA</td><td>+135</td><td>$14</td><td>56.6%</td><td>+3.4%</td><td><span class="badge-win">W</span></td><td class="green">+$18.90</td></tr>
-                    <!-- May 20 picks -->
-                    <tr class="pending"><td>05-20</td><td>MLB</td><td>Rays ML</td><td>BAL @ TB</td><td>-130</td><td>$25</td><td>58.6%</td><td>+4.4%</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>MLB</td><td>Yankees ML</td><td>TOR @ NYY</td><td>-150</td><td>$20</td><td>61.0%</td><td>+3.8%</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>MLB</td><td>OVER 8.0</td><td>HOU @ MIN</td><td>-110</td><td>$20</td><td>—</td><td>+2.1</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>MLB</td><td>OVER 6.5</td><td>MIL @ CHC</td><td>-110</td><td>$20</td><td>—</td><td>+2.3</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>MLB</td><td>OVER 9.0</td><td>SF @ ARI</td><td>-110</td><td>$20</td><td>—</td><td>+2.1</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="straights-container"><div class="loading">Loading...</div></div>
     </div>
 
     <!-- PARLAYS TAB -->
     <div class="tab-content" id="tab-parlays">
+        <div class="header-row">
+            <h3>Parlays</h3>
+            <button class="btn btn-primary" onclick="refreshResults()">Refresh Results</button>
+        </div>
         <div class="summary-grid">
-            <div class="summary-card"><div class="value orange" id="par-pnl">$0.00</div><div class="label">Parlay P&L</div></div>
-            <div class="summary-card"><div class="value" id="par-record">0-0</div><div class="label">Record</div></div>
-            <div class="summary-card"><div class="value" id="par-biggest"">$0</div><div class="label">Biggest Win</div></div>
-            <div class="summary-card"><div class="value" id="par-roi">0.0%</div><div class="label">ROI</div></div>
+            <div class="summary-card"><div class="value orange" id="par-pnl">—</div><div class="label">Parlay P&L</div></div>
+            <div class="summary-card"><div class="value" id="par-record">—</div><div class="label">Record</div></div>
+            <div class="summary-card"><div class="value" id="par-biggest">—</div><div class="label">Biggest Win</div></div>
+            <div class="summary-card"><div class="value" id="par-roi">—</div><div class="label">ROI</div></div>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Date</th><th>Type</th><th>Legs</th><th>Stake</th><th>Odds</th><th>Payout</th><th>Win%</th><th>EV</th><th>Result</th><th>P&L</th></tr></thead>
-                <tbody id="parlays-body">
-                    <tr class="win"><td>05-18</td><td>2-Leg</td><td>SA +6.5 / Williams O19.5</td><td>$50</td><td>3.64x</td><td>$182</td><td>33.6%</td><td>+$11.30</td><td><span class="badge-win">W</span></td><td class="green">+$132.00</td></tr>
-                    <tr class="win"><td>05-18</td><td>3-Leg</td><td>SA +6.5 / Williams O19.5 / MIN ML</td><td>$50</td><td>6.90x</td><td>$345</td><td>18.9%</td><td>+$15.21</td><td><span class="badge-win">W</span></td><td class="green">+$295.00</td></tr>
-                    <tr class="loss"><td>05-18</td><td>3-Leg</td><td>WSH / SD / COL (dogs)</td><td>$20</td><td>10.45x</td><td>$209</td><td>11.9%</td><td>+$4.80</td><td><span class="badge-loss">L</span></td><td class="red">-$20.00</td></tr>
-                    <tr class="loss"><td>05-18</td><td>4-Leg</td><td>CLE / CHW / MIL / ATL</td><td>$20</td><td>25.8x</td><td>$516</td><td>4.5%</td><td>-$6.72</td><td><span class="badge-loss">L</span></td><td class="red">-$20.00</td></tr>
-                    <!-- May 19 parlays -->
-                    <tr class="win"><td>05-19</td><td>2-Leg</td><td>NYK ML / TB Rays ML</td><td>$50</td><td>2.53x</td><td>$126</td><td>42.6%</td><td>+$3.81</td><td><span class="badge-win">W</span></td><td class="green">+$76.50</td></tr>
-                    <tr class="loss"><td>05-19</td><td>2-Leg</td><td>CLE +7.5 / Over 217.5 (SGP)</td><td>$50</td><td>3.57x</td><td>$178</td><td>28.6%</td><td>+$1.04</td><td><span class="badge-loss">L</span></td><td class="red">-$50.00</td></tr>
-                    <tr class="loss"><td>05-19</td><td>3-Leg</td><td>CLE +7.5 / TB ML / Over 7.5</td><td>$30</td><td>6.54x</td><td>$196</td><td>17.8%</td><td>+$4.86</td><td><span class="badge-loss">L</span></td><td class="red">-$30.00</td></tr>
-                    <tr class="loss"><td>05-19</td><td>2-Leg</td><td>CLE ML / CHW ML (dogs)</td><td>$20</td><td>7.40x</td><td>$148</td><td>15.2%</td><td>+$2.49</td><td><span class="badge-loss">L</span></td><td class="red">-$20.00</td></tr>
-                    <!-- May 20 parlays -->
-                    <tr class="pending"><td>05-20</td><td>2-Leg</td><td>Yankees ML / HOU@MIN OVER 8</td><td>$50</td><td>2.93x</td><td>$146</td><td>35.4%</td><td>+$1.67</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>3-Leg</td><td>Yankees ML / MIL@CHC O6.5 / SF@ARI O9</td><td>$30</td><td>5.25x</td><td>$158</td><td>21.5%</td><td>+$3.62</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                    <tr class="pending"><td>05-20</td><td>3-Leg</td><td>HOU@MIN O8 / MIL@CHC O6.5 / SF@ARI O9</td><td>$20</td><td>5.88x</td><td>$118</td><td>17.6%</td><td>+$0.70</td><td><span class="badge-pending">PEND</span></td><td>—</td></tr>
-                </tbody>
-            </table>
-        </div>
+        <div id="parlays-container"><div class="loading">Loading...</div></div>
     </div>
 
     <!-- P&L HISTORY TAB -->
     <div class="tab-content" id="tab-pnl">
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Date</th><th>Straight W</th><th>Straight L</th><th>Straight P&L</th><th>Parlay W</th><th>Parlay L</th><th>Parlay P&L</th><th>Day Total</th><th>Running Total</th></tr></thead>
-                <tbody id="pnl-body">
-                    <tr><td>05-16</td><td>3</td><td>5</td><td class="red">-$82.50</td><td>0</td><td>0</td><td>$0</td><td class="red">-$82.50</td><td class="red">-$82.50</td></tr>
-                    <tr><td>05-17</td><td>7</td><td>0</td><td class="green">+$209.14</td><td>0</td><td>0</td><td>$0</td><td class="green">+$209.14</td><td class="green">+$126.64</td></tr>
-                    <tr><td>05-18</td><td>2</td><td>4</td><td class="red">-$15.70</td><td>2</td><td>2</td><td class="green">+$387.00</td><td class="green">+$371.30</td><td class="green">+$497.94</td></tr>
-                    <tr><td>05-19</td><td>2</td><td>0</td><td class="green">+$35.57</td><td>1</td><td>3</td><td class="red">-$23.50</td><td class="green">+$12.07</td><td class="green">+$510.01</td></tr>
-                </tbody>
-            </table>
+        <div class="header-row">
+            <h3>P&L History</h3>
+            <button class="btn btn-primary" onclick="refreshResults()">Refresh Results</button>
         </div>
+        <div id="pnl-container"><div class="loading">Loading...</div></div>
+    </div>
 
-        <div class="chart" style="margin-top:20px;">
-            <h3>Cumulative P&L</h3>
-            <div class="bar-row">
-                <div class="bar-label">May 16</div>
-                <div class="bar-track"><div class="bar-fill" style="width:0%; background:#f87171;"></div></div>
-                <div class="bar-value red">-$82.50</div>
-            </div>
-            <div class="bar-row">
-                <div class="bar-label">May 17</div>
-                <div class="bar-track"><div class="bar-fill" style="width:13%; background:#34d399;"></div></div>
-                <div class="bar-value green">+$126.64</div>
-            </div>
-            <div class="bar-row">
-                <div class="bar-label">May 18</div>
-                <div class="bar-track"><div class="bar-fill" style="width:50%; background:#34d399;"></div></div>
-                <div class="bar-value green">+$497.94</div>
-            </div>
-            <div class="bar-row">
-                <div class="bar-label">May 19</div>
-                <div class="bar-track"><div class="bar-fill" style="width:51%; background:#34d399;"></div></div>
-                <div class="bar-value green">+$510.01</div>
-            </div>
-            <div class="bar-row">
-                <div class="bar-label">May 20</div>
-                <div class="bar-track"><div class="bar-fill" style="width:0%; background:#6b7280;"></div></div>
-                <div class="bar-value" style="color:#6b7280">In Progress</div>
-            </div>
-        </div>
-
-        <div style="background:#111827; border:1px solid #1f2937; border-radius:10px; padding:16px; margin-top:20px;">
-            <div style="color:#e5e7eb; font-weight:600; margin-bottom:8px;">Monthly Pace</div>
-            <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.85em;">
-                <div><span style="color:#6b7280;">Days Active:</span> 4</div>
-                <div><span style="color:#6b7280;">Avg/Day:</span> <span class="green">+$127.50</span></div>
-                <div><span style="color:#6b7280;">Projected Monthly:</span> <span class="blue">+$3,825</span></div>
-                <div><span style="color:#6b7280;">Target Gap:</span> <span class="green">+$825 above pace</span></div>
-                <div><span style="color:#6b7280;">Need/Day (remaining):</span> <span>$227/day for 11 days</span></div>
-            </div>
-        </div>
+    <div class="nav-links">
+        <a href="/">Daily Picks</a>
+        <a href="/mlb">MLB Season</a>
+        <a href="/nba">NBA</a>
     </div>
 
     <footer>
-        <p>Last updated: May 20, 2026. Results verified against ESPN/MLB Stats API final scores.</p>
-        <p>Model: Ensemble v2 (Pythagorean + Elo + FIP + Market) | Kelly Criterion Sizing</p>
+        <p>Model: Ensemble v2 (Pythagorean + Elo + FIP + Market + Roster) | Kelly Criterion Sizing</p>
+        <p style="margin-top:4px">Auto-graded at 2am ET. Manual refresh fetches live scores from MLB Stats API.</p>
     </footer>
 </div>
 
 <script>
+let trackerData = null;
+
 function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -237,50 +177,304 @@ function switchTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Calculate stats from table data
-function calculateStats() {
-    const straights = document.querySelectorAll('#straights-body tr');
-    let sWins = 0, sLosses = 0, sPnl = 0, totalStaked = 0;
-    straights.forEach(row => {
-        if (row.classList.contains('win')) { sWins++; sPnl += parseFloat(row.cells[9]?.textContent?.replace(/[^-\d.]/g,'') || 0); }
-        if (row.classList.contains('loss')) { sLosses++; sPnl += parseFloat(row.cells[9]?.textContent?.replace(/[^-\d.]/g,'') || 0); }
-        const stake = parseFloat(row.cells[5]?.textContent?.replace(/[^-\d.]/g,'') || 0);
-        if (!row.classList.contains('pending')) totalStaked += stake;
-    });
+function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
 
-    const parlays = document.querySelectorAll('#parlays-body tr');
-    let pWins = 0, pLosses = 0, pPnl = 0;
-    parlays.forEach(row => {
-        if (row.classList.contains('win')) { pWins++; pPnl += parseFloat(row.cells[9]?.textContent?.replace(/[^-\d.]/g,'') || 0); }
-        if (row.classList.contains('loss')) { pLosses++; pPnl += parseFloat(row.cells[9]?.textContent?.replace(/[^-\d.]/g,'') || 0); }
-    });
+function calcPnl(pick) {
+    if (pick.result === 'pending' || pick.result === 'push') return 0;
+    const odds = parseInt(pick.odds) || -110;
+    const stake = pick.stake || 20;
+    if (pick.result === 'win') {
+        return odds > 0 ? (stake * odds / 100) : (stake * 100 / Math.abs(odds));
+    }
+    return -stake;
+}
+
+function resultBadge(result) {
+    if (result === 'win') return '<span class="badge-win">W</span>';
+    if (result === 'loss') return '<span class="badge-loss">L</span>';
+    if (result === 'push') return '<span class="badge-push">PUSH</span>';
+    return '<span class="badge-pending">PEND</span>';
+}
+
+function pnlStr(val) {
+    if (val === 0) return '—';
+    const cls = val >= 0 ? 'green' : 'red';
+    return `<span class="${cls}">${val >= 0 ? '+' : ''}$${val.toFixed(2)}</span>`;
+}
+
+function toggleDay(el) {
+    const body = el.nextElementSibling;
+    const chevron = el.querySelector('.chevron');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open');
+}
+
+async function loadTracker() {
+    try {
+        const res = await fetch('/api/tracker');
+        trackerData = await res.json();
+        renderAll();
+    } catch (e) {
+        document.getElementById('straights-container').innerHTML = '<p class="loading">Failed to load data.</p>';
+    }
+}
+
+function renderAll() {
+    if (!trackerData) return;
+    const { days } = trackerData;
+    const today = new Date().toISOString().split('T')[0];
+
+    // Compute overall stats
+    let sWins = 0, sLosses = 0, sPnl = 0, sWagered = 0, totalEdge = 0, edgeCount = 0;
+    let pWins = 0, pLosses = 0, pPnl = 0, pWagered = 0, biggestWin = 0;
+
+    for (const day of days) {
+        for (const pick of day.picks) {
+            if (pick.result === 'win') { sWins++; sPnl += calcPnl(pick); sWagered += pick.stake; }
+            else if (pick.result === 'loss') { sLosses++; sPnl += calcPnl(pick); sWagered += pick.stake; }
+            if (pick.edge) { totalEdge += pick.edge; edgeCount++; }
+        }
+        for (const p of day.parlays) {
+            if (p.result === 'win') { pWins++; const win = (p.stake * p.odds) - p.stake; pPnl += win; pWagered += p.stake; if (win > biggestWin) biggestWin = win; }
+            else if (p.result === 'loss') { pLosses++; pPnl -= p.stake; pWagered += p.stake; }
+        }
+    }
 
     const netPnl = sPnl + pPnl;
-    const roi = totalStaked > 0 ? (netPnl / totalStaked * 100) : 0;
+    const totalWagered = sWagered + pWagered;
+    const roi = totalWagered > 0 ? (netPnl / totalWagered * 100) : 0;
 
+    // Dashboard cards
     document.getElementById('net-pnl').textContent = (netPnl >= 0 ? '+' : '') + '$' + netPnl.toFixed(2);
     document.getElementById('net-pnl').className = 'value ' + (netPnl >= 0 ? 'green' : 'red');
-    document.getElementById('total-wagered').textContent = '$' + totalStaked.toFixed(0);
+    document.getElementById('total-wagered').textContent = '$' + totalWagered.toFixed(0);
     document.getElementById('roi').textContent = roi.toFixed(1) + '%';
     document.getElementById('roi').className = 'value ' + (roi >= 0 ? 'green' : 'red');
     document.getElementById('straight-record').textContent = sWins + '-' + sLosses;
     document.getElementById('parlay-record').textContent = pWins + '-' + pLosses;
-
     const targetPct = Math.min(100, Math.max(0, (netPnl / 3000) * 100));
     document.getElementById('target-pct').textContent = targetPct.toFixed(0) + '%';
     document.getElementById('target-bar').style.width = targetPct + '%';
     document.getElementById('target-value').textContent = '$' + netPnl.toFixed(0) + ' / $3,000';
 
+    // Straight stats
     document.getElementById('str-pnl').textContent = (sPnl >= 0 ? '+' : '') + '$' + sPnl.toFixed(2);
     document.getElementById('str-pnl').className = 'value ' + (sPnl >= 0 ? 'green' : 'red');
     document.getElementById('str-record').textContent = sWins + '-' + sLosses;
-    document.getElementById('str-roi').textContent = (totalStaked > 0 ? (sPnl/totalStaked*100).toFixed(1) : '0.0') + '%';
+    document.getElementById('str-roi').textContent = (sWagered > 0 ? (sPnl / sWagered * 100).toFixed(1) : '0.0') + '%';
+    document.getElementById('str-avg-edge').textContent = (edgeCount > 0 ? (totalEdge / edgeCount).toFixed(1) : '0.0') + '%';
 
+    // Parlay stats
     document.getElementById('par-pnl').textContent = (pPnl >= 0 ? '+' : '') + '$' + pPnl.toFixed(2);
+    document.getElementById('par-pnl').className = 'value ' + (pPnl >= 0 ? 'green' : 'red');
     document.getElementById('par-record').textContent = pWins + '-' + pLosses;
+    document.getElementById('par-biggest').textContent = '$' + biggestWin.toFixed(0);
+    document.getElementById('par-roi').textContent = (pWagered > 0 ? (pPnl / pWagered * 100).toFixed(1) : '0.0') + '%';
+
+    // Render daily bars
+    renderDailyBars(days);
+
+    // Render straights (collapsible by day)
+    renderStraights(days, today);
+
+    // Render parlays (collapsible by day)
+    renderParlays(days, today);
+
+    // Render P&L history
+    renderPnL(days);
 }
 
-calculateStats();
+function renderDailyBars(days) {
+    const container = document.getElementById('daily-bars');
+    const reversed = [...days].reverse();
+    let maxVal = 1;
+
+    const dayTotals = reversed.map(day => {
+        let pnl = 0;
+        for (const p of day.picks) pnl += calcPnl(p);
+        for (const p of day.parlays) {
+            if (p.result === 'win') pnl += (p.stake * p.odds) - p.stake;
+            else if (p.result === 'loss') pnl -= p.stake;
+        }
+        if (Math.abs(pnl) > maxVal) maxVal = Math.abs(pnl);
+        return { date: day.date, pnl };
+    });
+
+    let html = '';
+    for (const dt of dayTotals) {
+        const pct = Math.abs(dt.pnl) / maxVal * 80;
+        const color = dt.pnl >= 0 ? '#34d399' : '#f87171';
+        const cls = dt.pnl >= 0 ? 'green' : 'red';
+        const label = dt.date.slice(5);
+        const valStr = dt.pnl === 0 ? 'Pending' : (dt.pnl >= 0 ? '+' : '') + '$' + dt.pnl.toFixed(0);
+        html += `<div class="bar-row"><div class="bar-label">${label}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${color};"></div></div><div class="bar-value ${cls}">${valStr}</div></div>`;
+    }
+    container.innerHTML = html || '<div class="loading">No data yet</div>';
+}
+
+function renderStraights(days, today) {
+    const container = document.getElementById('straights-container');
+    let html = '';
+
+    for (const day of days) {
+        if (day.picks.length === 0) continue;
+        const isToday = day.date === today;
+        const dateLabel = formatDate(day.date);
+        let dayPnl = 0, dayW = 0, dayL = 0, pending = 0;
+
+        for (const p of day.picks) {
+            if (p.result === 'win') { dayW++; dayPnl += calcPnl(p); }
+            else if (p.result === 'loss') { dayL++; dayPnl += calcPnl(p); }
+            else pending++;
+        }
+
+        const summaryStr = pending > 0
+            ? `${dayW}W-${dayL}L, ${pending} pending`
+            : `${dayW}W-${dayL}L`;
+        const pnlCls = dayPnl >= 0 ? 'green' : 'red';
+        const pnlDisplay = dayPnl === 0 && pending > 0 ? 'In Progress' : (dayPnl >= 0 ? '+' : '') + '$' + dayPnl.toFixed(2);
+
+        html += `<div class="day-group">`;
+        html += `<div class="day-header" onclick="toggleDay(this)"><h4>${dateLabel}${isToday ? ' (Today)' : ''}</h4><div class="day-summary"><span>${summaryStr}</span><span class="day-pnl ${pnlCls}">${pnlDisplay}</span><span class="chevron ${isToday ? 'open' : ''}">&#9660;</span></div></div>`;
+        html += `<div class="day-body ${isToday ? 'open' : ''}">`;
+        html += `<table><thead><tr><th>Sport</th><th>Pick</th><th>Matchup</th><th>Odds</th><th>Stake</th><th>Model%</th><th>Edge</th><th>Signal</th><th>Result</th><th>P&L</th></tr></thead><tbody>`;
+
+        for (const p of day.picks) {
+            const pnl = calcPnl(p);
+            const rowCls = p.result === 'win' ? 'win' : p.result === 'loss' ? 'loss' : 'pending';
+            const oddsStr = p.odds ? (p.odds > 0 ? '+' + p.odds : p.odds) : '—';
+            const signal = p.signal === 'kelly' ? 'KELLY' : p.signal === 'total' ? 'TOTAL' : 'LEAN';
+            html += `<tr class="${rowCls}"><td>MLB</td><td style="font-weight:600">${p.team} ${p.type === 'ml' ? 'ML' : ''}</td><td>${p.matchup}</td><td>${oddsStr}</td><td>$${p.stake}</td><td>${p.winProb ? p.winProb.toFixed(1) + '%' : '—'}</td><td>+${p.edge?.toFixed(1) || '0'}%</td><td style="font-size:0.75em;font-weight:600">${signal}</td><td>${resultBadge(p.result)}</td><td>${p.result === 'pending' ? '—' : pnlStr(pnl)}</td></tr>`;
+        }
+
+        html += `</tbody></table></div></div>`;
+    }
+
+    container.innerHTML = html || '<div class="loading">No straight bets found</div>';
+}
+
+function renderParlays(days, today) {
+    const container = document.getElementById('parlays-container');
+    let html = '';
+
+    for (const day of days) {
+        if (day.parlays.length === 0) continue;
+        const isToday = day.date === today;
+        const dateLabel = formatDate(day.date);
+        let dayPnl = 0, dayW = 0, dayL = 0, pending = 0;
+
+        for (const p of day.parlays) {
+            if (p.result === 'win') { dayW++; dayPnl += (p.stake * p.odds) - p.stake; }
+            else if (p.result === 'loss') { dayL++; dayPnl -= p.stake; }
+            else pending++;
+        }
+
+        const summaryStr = pending > 0 ? `${dayW}W-${dayL}L, ${pending} pending` : `${dayW}W-${dayL}L`;
+        const pnlCls = dayPnl >= 0 ? 'green' : 'red';
+        const pnlDisplay = dayPnl === 0 && pending > 0 ? 'In Progress' : (dayPnl >= 0 ? '+' : '') + '$' + dayPnl.toFixed(0);
+
+        html += `<div class="day-group">`;
+        html += `<div class="day-header" onclick="toggleDay(this)"><h4>${dateLabel}</h4><div class="day-summary"><span>${summaryStr}</span><span class="day-pnl ${pnlCls}">${pnlDisplay}</span><span class="chevron ${isToday ? 'open' : ''}">&#9660;</span></div></div>`;
+        html += `<div class="day-body ${isToday ? 'open' : ''}">`;
+        html += `<table><thead><tr><th>Type</th><th>Legs</th><th>Stake</th><th>Odds</th><th>Payout</th><th>Win%</th><th>EV</th><th>Result</th><th>P&L</th></tr></thead><tbody>`;
+
+        for (const p of day.parlays) {
+            const pnl = p.result === 'win' ? (p.stake * p.odds) - p.stake : p.result === 'loss' ? -p.stake : 0;
+            const rowCls = p.result === 'win' ? 'win' : p.result === 'loss' ? 'loss' : 'pending';
+            html += `<tr class="${rowCls}"><td>${p.label}</td><td style="max-width:250px">${p.legs}</td><td>$${p.stake}</td><td>${p.odds?.toFixed(2) || '—'}x</td><td>$${p.payout || '—'}</td><td>${p.prob || '—'}%</td><td>${p.ev ? (parseFloat(p.ev) >= 0 ? '+' : '') + '$' + p.ev : '—'}</td><td>${resultBadge(p.result)}</td><td>${p.result === 'pending' ? '—' : pnlStr(pnl)}</td></tr>`;
+        }
+
+        html += `</tbody></table></div></div>`;
+    }
+
+    container.innerHTML = html || '<div class="loading">No parlays found</div>';
+}
+
+function renderPnL(days) {
+    const container = document.getElementById('pnl-container');
+    const reversed = [...days].reverse();
+    let runningTotal = 0;
+
+    let tableHtml = '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Straight W</th><th>Straight L</th><th>Straight P&L</th><th>Parlay W</th><th>Parlay L</th><th>Parlay P&L</th><th>Day Total</th><th>Running Total</th></tr></thead><tbody>';
+
+    const dayData = [];
+    for (const day of reversed) {
+        let sW = 0, sL = 0, sPnl = 0, pW = 0, pL = 0, pPnl = 0;
+        for (const p of day.picks) {
+            if (p.result === 'win') { sW++; sPnl += calcPnl(p); }
+            else if (p.result === 'loss') { sL++; sPnl += calcPnl(p); }
+        }
+        for (const p of day.parlays) {
+            if (p.result === 'win') { pW++; pPnl += (p.stake * p.odds) - p.stake; }
+            else if (p.result === 'loss') { pL++; pPnl -= p.stake; }
+        }
+        const dayTotal = sPnl + pPnl;
+        runningTotal += dayTotal;
+
+        const sPnlCls = sPnl >= 0 ? 'green' : 'red';
+        const pPnlCls = pPnl >= 0 ? 'green' : 'red';
+        const totalCls = dayTotal >= 0 ? 'green' : 'red';
+        const runCls = runningTotal >= 0 ? 'green' : 'red';
+
+        tableHtml += `<tr><td>${day.date.slice(5)}</td><td>${sW}</td><td>${sL}</td><td class="${sPnlCls}">${sPnl === 0 ? '—' : (sPnl >= 0 ? '+' : '') + '$' + sPnl.toFixed(2)}</td><td>${pW}</td><td>${pL}</td><td class="${pPnlCls}">${pPnl === 0 ? '—' : (pPnl >= 0 ? '+' : '') + '$' + pPnl.toFixed(0)}</td><td class="${totalCls}">${dayTotal === 0 ? '—' : (dayTotal >= 0 ? '+' : '') + '$' + dayTotal.toFixed(2)}</td><td class="${runCls}">${runningTotal >= 0 ? '+' : ''}$${runningTotal.toFixed(2)}</td></tr>`;
+        dayData.push({ date: day.date, total: dayTotal, running: runningTotal });
+    }
+
+    tableHtml += '</tbody></table></div>';
+
+    // Cumulative chart
+    let chartHtml = '<div class="chart" style="margin-top:20px;"><h3>Cumulative P&L</h3>';
+    const maxRun = Math.max(...dayData.map(d => Math.abs(d.running)), 1);
+    for (const d of dayData) {
+        const pct = Math.abs(d.running) / maxRun * 80;
+        const color = d.running >= 0 ? '#34d399' : '#f87171';
+        const cls = d.running >= 0 ? 'green' : 'red';
+        chartHtml += `<div class="bar-row"><div class="bar-label">${d.date.slice(5)}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${color};"></div></div><div class="bar-value ${cls}">${d.running >= 0 ? '+' : ''}$${d.running.toFixed(0)}</div></div>`;
+    }
+    chartHtml += '</div>';
+
+    // Monthly pace
+    const daysActive = dayData.filter(d => d.total !== 0).length;
+    const avgDay = daysActive > 0 ? runningTotal / daysActive : 0;
+    const projMonthly = avgDay * 30;
+    const targetGap = projMonthly - 3000;
+    const daysRemaining = 30 - new Date().getDate() + 1;
+    const needPerDay = daysRemaining > 0 ? (3000 - runningTotal) / daysRemaining : 0;
+
+    let paceHtml = `<div style="background:#111827; border:1px solid #1f2937; border-radius:10px; padding:16px; margin-top:20px;">
+        <div style="color:#e5e7eb; font-weight:600; margin-bottom:8px;">Monthly Pace</div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.85em;">
+            <div><span style="color:#6b7280;">Days Active:</span> ${daysActive}</div>
+            <div><span style="color:#6b7280;">Avg/Day:</span> <span class="${avgDay >= 0 ? 'green' : 'red'}">${avgDay >= 0 ? '+' : ''}$${avgDay.toFixed(0)}</span></div>
+            <div><span style="color:#6b7280;">Projected Monthly:</span> <span class="blue">${projMonthly >= 0 ? '+' : ''}$${projMonthly.toFixed(0)}</span></div>
+            <div><span style="color:#6b7280;">Target Gap:</span> <span class="${targetGap >= 0 ? 'green' : 'red'}">${targetGap >= 0 ? '+' : ''}$${targetGap.toFixed(0)} ${targetGap >= 0 ? 'above' : 'below'} pace</span></div>
+            <div><span style="color:#6b7280;">Need/Day (remaining):</span> <span>${needPerDay <= 0 ? 'Target met!' : '$' + needPerDay.toFixed(0) + '/day for ' + daysRemaining + ' days'}</span></div>
+        </div>
+    </div>`;
+
+    container.innerHTML = tableHtml + chartHtml + paceHtml;
+}
+
+async function refreshResults() {
+    const btns = document.querySelectorAll('.btn-primary');
+    btns.forEach(b => { b.textContent = 'Grading...'; b.disabled = true; });
+
+    try {
+        await fetch('/api/grade', { method: 'POST' });
+        const res = await fetch('/api/tracker');
+        trackerData = await res.json();
+        renderAll();
+        btns.forEach(b => { b.textContent = 'Updated!'; setTimeout(() => { b.textContent = 'Refresh Results'; b.disabled = false; }, 2000); });
+    } catch (e) {
+        btns.forEach(b => { b.textContent = 'Error'; b.disabled = false; });
+    }
+}
+
+// Initial load
+loadTracker();
 </script>
 </body>
 </html>

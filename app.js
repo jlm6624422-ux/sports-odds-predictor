@@ -2,7 +2,7 @@
  * Sports Odds Predictor — PWA Server
  *
  * Serves daily predictions, runs ensemble model on-demand and via cron.
- * Deployable to Railway/Render with auto-predictions at 7am ET daily.
+ * Deployable to Railway/Render with auto-predictions at 5am ET daily.
  */
 
 const express = require('express');
@@ -248,6 +248,129 @@ app.post('/api/results', (req, res) => {
   res.json({ success: true });
 });
 
+// API: Full tracker data — daily picks, parlays, P&L
+app.get('/api/tracker', (req, res) => {
+  const historyDir = path.join(__dirname, 'data', 'history');
+  const resultsPath = path.join(__dirname, 'data', 'results.json');
+
+  if (!fs.existsSync(historyDir)) return res.json({ days: [] });
+
+  let results = {};
+  if (fs.existsSync(resultsPath)) {
+    results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+  }
+
+  const abbrevTeam = (name) => {
+    const abbrevs = {
+      'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
+      'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
+      'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
+      'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
+      'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
+      'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
+      'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
+      'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
+      'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
+      'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
+      'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
+      'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
+      'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
+      'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
+    };
+    return abbrevs[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
+  };
+
+  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 14);
+  const days = [];
+
+  for (const f of files) {
+    const data = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
+    const date = f.replace('.json', '');
+    const dayResults = results[date] || {};
+    const picks = [];
+    const parlays = [];
+
+    for (const game of (data.mlb || [])) {
+      const prediction = game.prediction || {};
+      const ouLine = game.ouLine;
+      const expectedTotal = prediction.expectedTotal || 0;
+      const totalEdge = ouLine ? expectedTotal - ouLine : 0;
+      const confidence = game.confidence || 'low';
+      const matchupStr = `${abbrevTeam(game.away)} @ ${abbrevTeam(game.home)}`;
+      const kelly = game.kelly;
+
+      // ML picks (kelly or high confidence)
+      if ((kelly && kelly.betSize > 0) || (confidence === 'high' && !game.coinFlip)) {
+        const side = prediction.homeWinProb > prediction.awayWinProb ? 'home' : 'away';
+        const team = side === 'home' ? game.home : game.away;
+        const ml = side === 'home' ? (game.homeML || '') : (game.awayML || '');
+        const resultKey = `${matchupStr}-ml`;
+        const stake = kelly?.betSize || 25;
+
+        picks.push({
+          type: 'ml', team: abbrevTeam(team), matchup: matchupStr,
+          odds: ml, stake: parseFloat(stake.toFixed(0)),
+          winProb: side === 'home' ? prediction.homeWinProb : prediction.awayWinProb,
+          edge: Math.max(Math.abs(game.edge?.home || 0), Math.abs(game.edge?.away || 0)),
+          confidence, signal: kelly?.betSize > 0 ? 'kelly' : 'lean',
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      }
+
+      // Over/under picks
+      if (ouLine && totalEdge >= 1.5) {
+        const resultKey = `${matchupStr}-over`;
+        picks.push({
+          type: 'over', team: `OVER ${ouLine}`, matchup: matchupStr,
+          odds: -110, stake: 20,
+          winProb: null, edge: parseFloat(totalEdge.toFixed(1)),
+          confidence: totalEdge >= 2.0 ? 'high' : 'med', signal: 'total',
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      } else if (ouLine && totalEdge <= -1.5) {
+        const resultKey = `${matchupStr}-under`;
+        picks.push({
+          type: 'under', team: `UNDER ${ouLine}`, matchup: matchupStr,
+          odds: -110, stake: 20,
+          winProb: null, edge: parseFloat(Math.abs(totalEdge).toFixed(1)),
+          confidence: totalEdge <= -2.0 ? 'high' : 'med', signal: 'total',
+          result: dayResults[resultKey]?.result || 'pending',
+          score: dayResults[resultKey]?.score || '',
+        });
+      }
+    }
+
+    // Include parlays from the daily data
+    for (const p of (data.parlays || [])) {
+      const resultKey = `parlay-${date}-${parlays.length}`;
+      parlays.push({
+        label: p.label || `${p.legs?.split(' + ')?.length || 2}-Leg`,
+        legs: p.legs, stake: p.stake, odds: p.odds,
+        payout: p.payout, prob: p.prob, ev: p.ev,
+        result: dayResults[resultKey]?.result || 'pending',
+      });
+    }
+
+    if (picks.length > 0 || parlays.length > 0) {
+      days.push({ date, picks, parlays });
+    }
+  }
+
+  res.json({ days });
+});
+
+// API: Trigger grading on demand (used by tracker Refresh button)
+app.post('/api/grade', async (req, res) => {
+  try {
+    await gradeResults();
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Prediction engine
 async function runPredictions() {
   const { ensembleMLB } = require('./server/services/ensembleModel');
@@ -423,7 +546,7 @@ async function runPredictions() {
   return output.summary;
 }
 
-// Cron: auto-run predictions at 7am ET
+// Cron: auto-run predictions at 5am ET
 // Grade yesterday's results by fetching final scores from MLB API
 async function gradeResults() {
   const historyDir = path.join(__dirname, 'data', 'history');
@@ -496,8 +619,9 @@ async function gradeResults() {
       const winner = homeScore > awayScore ? finalGame.teams.home.team.name : finalGame.teams.away.team.name;
       const score = `${finalGame.teams.away.team.name.split(' ').pop()} ${awayScore}, ${finalGame.teams.home.team.name.split(' ').pop()} ${homeScore}`;
 
-      // Grade ML pick
-      if (confidence === 'high' && !game.coinFlip) {
+      // Grade ML pick (kelly bets or high confidence)
+      const kelly = game.kelly;
+      if (((kelly && kelly.betSize > 0) || confidence === 'high') && !game.coinFlip) {
         const resultKey = `${matchupStr}-ml`;
         if (!dayResults[resultKey]) {
           const side = prediction.homeWinProb > prediction.awayWinProb ? 'home' : 'away';
@@ -542,14 +666,14 @@ function scheduleDailyRun() {
   let lastRunDate = null;
   let lastGradeDate = null;
 
-  // Startup catch-up: if past 7am ET and today's predictions don't exist, run immediately
+  // Startup catch-up: if past 5am ET and today's predictions don't exist, run immediately
   const startupNow = new Date();
   const etNow = new Date(startupNow.toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const etHourNow = etNow.getHours();
   const todayDate = startupNow.toISOString().split('T')[0];
   const historyPath = path.join(__dirname, 'data', 'history', `${todayDate}.json`);
 
-  if (etHourNow >= 7 && !fs.existsSync(historyPath)) {
+  if (etHourNow >= 5 && !fs.existsSync(historyPath)) {
     console.log(`[CRON] Startup catch-up: it's ${etHourNow}:00 ET and no predictions for ${todayDate}, running now...`);
     runPredictions().catch(e => console.error('[CRON] Startup catch-up failed:', e.message));
     lastRunDate = todayDate;
@@ -559,7 +683,7 @@ function scheduleDailyRun() {
 
   if (etHourNow >= 2) {
     lastGradeDate = todayDate;
-    if (etHourNow >= 2 && etHourNow < 7) {
+    if (etHourNow >= 2 && etHourNow < 5) {
       gradeResults().catch(e => console.error('[CRON] Startup grade failed:', e.message));
     }
   }
@@ -576,15 +700,15 @@ function scheduleDailyRun() {
       gradeResults().catch(e => console.error('[CRON] Grade failed:', e.message));
     }
 
-    // 7am ET: run new predictions
-    if (etHour === 7 && lastRunDate !== todayStr) {
+    // 5am ET: run new predictions
+    if (etHour === 5 && lastRunDate !== todayStr) {
       lastRunDate = todayStr;
       console.log(`[CRON] Auto-running predictions for ${todayStr}`);
       runPredictions().catch(e => console.error('[CRON] Failed:', e.message));
     }
   }, checkInterval);
 
-  console.log('[CRON] Scheduled: grade results at 2:00 AM ET, predictions at 7:00 AM ET');
+  console.log('[CRON] Scheduled: grade results at 2:00 AM ET, predictions at 5:00 AM ET');
 }
 
 function getLastPredictionTime() {
