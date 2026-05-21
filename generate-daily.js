@@ -349,23 +349,37 @@ async function main() {
     if (totalMatch) runningTotal = parseFloat(totalMatch[1].replace(/[$,]/g, ''));
   } catch(e) {}
 
+  // Merge with any manually-added parlays in existing history file
+  const dataDir = path.join(__dirname, 'data');
+  const historyDir = path.join(dataDir, 'history');
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
+
+  const historyPath = path.join(historyDir, `${today}.json`);
+  let existingParlays = [];
+  if (fs.existsSync(historyPath)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+      existingParlays = (existing.parlays || []).filter(p =>
+        !parlays.some(gen => gen.legs === p.legs)
+      );
+    } catch (e) {}
+  }
+  const allParlays = [...parlays, ...existingParlays];
+
   // --- GENERATE HTML ---
   const html = buildHTML({
     today, yesterday, formatDate: formatDate(today),
-    mlbPicks, nbaGames, parlays, kellyBets, actionable,
+    mlbPicks, nbaGames, parlays: allParlays, kellyBets, actionable,
     runningTotal, daysActive,
   });
 
   fs.writeFileSync(path.join(__dirname, 'today-picks.html'), html);
 
   // Save prediction data
-  const dataDir = path.join(__dirname, 'data');
-  const historyDir = path.join(dataDir, 'history');
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  if (!fs.existsSync(historyDir)) fs.mkdirSync(historyDir, { recursive: true });
-  const output = { date: today, generatedAt: new Date().toISOString(), mlb: mlbPicks, nba: nbaGames, parlays };
+  const output = { date: today, generatedAt: new Date().toISOString(), mlb: mlbPicks, nba: nbaGames, parlays: allParlays };
   fs.writeFileSync(path.join(dataDir, 'today.json'), JSON.stringify(output, null, 2));
-  fs.writeFileSync(path.join(historyDir, `${today}.json`), JSON.stringify(output, null, 2));
+  fs.writeFileSync(historyPath, JSON.stringify(output, null, 2));
 
   // Fetch NBA player props for best bets
   const nbaProps = await generateNBAProps(nbaGames, today);

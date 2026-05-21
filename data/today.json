@@ -1,6 +1,6 @@
 {
   "date": "2026-05-21",
-  "generatedAt": "2026-05-21T15:01:50.792Z",
+  "generatedAt": "2026-05-21T15:36:41.882Z",
   "mlb": [
     {
       "home": "Detroit Tigers",
@@ -170,37 +170,37 @@
       "homePitcher": "Dustin May",
       "awayPitcher": "Braxton Ashcraft",
       "prediction": {
-        "homeWinProb": 53.5,
-        "awayWinProb": 46.5,
+        "homeWinProb": 53.6,
+        "awayWinProb": 46.4,
         "expectedTotal": 8.9,
         "expectedHomeRuns": 4.1,
         "expectedAwayRuns": 4.7
       },
       "edge": {
-        "home": 4.2,
-        "away": -4.2
+        "home": 4,
+        "away": -4
       },
       "kelly": {
-        "betSize": 20.7,
-        "kellyPct": 8.28,
-        "fractionalKellyPct": 2.07,
-        "edge": 4.2,
-        "impliedProb": 49.3,
-        "modelProb": 53.5,
+        "betSize": 20.04,
+        "kellyPct": 8.02,
+        "fractionalKellyPct": 2,
+        "edge": 4.05,
+        "impliedProb": 49.5,
+        "modelProb": 53.6,
         "recommendation": "SMALL BET",
-        "expectedValue": 0.0853,
+        "expectedValue": 0.0818,
         "side": "home",
         "team": "St. Louis Cardinals"
       },
       "confidence": "low",
       "modelsUsed": 4,
       "coinFlip": false,
-      "ouLine": 7.5,
-      "homeML": 102,
-      "awayML": -123,
+      "ouLine": 7,
+      "homeML": -101,
+      "awayML": -120,
       "pick": "St. Louis Cardinals",
       "pickSide": "home",
-      "conf": 53.5,
+      "conf": 53.6,
       "rosterImpact": {
         "home": {
           "teamName": "St. Louis Cardinals",
@@ -502,7 +502,7 @@
       "confidence": "low",
       "modelsUsed": 4,
       "coinFlip": false,
-      "ouLine": 8,
+      "ouLine": 7.5,
       "homeML": 119,
       "awayML": -143,
       "pick": "Atlanta Braves",
@@ -814,25 +814,25 @@
       "homePitcher": "José Soriano",
       "awayPitcher": "Luis Severino",
       "prediction": {
-        "homeWinProb": 44.4,
-        "awayWinProb": 55.6,
+        "homeWinProb": 44.7,
+        "awayWinProb": 55.3,
         "expectedTotal": 9.5,
         "expectedHomeRuns": 4.8,
         "expectedAwayRuns": 4.6
       },
       "edge": {
-        "home": -8.5,
-        "away": 8.5
+        "home": -9.2,
+        "away": 9.2
       },
       "kelly": {
-        "betSize": 39.7,
-        "kellyPct": 15.88,
-        "fractionalKellyPct": 3.97,
-        "edge": 8.39,
-        "impliedProb": 47.2,
-        "modelProb": 55.6,
+        "betSize": 42.53,
+        "kellyPct": 17.01,
+        "fractionalKellyPct": 4.25,
+        "edge": 9.17,
+        "impliedProb": 46.1,
+        "modelProb": 55.3,
         "recommendation": "STANDARD BET",
-        "expectedValue": 0.1779,
+        "expectedValue": 0.1991,
         "side": "away",
         "team": "Athletics"
       },
@@ -840,11 +840,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 8.5,
-      "homeML": -110,
-      "awayML": -109,
+      "homeML": -119,
+      "awayML": -101,
       "pick": "Athletics",
       "pickSide": "away",
-      "conf": 55.6,
+      "conf": 55.3,
       "rosterImpact": {
         "home": {
           "teamName": "Los Angeles Angels",
@@ -1101,8 +1101,8 @@
       "homeRecord": "53-29",
       "awayRecord": "52-30",
       "spread": "-6.5",
-      "homeML": "-245",
-      "awayML": "+200",
+      "homeML": "-238",
+      "awayML": "+195",
       "ou": "216.5",
       "time": "5/21 - 8:00 PM EDT",
       "homeHomeRecord": "30-10",
@@ -1114,9 +1114,9 @@
       "label": "Parlay A — Safe 2-Leg",
       "legs": "New York Knicks ML + Arizona Diamondbacks ML",
       "stake": 50,
-      "odds": 2.0884353741496597,
-      "payout": 104,
-      "prob": "44.8",
+      "odds": 2.1062395972881904,
+      "payout": 105,
+      "prob": "44.4",
       "ev": "-3.21",
       "best": true
     },
@@ -1146,6 +1146,24 @@
       "payout": 121,
       "prob": "14.3",
       "ev": "-2.71"
+    },
+    {
+      "label": "2-Leg",
+      "legs": "Cleveland Guardians ML + PIT@STL Over 7.5",
+      "stake": 50,
+      "odds": 2.83,
+      "payout": 141,
+      "prob": "31.0",
+      "ev": "4.50"
+    },
+    {
+      "label": "3-Leg",
+      "legs": "Cleveland Guardians ML + St. Louis Cardinals ML + CLE@DET Over 7",
+      "stake": 30,
+      "odds": 5.65,
+      "payout": 170,
+      "prob": "16.3",
+      "ev": "5.20"
     }
   ]
 }
