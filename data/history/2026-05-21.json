@@ -46,7 +46,7 @@
           "adjustment": -10,
           "ilPlayers": [
             {
-              "name": "Javier Báez",
+              "name": "Javier B\u00e1ez",
               "position": "SS",
               "isHitter": true,
               "gamesPlayed": 129,
@@ -207,7 +207,7 @@
           "adjustment": 0,
           "ilPlayers": [
             {
-              "name": "Ramón Urías",
+              "name": "Ram\u00f3n Ur\u00edas",
               "position": "3B",
               "isHitter": true,
               "gamesPlayed": 104,
@@ -590,7 +590,7 @@
       "home": "New York Yankees",
       "away": "Toronto Blue Jays",
       "venue": "Yankee Stadium",
-      "homePitcher": "Carlos Rodón",
+      "homePitcher": "Carlos Rod\u00f3n",
       "awayPitcher": "Braydon Fisher",
       "prediction": {
         "homeWinProb": 59.8,
@@ -645,7 +645,7 @@
               "status": "Injured 15-Day"
             },
             {
-              "name": "José Caballero",
+              "name": "Jos\u00e9 Caballero",
               "position": "SS",
               "isHitter": true,
               "gamesPlayed": 114,
@@ -660,7 +660,7 @@
               "status": "Injured 10-Day"
             },
             {
-              "name": "Jasson Domínguez",
+              "name": "Jasson Dom\u00ednguez",
               "position": "LF",
               "isHitter": true,
               "gamesPlayed": 123,
@@ -811,7 +811,7 @@
       "home": "Los Angeles Angels",
       "away": "Athletics",
       "venue": "Angel Stadium",
-      "homePitcher": "José Soriano",
+      "homePitcher": "Jos\u00e9 Soriano",
       "awayPitcher": "Luis Severino",
       "prediction": {
         "homeWinProb": 44.4,
@@ -1111,7 +1111,7 @@
   ],
   "parlays": [
     {
-      "label": "Parlay A — Safe 2-Leg",
+      "label": "Parlay A \u2014 Safe 2-Leg",
       "legs": "New York Knicks ML + Arizona Diamondbacks ML",
       "stake": 50,
       "odds": 2.0884353741496597,
@@ -1121,7 +1121,7 @@
       "best": true
     },
     {
-      "label": "Parlay B — SGP Value",
+      "label": "Parlay B \u2014 SGP Value",
       "legs": "Cleveland Cavaliers +6.5 + Over 216.5",
       "stake": 50,
       "odds": 3.569169960474308,
@@ -1130,7 +1130,7 @@
       "ev": "-2.71"
     },
     {
-      "label": "Parlay C — Cross-Sport 3-Leg",
+      "label": "Parlay C \u2014 Cross-Sport 3-Leg",
       "legs": "Cleveland Cavaliers +6.5 + Arizona Diamondbacks ML + New York Yankees ML",
       "stake": 30,
       "odds": 4.633634014623851,
@@ -1139,13 +1139,31 @@
       "ev": "-2.20"
     },
     {
-      "label": "Parlay D — Dogs Longshot",
+      "label": "Parlay D \u2014 Dogs Longshot",
       "legs": "Cleveland Cavaliers ML + St. Louis Cardinals ML",
       "stake": 20,
       "odds": 6.0600000000000005,
       "payout": 121,
       "prob": "14.3",
       "ev": "-2.71"
+    },
+    {
+      "label": "2-Leg",
+      "legs": "Cleveland Guardians ML + PIT@STL Over 7.5",
+      "stake": 50,
+      "odds": 2.83,
+      "payout": 141,
+      "prob": "31.0",
+      "ev": "4.50"
+    },
+    {
+      "label": "3-Leg",
+      "legs": "Cleveland Guardians ML + St. Louis Cardinals ML + CLE@DET Over 7",
+      "stake": 30,
+      "odds": 5.65,
+      "payout": 170,
+      "prob": "16.3",
+      "ev": "5.20"
     }
   ]
 }
