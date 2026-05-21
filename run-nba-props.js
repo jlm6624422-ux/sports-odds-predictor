@@ -41,7 +41,7 @@ const PLAYER_DB = {
   // Cleveland Cavaliers
   'Donovan Mitchell': { team: 'CLE', pos: 'G', pts: 26.8, reb: 4.5, ast: 5.5, min: 34.0 },
   'Evan Mobley': { team: 'CLE', pos: 'C', pts: 18.5, reb: 9.2, ast: 3.2, min: 33.5 },
-  'Darius Garland': { team: 'CLE', pos: 'G', pts: 21.2, reb: 2.8, ast: 7.5, min: 33.0 },
+  'James Harden': { team: 'CLE', pos: 'G', pts: 19.5, reb: 5.2, ast: 8.5, min: 33.0 },
   'Jarrett Allen': { team: 'CLE', pos: 'C', pts: 13.5, reb: 10.5, ast: 1.8, min: 30.0 },
 
   // Detroit Pistons
@@ -53,13 +53,30 @@ const PLAYER_DB = {
   'Jayson Tatum': { team: 'BOS', pos: 'F', pts: 27.8, reb: 8.5, ast: 5.2, min: 35.5 },
   'Jaylen Brown': { team: 'BOS', pos: 'G', pts: 23.5, reb: 5.8, ast: 3.8, min: 34.0 },
   'Derrick White': { team: 'BOS', pos: 'G', pts: 15.5, reb: 4.2, ast: 4.5, min: 30.0 },
-  'Kristaps Porzingis': { team: 'BOS', pos: 'C', pts: 19.5, reb: 7.2, ast: 2.0, min: 28.5 },
+  'Payton Pritchard': { team: 'BOS', pos: 'G', pts: 14.5, reb: 3.2, ast: 3.8, min: 28.0 },
 
   // New York Knicks
   'Jalen Brunson': { team: 'NYK', pos: 'G', pts: 26.5, reb: 3.5, ast: 7.2, min: 35.0 },
   'Karl-Anthony Towns': { team: 'NYK', pos: 'C', pts: 22.5, reb: 10.8, ast: 3.2, min: 34.0 },
   'Mikal Bridges': { team: 'NYK', pos: 'F', pts: 17.5, reb: 4.2, ast: 3.5, min: 33.5 },
   'OG Anunoby': { team: 'NYK', pos: 'F', pts: 14.8, reb: 4.5, ast: 2.0, min: 30.0 },
+
+  // Dallas Mavericks
+  'Kyrie Irving': { team: 'DAL', pos: 'G', pts: 24.2, reb: 4.5, ast: 5.2, min: 34.5 },
+  'Cooper Flagg': { team: 'DAL', pos: 'F', pts: 16.5, reb: 7.2, ast: 3.5, min: 32.0 },
+  'Dereck Lively II': { team: 'DAL', pos: 'C', pts: 10.8, reb: 8.5, ast: 1.8, min: 28.0 },
+
+  // Los Angeles Lakers
+  'LeBron James': { team: 'LAL', pos: 'F', pts: 23.5, reb: 7.5, ast: 8.2, min: 33.0 },
+  'Luka Doncic': { team: 'LAL', pos: 'G', pts: 28.5, reb: 8.2, ast: 8.8, min: 36.0 },
+  'Deandre Ayton': { team: 'LAL', pos: 'C', pts: 16.5, reb: 10.2, ast: 2.0, min: 30.5 },
+  'Rui Hachimura': { team: 'LAL', pos: 'F', pts: 13.8, reb: 5.5, ast: 1.5, min: 28.0 },
+
+  // Golden State Warriors
+  'Stephen Curry': { team: 'GSW', pos: 'G', pts: 26.5, reb: 4.8, ast: 6.2, min: 34.0 },
+  'Kristaps Porzingis': { team: 'GSW', pos: 'C', pts: 19.5, reb: 7.2, ast: 2.0, min: 28.5 },
+  'Jimmy Butler III': { team: 'GSW', pos: 'F', pts: 18.5, reb: 5.5, ast: 4.8, min: 32.0 },
+  'Draymond Green': { team: 'GSW', pos: 'F', pts: 8.5, reb: 6.8, ast: 5.5, min: 28.0 },
 };
 
 async function fetchGameData(date) {

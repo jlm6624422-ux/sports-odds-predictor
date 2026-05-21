@@ -100,7 +100,6 @@
             border: 1px solid #21262d;
             border-radius: 10px;
             margin-bottom: 20px;
-            overflow: hidden;
         }
 
         .day-header {
@@ -141,10 +140,16 @@
         .day-record .l { color: #f85149; }
         .day-record .p { color: #8b949e; }
 
+        .day-body {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         /* Picks Table */
         .picks-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 700px;
         }
 
         .picks-table th {
@@ -155,12 +160,14 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             border-bottom: 1px solid #21262d;
+            white-space: nowrap;
         }
 
         .picks-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #21262d;
             font-size: 0.9em;
+            white-space: nowrap;
         }
 
         .picks-table tr:last-child td { border-bottom: none; }
