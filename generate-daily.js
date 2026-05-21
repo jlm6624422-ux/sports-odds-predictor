@@ -880,6 +880,15 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 
 ${nbaContent}
 
+<div class="section" style="margin-top:40px">
+<div class="section-title" style="color:#d2a8ff;display:flex;justify-content:space-between;align-items:center">
+<span>&#128202; NBA Best Bets Tracker</span>
+<button id="nba-tracker-refresh" onclick="refreshTrackerResults()" style="padding:6px 14px;background:#d2a8ff;color:#0f1117;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button>
+</div>
+<div id="nba-stats-banner" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px"></div>
+<div id="nba-tracker-days"></div>
+</div>
+
 <div class="nav-links">
 <a href="/">Daily Picks</a>
 <a href="/tracker">Betting Tracker</a>
@@ -992,6 +1001,133 @@ async function refreshNBA() {
     btn.disabled = false;
   }
 }
+
+// NBA BEST BETS TRACKER
+let NBA_TRACKER_DATA = [
+  { date: "${today}", picks: [] },
+  { date: "2026-05-20", picks: [
+    { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
+    { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
+    { type: "prop", team: "Shai Gilgeous-Alexander O 34.5 PRA", matchup: "SA @ OKC", line: "O 34.5 (+3.1 edge)", odds: "-115", confidence: "high", thesis: "Avg 37.7 PRA", result: "pending", score: "" },
+    { type: "prop", team: "Victor Wembanyama O 36.5 PRA", matchup: "SA @ OKC", line: "O 36.5 (+2.9 edge)", odds: "-110", confidence: "high", thesis: "Avg 39.4 PRA", result: "pending", score: "" },
+    { type: "prop", team: "Jalen Williams O 28.5 PRA", matchup: "SA @ OKC", line: "O 28.5 (+2.5 edge)", odds: "-110", confidence: "med", thesis: "Avg 31.0 PRA", result: "pending", score: "" }
+  ]},
+  { date: "2026-05-19", picks: [
+    { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +7.5", odds: "-115", confidence: "high", thesis: "Playoff games run tight", result: "loss", score: "Cavaliers 104, Knicks 115 (OT)" },
+    { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -265", odds: "-265", confidence: "med", thesis: "Home court + better record", result: "win", score: "Cavaliers 104, Knicks 115 (OT)" },
+    { type: "over", team: "OVER 217.5", matchup: "CLE @ NYK", line: "O 217.5", odds: "-110", confidence: "med", thesis: "Competitive series = pace", result: "win", score: "Cavaliers 104, Knicks 115 (219 total)" },
+    { type: "prop", team: "Jalen Brunson O 30.5 PRA", matchup: "CLE @ NYK", line: "O 30.5 (+2.3 edge)", odds: "-115", confidence: "med", thesis: "Avg 32.8 PRA", result: "win", score: "49 actual" },
+    { type: "prop", team: "Donovan Mitchell O 31.5 PRA", matchup: "CLE @ NYK", line: "O 31.5 (+2.1 edge)", odds: "-110", confidence: "med", thesis: "Avg 33.6 PRA", result: "win", score: "37 actual" },
+    { type: "prop", team: "Karl-Anthony Towns O 10.5 REB", matchup: "CLE @ NYK", line: "O 10.5 (+1.4 edge)", odds: "-120", confidence: "med", thesis: "Avg 11.9 RPG", result: "win", score: "13 actual" }
+  ]}
+];
+
+async function autoGradePendingDays() {
+  for (const day of NBA_TRACKER_DATA) {
+    if (!day.picks.some(p => p.result === 'pending')) continue;
+    try {
+      const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
+      const data = await res.json();
+      for (const event of (data.events || [])) {
+        const comp = event.competitions[0];
+        const home = comp.competitors?.find(c => c.homeAway === 'home');
+        const away = comp.competitors?.find(c => c.homeAway === 'away');
+        if (!home || !away || !comp.status?.type?.completed) continue;
+        const homeScore = parseInt(home.score || 0);
+        const awayScore = parseInt(away.score || 0);
+        const total = homeScore + awayScore;
+        const margin = homeScore - awayScore;
+        const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
+        const scoreStr = away.team.shortDisplayName + ' ' + awayScore + ', ' + home.team.shortDisplayName + ' ' + homeScore;
+
+        for (const pick of day.picks) {
+          if (pick.result !== 'pending') continue;
+          if (pick.type === 'ml') {
+            const won = winner.toLowerCase().includes(pick.team.split(' ').slice(-1)[0].toLowerCase());
+            pick.result = won ? 'win' : 'loss'; pick.score = scoreStr;
+          } else if (pick.type === 'spread') {
+            const lineMatch = pick.line.match(/([+-]?\\d+\\.?\\d*)/);
+            if (lineMatch) {
+              const spread = parseFloat(lineMatch[1]);
+              const isHome = home.team.displayName.includes(pick.team.split(' ').pop());
+              const teamMargin = isHome ? margin : -margin;
+              pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss'; pick.score = scoreStr;
+            }
+          } else if (pick.type === 'over') {
+            const lineMatch = pick.line.match(/([\\d.]+)/);
+            if (lineMatch) { const line = parseFloat(lineMatch[1]); pick.result = total > line ? 'win' : 'loss'; pick.score = scoreStr + ' (' + total + ' total)'; }
+          } else if (pick.type === 'prop') {
+            try {
+              const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
+              const boxData = await boxRes.json();
+              const lineMatch = pick.line.match(/O\\s*([\\d.]+)/);
+              if (!lineMatch) continue;
+              const propLine = parseFloat(lineMatch[1]);
+              const playerName = pick.team.split(' O ')[0].split(' U ')[0];
+              for (const team of (boxData.boxscore?.players || [])) {
+                for (const stat of team.statistics) {
+                  const labels = stat.labels || [];
+                  for (const athlete of stat.athletes) {
+                    if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
+                    const pts = parseInt(athlete.stats[labels.indexOf('PTS')]) || 0;
+                    const reb = parseInt(athlete.stats[labels.indexOf('REB')]) || 0;
+                    const ast = parseInt(athlete.stats[labels.indexOf('AST')]) || 0;
+                    let actual = null;
+                    if (pick.team.includes('PRA')) actual = pts + reb + ast;
+                    else if (pick.team.includes('REB')) actual = reb;
+                    else if (pick.team.includes('AST')) actual = ast;
+                    else if (pick.team.includes('PTS')) actual = pts;
+                    if (actual !== null) { pick.result = actual > propLine ? 'win' : 'loss'; pick.score = actual + ' actual'; }
+                  }
+                }
+              }
+            } catch(e) {}
+          }
+        }
+      }
+    } catch(e) {}
+  }
+}
+
+function renderNBATracker() {
+  // Remove empty days
+  const days = NBA_TRACKER_DATA.filter(d => d.picks.length > 0);
+  let totalW = 0, totalL = 0;
+  for (const d of days) { for (const p of d.picks) { if (p.result === 'win') totalW++; else if (p.result === 'loss') totalL++; } }
+  const pct = (totalW + totalL) > 0 ? ((totalW / (totalW + totalL)) * 100).toFixed(1) : '0';
+
+  document.getElementById('nba-stats-banner').innerHTML = '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#3fb950">' + totalW + '</div><div style="font-size:0.8em;color:#8b949e">Wins</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f85149">' + totalL + '</div><div style="font-size:0.8em;color:#8b949e">Losses</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#d2a8ff">' + pct + '%</div><div style="font-size:0.8em;color:#8b949e">Win Rate</div></div>';
+
+  let html = '';
+  for (const day of days) {
+    const dW = day.picks.filter(p => p.result === 'win').length;
+    const dL = day.picks.filter(p => p.result === 'loss').length;
+    const dP = day.picks.filter(p => p.result === 'pending').length;
+    const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    html += '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\\'none\\'?\\'block\\':\\'none\\'"><h4 style="font-size:0.95em">' + dateLabel + '</h4><span style="font-size:0.85em;color:#8b949e"><span style="color:#3fb950">' + dW + 'W</span> <span style="color:#f85149">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '</span></div>';
+    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse;font-size:0.85em;min-width:650px">';
+    html += '<thead><tr><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Type</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Pick</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Line</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Score</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Result</th></tr></thead><tbody>';
+    for (const p of day.picks) {
+      const bg = p.result === 'win' ? 'background:rgba(52,211,153,0.06);border-left:3px solid #34d399' : p.result === 'loss' ? 'background:rgba(248,113,113,0.06);border-left:3px solid #f87171' : '';
+      const badge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">PEND</span>';
+      html += '<tr style="' + bg + '"><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.type.toUpperCase() + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;font-weight:600">' + p.team + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.line + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e">' + (p.score || '—') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + badge + '</td></tr>';
+    }
+    html += '</tbody></table></div></div>';
+  }
+  document.getElementById('nba-tracker-days').innerHTML = html || '<p style="color:#8b949e;text-align:center;padding:20px">No tracker data yet</p>';
+}
+
+async function refreshTrackerResults() {
+  const btn = document.getElementById('nba-tracker-refresh');
+  btn.textContent = 'Grading...'; btn.disabled = true;
+  await autoGradePendingDays();
+  renderNBATracker();
+  btn.textContent = '\\u2713 Updated';
+  setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+}
+
+// Load tracker on page init
+autoGradePendingDays().then(() => renderNBATracker());
 </script>
 </body>
 </html>`;

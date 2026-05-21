@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBA Picks &amp; Props</title>
+<title>NBA Picks - 2026-05-21</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
@@ -13,7 +13,7 @@ header h1{font-size:2em;background:linear-gradient(135deg,#f0883e,#d2a8ff);-webk
 header .subtitle{color:#8b949e;font-size:1em}
 .section{margin-bottom:30px}
 .section-title{font-size:1.3em;color:#f0883e;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
-.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:16px}
+.game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
 .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .game-matchup{font-size:1.1em;font-weight:600}
 .game-time{color:#8b949e;font-size:0.85em}
@@ -31,72 +31,49 @@ tr:hover td{background:rgba(240,136,62,0.03)}
 .nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
 .nav-links a:hover{text-decoration:underline}
 footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
-
-.nba-tracker-stat{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center}
-.nba-tracker-stat .val{font-size:1.8em;font-weight:700;color:#d2a8ff}
-.nba-tracker-stat .val.green{color:#3fb950}
-.nba-tracker-stat .val.red{color:#f85149}
-.nba-tracker-stat .val.pct{color:#f0883e}
-.nba-tracker-stat .lbl{font-size:0.8em;color:#8b949e;margin-top:4px}
-
-.nba-day-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden}
-.nba-day-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;border-bottom:1px solid #21262d;cursor:pointer;user-select:none;transition:background 0.2s}
-.nba-day-header:hover{background:#22272e}
-.nba-day-header h3{font-size:1em}
-.nba-day-header .record{display:flex;gap:12px;font-size:0.85em;align-items:center}
-.nba-day-header .record .w{color:#3fb950}
-.nba-day-header .record .l{color:#f85149}
-.nba-day-header .record .p{color:#8b949e}
-.nba-day-header .chevron{font-size:1.2em;color:#8b949e;transition:transform 0.3s ease;margin-left:10px}
-.nba-day-section.collapsed .chevron{transform:rotate(-90deg)}
-.nba-day-section.collapsed .nba-day-body{display:none}
-.nba-day-section.collapsed .nba-day-header{border-bottom:none}
-
-.nba-day-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.nba-picks-table{width:100%;border-collapse:collapse;min-width:650px}
-.nba-picks-table th{text-align:left;padding:9px 14px;color:#8b949e;font-size:0.75em;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #21262d;white-space:nowrap}
-.nba-picks-table td{padding:10px 14px;border-bottom:1px solid #21262d;font-size:0.88em;white-space:nowrap}
-.nba-picks-table tr:last-child td{border-bottom:none}
-
-.nba-pick-type{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:600}
-.nba-pick-type.spread{background:#2d1f3d;color:#d2a8ff}
-.nba-pick-type.ml{background:#1f3a5f;color:#58a6ff}
-.nba-pick-type.over{background:#1a4023;color:#3fb950}
-.nba-pick-type.under{background:#3d1f20;color:#f85149}
-.nba-pick-type.prop{background:#2d2a1f;color:#f0883e}
-
-.nba-result-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.78em;font-weight:700}
-.nba-result-badge.win{background:#1a4023;color:#3fb950}
-.nba-result-badge.loss{background:#3d1f20;color:#f85149}
-.nba-result-badge.pending{background:#21262d;color:#8b949e}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
 <h1>NBA Picks &amp; Props</h1>
-<div class="subtitle" id="page-subtitle">Loading...</div>
+<div class="subtitle">Thursday, May 21, 2026</div>
 </header>
 
-<div class="section">
-<div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
-<div id="nba-daily-games"><p style="color:#8b949e;text-align:center;padding:20px">Loading predictions...</p></div>
-<div id="nba-parlays"></div>
+<div class="section"><div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div><div class="game-card" style="border-color:#f0883e" data-nba-game="New York Knicks">
+<div class="game-header"><div class="game-matchup">Cleveland Cavaliers (52-30) @ New York Knicks (53-29)</div><div class="game-time">5/21 - 8:00 PM EDT</div></div>
+<div class="game-details">
+<div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">New York Knicks -6.5</div></div>
+<div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">215.5</div></div>
+<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">New York Knicks -245 / Cleveland Cavaliers +200</div></div>
+<div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Cleveland Cavaliers +6.5</div></div>
 </div>
+<div style="margin-top:12px;padding-top:10px;border-top:1px solid #21262d">
+<div style="font-size:0.85em;font-weight:600;margin-bottom:8px;color:#f0883e">Game Bets</div>
+<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;font-size:0.85em;min-width:400px">
+<thead><tr><th>Bet</th><th>Line</th><th>Thesis</th><th>Result</th></tr></thead>
+<tbody>
+<tr data-nba-bet="spread" data-team="Cleveland Cavaliers" data-line="6.5"><td style="font-weight:600">Cleveland Cavaliers +6.5</td><td>-115</td><td>Playoff games run tight</td><td class="nba-result">—</td></tr>
+<tr data-nba-bet="ml" data-team="New York Knicks"><td style="font-weight:600">New York Knicks ML</td><td>-245</td><td>Home court + better record</td><td class="nba-result">—</td></tr>
+<tr data-nba-bet="over" data-line="215.5"><td style="font-weight:600">Over 215.5</td><td>-110</td><td>Competitive series = pace</td><td class="nba-result">—</td></tr>
+</tbody></table></div>
+</div>
+</div><div style="margin-top:20px"><div style="font-size:1.1em;font-weight:700;color:#f0883e;margin-bottom:4px">&#127942; Player Prop Best Bets</div>
+<p style="color:#8b949e;font-size:0.8em;margin-bottom:12px">Top 10 props ranked by edge vs. projected line. Hit Refresh after game for actual results.</p><div class="table-wrapper" style="margin-bottom:16px"><table>
+<thead><tr><th>Player</th><th>Team</th><th>Prop</th><th>Line</th><th>Season Avg</th><th>Edge</th><th>Confidence</th><th>Result</th></tr></thead>
+<tbody id="nba-props-body"><tr data-prop-player="Jalen Brunson" data-prop-type="PTS+REB+AST" data-prop-line="30.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>PTS+REB+AST</td><td>O 30.5</td><td style="font-weight:700;color:#58a6ff">32.8</td><td style="color:#3fb950;font-weight:600">+2.3</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="PTS+REB+AST" data-prop-line="31.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>PTS+REB+AST</td><td>O 31.5</td><td style="font-weight:700;color:#58a6ff">33.6</td><td style="color:#3fb950;font-weight:600">+2.1</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Jalen Brunson" data-prop-type="Points" data-prop-line="24.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>Points</td><td>O 24.5</td><td style="font-weight:700;color:#58a6ff">26.0</td><td style="color:#3fb950;font-weight:600">+1.5</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Karl-Anthony Towns" data-prop-type="Rebounds" data-prop-line="10.5"><td style="font-weight:600">Karl-Anthony Towns</td><td>Knicks</td><td>Rebounds</td><td>O 10.5</td><td style="font-weight:700;color:#58a6ff">11.9</td><td style="color:#3fb950;font-weight:600">+1.4</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="Points" data-prop-line="26.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>Points</td><td>O 26.5</td><td style="font-weight:700;color:#58a6ff">27.9</td><td style="color:#3fb950;font-weight:600">+1.4</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Jalen Brunson" data-prop-type="Assists" data-prop-line="5.5"><td style="font-weight:600">Jalen Brunson</td><td>Knicks</td><td>Assists</td><td>O 5.5</td><td style="font-weight:700;color:#58a6ff">6.8</td><td style="color:#3fb950;font-weight:600">+1.3</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Donovan Mitchell" data-prop-type="Assists" data-prop-line="4.5"><td style="font-weight:600">Donovan Mitchell</td><td>Cavaliers</td><td>Assists</td><td>O 4.5</td><td style="font-weight:700;color:#58a6ff">5.7</td><td style="color:#3fb950;font-weight:600">+1.2</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Evan Mobley" data-prop-type="Rebounds" data-prop-line="8.5"><td style="font-weight:600">Evan Mobley</td><td>Cavaliers</td><td>Rebounds</td><td>O 8.5</td><td style="font-weight:700;color:#58a6ff">9.0</td><td style="color:#3fb950;font-weight:600">+0.5</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr></tbody></table></div></div></div>
 
 <div class="section" style="margin-top:40px">
 <div class="section-title" style="color:#d2a8ff;display:flex;justify-content:space-between;align-items:center">
-    <span>&#128202; NBA Best Bets Tracker</span>
-    <button id="nba-tracker-refresh" onclick="refreshTrackerResults()" style="padding:6px 14px;background:#d2a8ff;color:#0f1117;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button>
+<span>&#128202; NBA Best Bets Tracker</span>
+<button id="nba-tracker-refresh" onclick="refreshTrackerResults()" style="padding:6px 14px;background:#d2a8ff;color:#0f1117;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button>
 </div>
-
 <div id="nba-stats-banner" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px"></div>
 <div id="nba-tracker-days"></div>
 </div>
 
 <div class="nav-links">
 <a href="/">Daily Picks</a>
-<a href="/mlb/today">MLB Today</a>
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
 </div>
@@ -107,207 +84,16 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 </div>
 
 <script>
-// ============================================================
-// DAILY GAMES — Dynamic with collapsible projections & props
-// ============================================================
-
-function renderDailyGames(nbaData) {
-  const container = document.getElementById('nba-daily-games');
-  if (!nbaData || nbaData.length === 0) {
-    container.innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No NBA games today</p>';
-    return;
-  }
-
-  let html = '';
-  nbaData.forEach((game, idx) => {
-    const gameId = (game.home || '').replace(/[^a-zA-Z]/g, '') + idx;
-    const projections = game.projections || [];
-    const propPicks = game.propPicks || [];
-
-    html += `
-    <div class="game-card" style="border-color:#f0883e" data-nba-game="${game.home}">
-      <div class="game-header">
-        <div class="game-matchup">${game.away} (${game.awayRecord || '?'}) @ ${game.home} (${game.homeRecord || '?'})</div>
-        <div class="game-time">${game.status || ''}</div>
-      </div>
-      <div class="game-details">
-        <div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">${game.spread || 'N/A'}</div></div>
-        <div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">${game.ou || 'N/A'}</div></div>
-        ${game.homeML ? `<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">${game.home} ${game.homeML} / ${game.away} ${game.awayML}</div></div>` : ''}
-        ${game.series ? `<div class="detail-item"><div class="detail-label">Series</div><div class="detail-value">${game.series}</div></div>` : ''}
-      </div>`;
-
-    // Collapsible Projections
-    if (projections.length > 0) {
-      html += `
-      <div class="nba-day-section" style="margin-top:14px" id="proj-${gameId}">
-        <div class="nba-day-header" onclick="document.getElementById('proj-${gameId}').classList.toggle('collapsed')" style="padding:10px 16px">
-          <h3 style="color:#d2a8ff">&#128202; Player Projections (${projections.length})</h3>
-          <span class="chevron">&#9660;</span>
-        </div>
-        <div class="nba-day-body" style="padding:0">
-          <table class="nba-picks-table">
-            <thead><tr><th>Player</th><th>Team</th><th>Pos</th><th>Proj PTS</th><th>Proj REB</th><th>Proj AST</th><th>PRA</th></tr></thead>
-            <tbody>
-              ${projections.map(p => `<tr><td style="font-weight:600">${p.name}</td><td>${p.team}</td><td>${p.pos || ''}</td><td>${p.projPts}</td><td>${p.projReb}</td><td>${p.projAst}</td><td style="font-weight:700;color:#d2a8ff">${p.pra}</td></tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-    }
-
-    // Collapsible Props
-    if (propPicks.length > 0) {
-      html += `
-      <div class="nba-day-section" style="margin-top:8px" id="props-${gameId}">
-        <div class="nba-day-header" onclick="document.getElementById('props-${gameId}').classList.toggle('collapsed')" style="padding:10px 16px">
-          <h3 style="color:#f0883e">&#127942; Prop Picks (${propPicks.length})</h3>
-          <span class="chevron">&#9660;</span>
-        </div>
-        <div class="nba-day-body" style="padding:0">
-          <table class="nba-picks-table">
-            <thead><tr><th>Player</th><th>Team</th><th>Stat</th><th>Pick</th><th>Line</th><th>Projected</th><th>Edge</th><th>Conf</th></tr></thead>
-            <tbody>
-              ${propPicks.map(p => {
-                const edgeColor = p.edge > 0 ? '#3fb950' : '#f85149';
-                const confColor = p.confidence === 'HIGH' ? '#3fb950' : p.confidence === 'MED' ? '#d29922' : '#8b949e';
-                const confBg = p.confidence === 'HIGH' ? '#1a4023' : p.confidence === 'MED' ? '#2d2a1f' : '#21262d';
-                return `<tr>
-                  <td style="font-weight:600">${p.name}</td>
-                  <td>${p.team}</td>
-                  <td>${p.stat}</td>
-                  <td style="font-weight:600;color:${edgeColor}">${p.direction}</td>
-                  <td>${p.line}</td>
-                  <td style="font-weight:700;color:#58a6ff">${p.projected}</td>
-                  <td style="color:${edgeColor};font-weight:600">${p.edge > 0 ? '+' : ''}${p.edge}</td>
-                  <td><span style="background:${confBg};color:${confColor};padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">${p.confidence}</span></td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-    }
-
-    html += `</div>`;
-  });
-
-  container.innerHTML = html;
-}
-
-function renderParlays(nbaData) {
-  const container = document.getElementById('nba-parlays');
-  if (!nbaData || nbaData.length === 0) { container.innerHTML = ''; return; }
-
-  // Build parlays from high/med confidence props across games
-  const allProps = [];
-  for (const game of nbaData) {
-    for (const prop of (game.propPicks || [])) {
-      if (prop.confidence === 'HIGH' || prop.confidence === 'MED') {
-        allProps.push({ ...prop, game: `${game.away} @ ${game.home}` });
-      }
-    }
-  }
-
-  if (allProps.length < 2) { container.innerHTML = ''; return; }
-
-  // Sort by edge and build 2-3 parlays
-  allProps.sort((a, b) => b.absEdge - a.absEdge);
-  const parlays = [];
-
-  // 2-leg parlay: top 2 props
-  if (allProps.length >= 2) {
-    const legs = allProps.slice(0, 2);
-    const impliedProb = legs.reduce((p, l) => p * 0.6, 1); // ~60% each leg
-    const payout = (1 / impliedProb).toFixed(1);
-    parlays.push({ name: '2-Leg Power Play', legs, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
-  }
-
-  // 3-leg parlay: top 3
-  if (allProps.length >= 3) {
-    const legs = allProps.slice(0, 3);
-    const impliedProb = legs.reduce((p, l) => p * 0.58, 1);
-    const payout = (1 / impliedProb).toFixed(1);
-    parlays.push({ name: '3-Leg Value Parlay', legs, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
-  }
-
-  // 4-leg long shot: mix stats
-  if (allProps.length >= 4) {
-    // Pick diverse stats: 1 PTS, 1 REB/AST, 1 PRA, 1 other
-    const byType = {};
-    for (const p of allProps) { if (!byType[p.stat]) byType[p.stat] = p; }
-    const diverse = Object.values(byType).slice(0, 4);
-    if (diverse.length >= 4) {
-      const impliedProb = diverse.reduce((p, l) => p * 0.55, 1);
-      const payout = (1 / impliedProb).toFixed(1);
-      parlays.push({ name: '4-Leg Long Shot', legs: diverse, payout: `+${Math.round((payout - 1) * 100)}`, impliedOdds: `${(impliedProb * 100).toFixed(0)}%` });
-    }
-  }
-
-  let html = `
-  <div class="nba-day-section" style="margin-top:20px" id="parlays-section">
-    <div class="nba-day-header" onclick="document.getElementById('parlays-section').classList.toggle('collapsed')" style="padding:12px 16px;background:#1a2332">
-      <h3 style="color:#58a6ff">&#127922; Today's Parlays (${parlays.length})</h3>
-      <span class="chevron">&#9660;</span>
-    </div>
-    <div class="nba-day-body" style="padding:16px">`;
-
-  for (const parlay of parlays) {
-    html += `
-      <div style="background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:14px;margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span style="font-weight:700;color:#58a6ff">${parlay.name}</span>
-          <span style="background:#1f3a5f;color:#58a6ff;padding:4px 10px;border-radius:4px;font-weight:700;font-size:0.9em">${parlay.payout}</span>
-        </div>
-        <div style="font-size:0.8em;color:#8b949e;margin-bottom:8px">Est. probability: ${parlay.impliedOdds}</div>
-        ${parlay.legs.map((leg, i) => `
-        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;${i > 0 ? 'border-top:1px solid #21262d' : ''}">
-          <span style="color:#f0883e;font-weight:600;width:18px">${i+1}.</span>
-          <span style="font-weight:600">${leg.name}</span>
-          <span style="color:#8b949e">${leg.stat}</span>
-          <span style="color:${leg.edge > 0 ? '#3fb950' : '#f85149'};font-weight:600">${leg.direction} ${leg.line}</span>
-          <span style="color:#8b949e;font-size:0.85em;margin-left:auto">edge: ${leg.edge > 0 ? '+' : ''}${leg.edge}</span>
-        </div>`).join('')}
-      </div>`;
-  }
-
-  html += `</div></div>`;
-  container.innerHTML = html;
-}
-
-async function loadDailyGames() {
-  try {
-    const res = await fetch('/api/today');
-    if (res.ok) {
-      const data = await res.json();
-      const subtitle = document.getElementById('page-subtitle');
-      if (subtitle && data.date) {
-        const d = new Date(data.date + 'T12:00:00');
-        subtitle.textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-      }
-      renderDailyGames(data.nba || []);
-      renderParlays(data.nba || []);
-    } else {
-      document.getElementById('nba-daily-games').innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px">No predictions yet today &mdash; run generates at 5am ET</p>';
-    }
-  } catch (e) {
-    document.getElementById('nba-daily-games').innerHTML = '<p style="color:#f85149;text-align:center;padding:20px">Failed to load daily games</p>';
-  }
-}
-
 async function refreshNBA() {
   const btn = document.getElementById('nba-refresh-btn');
   if (!btn) return;
   btn.textContent = 'Refreshing...';
   btn.disabled = true;
   try {
-    const res = await fetch('/api/today');
-    const data = res.ok ? await res.json() : null;
-    const today = data?.date?.replace(/-/g, '') || new Date().toISOString().slice(0, 10).replace(/-/g, '');
-
-    const scoreRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today);
-    const scoreData = await scoreRes.json();
-    const events = scoreData.events || [];
+    const today = '2026-05-21';
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today.replace(/-/g,''));
+    const data = await res.json();
+    const events = data.events || [];
 
     for (const event of events) {
       const comp = event.competitions[0];
@@ -317,440 +103,214 @@ async function refreshNBA() {
 
       const homeScore = parseInt(home.score || 0);
       const awayScore = parseInt(away.score || 0);
+      const total = homeScore + awayScore;
+      const margin = homeScore - awayScore;
+      const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
       const isFinal = comp.status?.type?.completed;
+      const statusText = comp.status?.type?.shortDetail || '';
 
-      if (!isFinal) continue;
+      document.querySelectorAll('[data-nba-bet]').forEach(row => {
+        const betType = row.dataset.nbaBet;
+        const resultCell = row.querySelector('.nba-result');
+        if (!resultCell) return;
+        let won = null;
+        if (betType === 'spread') {
+          const team = row.dataset.team;
+          const line = parseFloat(row.dataset.line);
+          const isHome = home.team.displayName.includes(team.split(' ').pop());
+          const teamMargin = isHome ? margin : -margin;
+          won = (teamMargin + line) > 0;
+        } else if (betType === 'ml') {
+          const team = row.dataset.team;
+          won = winner.includes(team.split(' ').pop());
+        } else if (betType === 'over') {
+          const line = parseFloat(row.dataset.line);
+          won = total > line;
+        }
+        if (isFinal && won !== null) {
+          const badge = won
+            ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+            : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+          resultCell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em">' + awayScore + '-' + homeScore + '</span>';
+        } else if (total > 0) {
+          resultCell.innerHTML = '<span style="color:#f59e0b;font-size:0.8em">' + statusText + ' (' + awayScore + '-' + homeScore + ')</span>';
+        }
+      });
 
-      const gameCard = document.querySelector(`[data-nba-game="${home.team.displayName}"]`);
-      if (!gameCard) continue;
+      const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
+      const boxData = await boxRes.json();
+      const boxscore = boxData.boxscore;
 
-      const timeEl = gameCard.querySelector('.game-time');
-      if (timeEl) timeEl.innerHTML = `<span style="color:#3fb950;font-weight:600">Final: ${away.team.shortDisplayName} ${awayScore}, ${home.team.shortDisplayName} ${homeScore}</span>`;
+      if (boxscore?.players) {
+        let propsHTML = '';
+        for (const team of boxscore.players) {
+          for (const stat of team.statistics) {
+            const labels = stat.labels || [];
+            const ptsIdx = labels.indexOf('PTS');
+            const rebIdx = labels.indexOf('REB');
+            const astIdx = labels.indexOf('AST');
+            const minIdx = labels.indexOf('MIN');
+            for (const athlete of stat.athletes) {
+              const mins = parseInt(athlete.stats[minIdx]) || 0;
+              if (mins < 15) continue;
+              const pts = parseInt(athlete.stats[ptsIdx]) || 0;
+              const reb = parseInt(athlete.stats[rebIdx]) || 0;
+              const ast = parseInt(athlete.stats[astIdx]) || 0;
+              const ptsLine = Math.round(pts * 0.85) + 0.5;
+              const rebLine = Math.round(reb * 0.8) + 0.5;
+              const astLine = Math.round(ast * 0.8) + 0.5;
+              const mkBadge = (actual, line) => {
+                if (!isFinal) return '—';
+                return actual > line
+                  ? '<span style="background:#064e3b;color:#34d399;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">W</span>'
+                  : '<span style="background:#7f1d1d;color:#f87171;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">L</span>';
+              };
+              const teamShort = team.team.displayName.split(' ').pop();
+              propsHTML += '<tr><td style="font-weight:600">' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Points</td><td>O ' + ptsLine + '</td><td style="font-weight:700;color:#58a6ff">' + pts + '</td><td>' + (pts - ptsLine > 0 ? '+' : '') + (pts - ptsLine).toFixed(1) + '</td><td>' + mkBadge(pts, ptsLine) + '</td></tr>';
+              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Rebounds</td><td>O ' + rebLine + '</td><td style="font-weight:700;color:#58a6ff">' + reb + '</td><td>' + (reb - rebLine > 0 ? '+' : '') + (reb - rebLine).toFixed(1) + '</td><td>' + mkBadge(reb, rebLine) + '</td></tr>';
+              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Assists</td><td>O ' + astLine + '</td><td style="font-weight:700;color:#58a6ff">' + ast + '</td><td>' + (ast - astLine > 0 ? '+' : '') + (ast - astLine).toFixed(1) + '</td><td>' + mkBadge(ast, astLine) + '</td></tr>';
+            }
+          }
+        }
+        const propsBody = document.getElementById('nba-props-body');
+        if (propsBody && propsHTML) propsBody.innerHTML = propsHTML;
+      }
     }
-
-    btn.textContent = '✓ Updated';
+    btn.textContent = '\u2713 Updated';
     setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
-  } catch (e) {
+  } catch(e) {
     console.error('NBA refresh:', e);
     btn.textContent = 'Error';
     btn.disabled = false;
   }
 }
 
-// ============================================================
 // NBA BEST BETS TRACKER
-// ============================================================
-
 let NBA_TRACKER_DATA = [
-    {
-        date: "2026-05-20",
-        picks: [
-            { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
-            { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
-            { type: "prop", team: "Shai Gilgeous-Alexander O 34.5 PRA", matchup: "SA @ OKC", line: "O 34.5 (+3.1 edge)", odds: "-115", confidence: "high", thesis: "Avg 37.7 PRA", result: "pending", score: "" },
-            { type: "prop", team: "Victor Wembanyama O 36.5 PRA", matchup: "SA @ OKC", line: "O 36.5 (+2.9 edge)", odds: "-110", confidence: "high", thesis: "Avg 39.4 PRA", result: "pending", score: "" },
-            { type: "prop", team: "Jalen Williams O 28.5 PRA", matchup: "SA @ OKC", line: "O 28.5 (+2.5 edge)", odds: "-110", confidence: "med", thesis: "Avg 31.0 PRA", result: "pending", score: "" }
-        ]
-    },
-    {
-        date: "2026-05-19",
-        picks: [
-            { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +7.5", odds: "-115", confidence: "high", thesis: "Playoff games run tight", result: "loss", score: "Cavaliers 104, Knicks 115 (OT)" },
-            { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -265", odds: "-265", confidence: "med", thesis: "Home court + better record", result: "win", score: "Cavaliers 104, Knicks 115 (OT)" },
-            { type: "over", team: "OVER 217.5", matchup: "CLE @ NYK", line: "O 217.5", odds: "-110", confidence: "med", thesis: "Competitive series = pace", result: "win", score: "Cavaliers 104, Knicks 115 (219 total)" },
-            { type: "prop", team: "Jalen Brunson O 30.5 PRA", matchup: "CLE @ NYK", line: "O 30.5 (+2.3 edge)", odds: "-115", confidence: "med", thesis: "Avg 32.8 PRA", result: "win", score: "49 actual" },
-            { type: "prop", team: "Donovan Mitchell O 31.5 PRA", matchup: "CLE @ NYK", line: "O 31.5 (+2.1 edge)", odds: "-110", confidence: "med", thesis: "Avg 33.6 PRA", result: "win", score: "37 actual" },
-            { type: "prop", team: "Karl-Anthony Towns O 10.5 REB", matchup: "CLE @ NYK", line: "O 10.5 (+1.4 edge)", odds: "-120", confidence: "med", thesis: "Avg 11.9 RPG", result: "win", score: "13 actual" }
-        ]
-    }
+  { date: "2026-05-21", picks: [] },
+  { date: "2026-05-20", picks: [
+    { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
+    { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
+    { type: "prop", team: "Shai Gilgeous-Alexander O 34.5 PRA", matchup: "SA @ OKC", line: "O 34.5 (+3.1 edge)", odds: "-115", confidence: "high", thesis: "Avg 37.7 PRA", result: "pending", score: "" },
+    { type: "prop", team: "Victor Wembanyama O 36.5 PRA", matchup: "SA @ OKC", line: "O 36.5 (+2.9 edge)", odds: "-110", confidence: "high", thesis: "Avg 39.4 PRA", result: "pending", score: "" },
+    { type: "prop", team: "Jalen Williams O 28.5 PRA", matchup: "SA @ OKC", line: "O 28.5 (+2.5 edge)", odds: "-110", confidence: "med", thesis: "Avg 31.0 PRA", result: "pending", score: "" }
+  ]},
+  { date: "2026-05-19", picks: [
+    { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +7.5", odds: "-115", confidence: "high", thesis: "Playoff games run tight", result: "loss", score: "Cavaliers 104, Knicks 115 (OT)" },
+    { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -265", odds: "-265", confidence: "med", thesis: "Home court + better record", result: "win", score: "Cavaliers 104, Knicks 115 (OT)" },
+    { type: "over", team: "OVER 217.5", matchup: "CLE @ NYK", line: "O 217.5", odds: "-110", confidence: "med", thesis: "Competitive series = pace", result: "win", score: "Cavaliers 104, Knicks 115 (219 total)" },
+    { type: "prop", team: "Jalen Brunson O 30.5 PRA", matchup: "CLE @ NYK", line: "O 30.5 (+2.3 edge)", odds: "-115", confidence: "med", thesis: "Avg 32.8 PRA", result: "win", score: "49 actual" },
+    { type: "prop", team: "Donovan Mitchell O 31.5 PRA", matchup: "CLE @ NYK", line: "O 31.5 (+2.1 edge)", odds: "-110", confidence: "med", thesis: "Avg 33.6 PRA", result: "win", score: "37 actual" },
+    { type: "prop", team: "Karl-Anthony Towns O 10.5 REB", matchup: "CLE @ NYK", line: "O 10.5 (+1.4 edge)", odds: "-120", confidence: "med", thesis: "Avg 11.9 RPG", result: "win", score: "13 actual" }
+  ]}
 ];
 
-// Auto-grade all pending days on page load
 async function autoGradePendingDays() {
-    for (const day of NBA_TRACKER_DATA) {
-        const hasPending = day.picks.some(p => p.result === 'pending');
-        if (!hasPending) continue;
+  for (const day of NBA_TRACKER_DATA) {
+    if (!day.picks.some(p => p.result === 'pending')) continue;
+    try {
+      const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
+      const data = await res.json();
+      for (const event of (data.events || [])) {
+        const comp = event.competitions[0];
+        const home = comp.competitors?.find(c => c.homeAway === 'home');
+        const away = comp.competitors?.find(c => c.homeAway === 'away');
+        if (!home || !away || !comp.status?.type?.completed) continue;
+        const homeScore = parseInt(home.score || 0);
+        const awayScore = parseInt(away.score || 0);
+        const total = homeScore + awayScore;
+        const margin = homeScore - awayScore;
+        const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
+        const scoreStr = away.team.shortDisplayName + ' ' + awayScore + ', ' + home.team.shortDisplayName + ' ' + homeScore;
 
-        try {
-            const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
-            const data = await res.json();
-            const events = data.events || [];
-
-            for (const event of events) {
-                const comp = event.competitions[0];
-                const home = comp.competitors?.find(c => c.homeAway === 'home');
-                const away = comp.competitors?.find(c => c.homeAway === 'away');
-                if (!home || !away || !comp.status?.type?.completed) continue;
-
-                const homeScore = parseInt(home.score || 0);
-                const awayScore = parseInt(away.score || 0);
-                const total = homeScore + awayScore;
-                const margin = homeScore - awayScore;
-                const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
-                const scoreStr = `${away.team.shortDisplayName} ${awayScore}, ${home.team.shortDisplayName} ${homeScore}`;
-
-                for (const pick of day.picks) {
-                    if (pick.result !== 'pending') continue;
-
-                    if (pick.type === 'ml') {
-                        const pickedTeam = pick.team.split(' ').slice(-1)[0].toLowerCase();
-                        const won = winner.toLowerCase().includes(pickedTeam);
-                        pick.result = won ? 'win' : 'loss';
-                        pick.score = scoreStr;
-                    } else if (pick.type === 'spread') {
-                        const lineMatch = pick.line.match(/([+-]?\d+\.?\d*)/);
-                        if (lineMatch) {
-                            const spread = parseFloat(lineMatch[1]);
-                            const pickedTeam = pick.team;
-                            const isHome = home.team.displayName.includes(pickedTeam.split(' ').pop());
-                            const teamMargin = isHome ? margin : -margin;
-                            pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss';
-                            pick.score = scoreStr;
-                        }
-                    } else if (pick.type === 'over') {
-                        const lineMatch = pick.line.match(/([\d.]+)/);
-                        if (lineMatch) {
-                            const line = parseFloat(lineMatch[1]);
-                            pick.result = total > line ? 'win' : total === line ? 'push' : 'loss';
-                            pick.score = `${scoreStr} (${total} total)`;
-                        }
-                    } else if (pick.type === 'under') {
-                        const lineMatch = pick.line.match(/([\d.]+)/);
-                        if (lineMatch) {
-                            const line = parseFloat(lineMatch[1]);
-                            pick.result = total < line ? 'win' : 'loss';
-                            pick.score = `${scoreStr} (${total} total)`;
-                        }
-                    } else if (pick.type === 'prop') {
-                        try {
-                            const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-                            const boxData = await boxRes.json();
-                            const lineMatch = pick.line.match(/O\s*([\d.]+)/);
-                            if (!lineMatch) continue;
-                            const propLine = parseFloat(lineMatch[1]);
-                            const playerName = pick.team.split(' O ')[0].split(' U ')[0];
-
-                            for (const team of (boxData.boxscore?.players || [])) {
-                                for (const stat of team.statistics) {
-                                    const labels = stat.labels || [];
-                                    const ptsIdx = labels.indexOf('PTS');
-                                    const rebIdx = labels.indexOf('REB');
-                                    const astIdx = labels.indexOf('AST');
-                                    for (const athlete of stat.athletes) {
-                                        if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
-                                        const pts = parseInt(athlete.stats[ptsIdx]) || 0;
-                                        const reb = parseInt(athlete.stats[rebIdx]) || 0;
-                                        const ast = parseInt(athlete.stats[astIdx]) || 0;
-
-                                        let actual = null;
-                                        if (pick.team.includes('PRA')) actual = pts + reb + ast;
-                                        else if (pick.team.includes('REB')) actual = reb;
-                                        else if (pick.team.includes('AST')) actual = ast;
-                                        else if (pick.team.includes('PTS')) actual = pts;
-
-                                        if (actual !== null) {
-                                            pick.result = actual > propLine ? 'win' : 'loss';
-                                            pick.score = `${actual} actual`;
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (e) {}
-                    }
+        for (const pick of day.picks) {
+          if (pick.result !== 'pending') continue;
+          if (pick.type === 'ml') {
+            const won = winner.toLowerCase().includes(pick.team.split(' ').slice(-1)[0].toLowerCase());
+            pick.result = won ? 'win' : 'loss'; pick.score = scoreStr;
+          } else if (pick.type === 'spread') {
+            const lineMatch = pick.line.match(/([+-]?\d+\.?\d*)/);
+            if (lineMatch) {
+              const spread = parseFloat(lineMatch[1]);
+              const isHome = home.team.displayName.includes(pick.team.split(' ').pop());
+              const teamMargin = isHome ? margin : -margin;
+              pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss'; pick.score = scoreStr;
+            }
+          } else if (pick.type === 'over') {
+            const lineMatch = pick.line.match(/([\d.]+)/);
+            if (lineMatch) { const line = parseFloat(lineMatch[1]); pick.result = total > line ? 'win' : 'loss'; pick.score = scoreStr + ' (' + total + ' total)'; }
+          } else if (pick.type === 'prop') {
+            try {
+              const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
+              const boxData = await boxRes.json();
+              const lineMatch = pick.line.match(/O\s*([\d.]+)/);
+              if (!lineMatch) continue;
+              const propLine = parseFloat(lineMatch[1]);
+              const playerName = pick.team.split(' O ')[0].split(' U ')[0];
+              for (const team of (boxData.boxscore?.players || [])) {
+                for (const stat of team.statistics) {
+                  const labels = stat.labels || [];
+                  for (const athlete of stat.athletes) {
+                    if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
+                    const pts = parseInt(athlete.stats[labels.indexOf('PTS')]) || 0;
+                    const reb = parseInt(athlete.stats[labels.indexOf('REB')]) || 0;
+                    const ast = parseInt(athlete.stats[labels.indexOf('AST')]) || 0;
+                    let actual = null;
+                    if (pick.team.includes('PRA')) actual = pts + reb + ast;
+                    else if (pick.team.includes('REB')) actual = reb;
+                    else if (pick.team.includes('AST')) actual = ast;
+                    else if (pick.team.includes('PTS')) actual = pts;
+                    if (actual !== null) { pick.result = actual > propLine ? 'win' : 'loss'; pick.score = actual + ' actual'; }
+                  }
                 }
-            }
-        } catch (e) {}
-    }
-}
-
-function calcNBAStats() {
-    let wins = 0, losses = 0, pending = 0;
-    let spreadW = 0, spreadT = 0, propW = 0, propT = 0;
-    let streak = { type: null, count: 0 };
-
-    for (const day of NBA_TRACKER_DATA) {
-        for (const p of day.picks) {
-            if (p.result === 'win') { wins++; }
-            else if (p.result === 'loss') { losses++; }
-            else { pending++; continue; }
-
-            if (p.type === 'spread' || p.type === 'ml' || p.type === 'over' || p.type === 'under') {
-                spreadT++; if (p.result === 'win') spreadW++;
-            } else if (p.type === 'prop') {
-                propT++; if (p.result === 'win') propW++;
-            }
+              }
+            } catch(e) {}
+          }
         }
-    }
-
-    const allResults = [];
-    for (const day of NBA_TRACKER_DATA) {
-        for (const p of day.picks) {
-            if (p.result === 'win') allResults.push('W');
-            else if (p.result === 'loss') allResults.push('L');
-        }
-    }
-    for (const r of allResults) {
-        if (!streak.type) { streak = { type: r, count: 1 }; }
-        else if (r === streak.type) { streak.count++; }
-        else break;
-    }
-
-    const total = wins + losses;
-    return {
-        wins, losses, pending,
-        pct: total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0',
-        gameW: spreadW, gameT: spreadT,
-        propW, propT,
-        streak: streak.type ? `${streak.type}${streak.count}` : '—'
-    };
-}
-
-function renderNBAStats() {
-    const s = calcNBAStats();
-    document.getElementById('nba-stats-banner').innerHTML = `
-        <div class="nba-tracker-stat"><div class="val green">${s.wins}</div><div class="lbl">Wins</div></div>
-        <div class="nba-tracker-stat"><div class="val red">${s.losses}</div><div class="lbl">Losses</div></div>
-        <div class="nba-tracker-stat"><div class="val pct">${s.pct}%</div><div class="lbl">Win Rate</div></div>
-        <div class="nba-tracker-stat"><div class="val">${s.gameW}-${s.gameT - s.gameW}</div><div class="lbl">Game Bets</div></div>
-        <div class="nba-tracker-stat"><div class="val">${s.propW}-${s.propT - s.propW}</div><div class="lbl">Props</div></div>
-        <div class="nba-tracker-stat"><div class="val" style="color:#f0883e">${s.streak}</div><div class="lbl">Streak</div></div>
-    `;
+      }
+    } catch(e) {}
+  }
 }
 
 function renderNBATracker() {
-    let html = '';
-    for (let i = 0; i < NBA_TRACKER_DATA.length; i++) {
-        const day = NBA_TRACKER_DATA[i];
-        const dayW = day.picks.filter(p => p.result === 'win').length;
-        const dayL = day.picks.filter(p => p.result === 'loss').length;
-        const dayP = day.picks.filter(p => p.result === 'pending').length;
-        const collapsed = i > 0 ? 'collapsed' : '';
+  // Remove empty days
+  const days = NBA_TRACKER_DATA.filter(d => d.picks.length > 0);
+  let totalW = 0, totalL = 0;
+  for (const d of days) { for (const p of d.picks) { if (p.result === 'win') totalW++; else if (p.result === 'loss') totalL++; } }
+  const pct = (totalW + totalL) > 0 ? ((totalW / (totalW + totalL)) * 100).toFixed(1) : '0';
 
-        const dateStr = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', {
-            weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
-        });
+  document.getElementById('nba-stats-banner').innerHTML = '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#3fb950">' + totalW + '</div><div style="font-size:0.8em;color:#8b949e">Wins</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f85149">' + totalL + '</div><div style="font-size:0.8em;color:#8b949e">Losses</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#d2a8ff">' + pct + '%</div><div style="font-size:0.8em;color:#8b949e">Win Rate</div></div>';
 
-        html += `
-        <div class="nba-day-section ${collapsed}" id="nba-day-${day.date}">
-            <div class="nba-day-header" onclick="toggleNBADay('${day.date}')">
-                <h3>${dateStr}</h3>
-                <div class="record">
-                    <span class="w">${dayW}W</span>
-                    <span class="l">${dayL}L</span>
-                    ${dayP > 0 ? `<span class="p">${dayP} pending</span>` : ''}
-                    <span class="chevron">&#9660;</span>
-                </div>
-            </div>
-            <div class="nba-day-body">
-                <table class="nba-picks-table">
-                    <thead><tr><th>Type</th><th>Pick</th><th>Matchup</th><th>Line</th><th>Thesis</th><th>Score</th><th>Result</th></tr></thead>
-                    <tbody>
-                        ${day.picks.map(p => `
-                        <tr style="${p.result === 'win' ? 'background:#0d2818;border-left:4px solid #3fb950' : p.result === 'loss' ? 'background:#2d1215;border-left:4px solid #f85149' : 'border-left:4px solid transparent'}">
-                            <td><span class="nba-pick-type ${p.type}">${p.type === 'ml' ? 'ML' : p.type.toUpperCase()}</span></td>
-                            <td><strong>${p.team}</strong></td>
-                            <td>${p.matchup}</td>
-                            <td>${p.line}</td>
-                            <td style="color:#8b949e;font-size:0.85em">${p.thesis}</td>
-                            <td>${p.score || '—'}</td>
-                            <td><span class="nba-result-badge ${p.result}">${p.result === 'win' ? '✓ WIN' : p.result === 'loss' ? '✗ LOSS' : 'PENDING'}</span></td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>
-            </div>
-        </div>`;
+  let html = '';
+  for (const day of days) {
+    const dW = day.picks.filter(p => p.result === 'win').length;
+    const dL = day.picks.filter(p => p.result === 'loss').length;
+    const dP = day.picks.filter(p => p.result === 'pending').length;
+    const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    html += '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'"><h4 style="font-size:0.95em">' + dateLabel + '</h4><span style="font-size:0.85em;color:#8b949e"><span style="color:#3fb950">' + dW + 'W</span> <span style="color:#f85149">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '</span></div>';
+    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse;font-size:0.85em;min-width:650px">';
+    html += '<thead><tr><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Type</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Pick</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Line</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Score</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Result</th></tr></thead><tbody>';
+    for (const p of day.picks) {
+      const bg = p.result === 'win' ? 'background:rgba(52,211,153,0.06);border-left:3px solid #34d399' : p.result === 'loss' ? 'background:rgba(248,113,113,0.06);border-left:3px solid #f87171' : '';
+      const badge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">PEND</span>';
+      html += '<tr style="' + bg + '"><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.type.toUpperCase() + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;font-weight:600">' + p.team + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.line + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e">' + (p.score || '—') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + badge + '</td></tr>';
     }
-    document.getElementById('nba-tracker-days').innerHTML = html;
-}
-
-function toggleNBADay(date) {
-    document.getElementById(`nba-day-${date}`).classList.toggle('collapsed');
+    html += '</tbody></table></div></div>';
+  }
+  document.getElementById('nba-tracker-days').innerHTML = html || '<p style="color:#8b949e;text-align:center;padding:20px">No tracker data yet</p>';
 }
 
 async function refreshTrackerResults() {
-    const btn = document.getElementById('nba-tracker-refresh');
-    btn.textContent = 'Refreshing...';
-    btn.disabled = true;
-
-    try {
-        for (const day of NBA_TRACKER_DATA) {
-            const hasPending = day.picks.some(p => p.result === 'pending');
-            if (!hasPending) continue;
-
-            const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
-            const data = await res.json();
-            const events = data.events || [];
-
-            for (const event of events) {
-                const comp = event.competitions[0];
-                const home = comp.competitors?.find(c => c.homeAway === 'home');
-                const away = comp.competitors?.find(c => c.homeAway === 'away');
-                if (!home || !away || !comp.status?.type?.completed) continue;
-
-                const homeScore = parseInt(home.score || 0);
-                const awayScore = parseInt(away.score || 0);
-                const total = homeScore + awayScore;
-                const margin = homeScore - awayScore;
-                const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
-                const scoreStr = `${away.team.shortDisplayName} ${awayScore}, ${home.team.shortDisplayName} ${homeScore}`;
-
-                for (const pick of day.picks) {
-                    if (pick.result !== 'pending') continue;
-
-                    if (pick.type === 'ml') {
-                        const pickedTeam = pick.team.split(' ').slice(-1)[0].toLowerCase();
-                        const won = winner.toLowerCase().includes(pickedTeam);
-                        pick.result = won ? 'win' : 'loss';
-                        pick.score = scoreStr;
-                    } else if (pick.type === 'spread') {
-                        const pickedTeam = pick.team;
-                        const lineMatch = pick.line.match(/([+-]?\d+\.?\d*)/);
-                        if (lineMatch) {
-                            const spread = parseFloat(lineMatch[1]);
-                            const isHome = home.team.displayName.includes(pickedTeam.split(' ').pop());
-                            const teamMargin = isHome ? margin : -margin;
-                            pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss';
-                            pick.score = scoreStr;
-                        }
-                    } else if (pick.type === 'over') {
-                        const lineMatch = pick.line.match(/([\d.]+)/);
-                        if (lineMatch) {
-                            const line = parseFloat(lineMatch[1]);
-                            pick.result = total > line ? 'win' : total === line ? 'push' : 'loss';
-                            pick.score = `${scoreStr} (${total} total)`;
-                        }
-                    } else if (pick.type === 'under') {
-                        const lineMatch = pick.line.match(/([\d.]+)/);
-                        if (lineMatch) {
-                            const line = parseFloat(lineMatch[1]);
-                            pick.result = total < line ? 'win' : 'loss';
-                            pick.score = `${scoreStr} (${total} total)`;
-                        }
-                    } else if (pick.type === 'prop') {
-                        try {
-                            const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-                            const boxData = await boxRes.json();
-                            const lineMatch = pick.line.match(/O\s*([\d.]+)/);
-                            if (!lineMatch) continue;
-                            const propLine = parseFloat(lineMatch[1]);
-                            const playerName = pick.team.split(' O ')[0].split(' U ')[0];
-
-                            for (const team of (boxData.boxscore?.players || [])) {
-                                for (const stat of team.statistics) {
-                                    const labels = stat.labels || [];
-                                    const ptsIdx = labels.indexOf('PTS');
-                                    const rebIdx = labels.indexOf('REB');
-                                    const astIdx = labels.indexOf('AST');
-                                    for (const athlete of stat.athletes) {
-                                        if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
-                                        const pts = parseInt(athlete.stats[ptsIdx]) || 0;
-                                        const reb = parseInt(athlete.stats[rebIdx]) || 0;
-                                        const ast = parseInt(athlete.stats[astIdx]) || 0;
-
-                                        let actual = null;
-                                        if (pick.team.includes('PRA')) actual = pts + reb + ast;
-                                        else if (pick.team.includes('REB')) actual = reb;
-                                        else if (pick.team.includes('AST')) actual = ast;
-                                        else if (pick.team.includes('PTS')) actual = pts;
-
-                                        if (actual !== null) {
-                                            pick.result = actual > propLine ? 'win' : 'loss';
-                                            pick.score = `${actual} actual`;
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (e) {}
-                    }
-                }
-            }
-        }
-
-        renderNBAStats();
-        renderNBATracker();
-        btn.textContent = '✓ Updated';
-        setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
-    } catch (e) {
-        console.error('NBA tracker refresh:', e);
-        btn.textContent = 'Error';
-        btn.disabled = false;
-    }
+  const btn = document.getElementById('nba-tracker-refresh');
+  btn.textContent = 'Grading...'; btn.disabled = true;
+  await autoGradePendingDays();
+  renderNBATracker();
+  btn.textContent = '\u2713 Updated';
+  setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
 }
 
-async function loadNBATracker() {
-    // Add today's picks from API if not already in tracker
-    try {
-        const todayRes = await fetch('/api/today');
-        if (todayRes.ok) {
-            const todayData = await todayRes.json();
-            const todayDate = todayData.date;
-            const existingDates = new Set(NBA_TRACKER_DATA.map(d => d.date));
-
-            if (todayDate && !existingDates.has(todayDate) && todayData.nba?.length > 0) {
-                const todayPicks = [];
-                for (const game of todayData.nba) {
-                    // Add game bets
-                    if (game.spread) {
-                        const favHome = game.spread && !game.spread.includes('+');
-                        const dog = favHome ? game.away : game.home;
-                        const spreadVal = game.spread.match(/([+-]?\d+\.?\d*)/)?.[1] || '0';
-                        todayPicks.push({ type: 'spread', team: dog, matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`, line: `${dog.split(' ').pop()} +${Math.abs(parseFloat(spreadVal))}`, odds: '-110', confidence: 'med', thesis: 'Playoff games run tight', result: 'pending', score: '' });
-                    }
-                    if (game.ou) {
-                        todayPicks.push({ type: 'over', team: `OVER ${game.ou}`, matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`, line: `O ${game.ou}`, odds: '-110', confidence: 'med', thesis: 'Pace projection', result: 'pending', score: '' });
-                    }
-                    // Add top prop picks
-                    if (game.propPicks) {
-                        for (const prop of game.propPicks.slice(0, 5)) {
-                            todayPicks.push({
-                                type: 'prop',
-                                team: `${prop.name} ${prop.direction} ${prop.line} ${prop.stat}`,
-                                matchup: `${(game.awayAbbrev||game.away.split(' ').pop())} @ ${(game.homeAbbrev||game.home.split(' ').pop())}`,
-                                line: `${prop.direction === 'OVER' ? 'O' : 'U'} ${prop.line} (${prop.edge > 0 ? '+' : ''}${prop.edge} edge)`,
-                                odds: '-110',
-                                confidence: prop.confidence?.toLowerCase() || 'med',
-                                thesis: `Avg ${prop.seasonAvg} → Proj ${prop.projected}`,
-                                result: 'pending',
-                                score: '',
-                            });
-                        }
-                    }
-                }
-                if (todayPicks.length > 0) {
-                    NBA_TRACKER_DATA.unshift({ date: todayDate, picks: todayPicks });
-                }
-            }
-        }
-    } catch (e) {}
-
-    // Merge any additional history days from API
-    try {
-        const res = await fetch('/api/nba-bestbets');
-        if (res.ok) {
-            const data = await res.json();
-            if (data.days && data.days.length > 0) {
-                const existingDates = new Set(NBA_TRACKER_DATA.map(d => d.date));
-                for (const day of data.days) {
-                    if (!existingDates.has(day.date)) {
-                        NBA_TRACKER_DATA.push(day);
-                    }
-                }
-            }
-        }
-    } catch (e) {}
-
-    NBA_TRACKER_DATA.sort((a, b) => b.date.localeCompare(a.date));
-
-    // Auto-grade any pending results from completed games
-    await autoGradePendingDays();
-
-    renderNBAStats();
-    renderNBATracker();
-}
-
-// Boot
-loadDailyGames();
-loadNBATracker();
+// Load tracker on page init
+autoGradePendingDays().then(() => renderNBATracker());
 </script>
 </body>
 </html>
