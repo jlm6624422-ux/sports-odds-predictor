@@ -1022,6 +1022,37 @@ let NBA_TRACKER_DATA = [
   ]}
 ];
 
+// Auto-populate today's picks from page game bets + props
+function loadTodayPicks() {
+  const todayEntry = NBA_TRACKER_DATA.find(d => d.date === '${today}');
+  if (!todayEntry || todayEntry.picks.length > 0) return;
+
+  // Grab game bets from the page
+  document.querySelectorAll('[data-nba-bet]').forEach(row => {
+    const type = row.dataset.nbaBet;
+    const team = row.dataset.team || '';
+    const line = row.dataset.line || '';
+    const betCell = row.querySelector('td');
+    const betText = betCell ? betCell.textContent : '';
+
+    if (type === 'spread') {
+      todayEntry.picks.push({ type: 'spread', team, matchup: '', line: betText, odds: '-110', confidence: 'med', thesis: 'Playoff games run tight', result: 'pending', score: '' });
+    } else if (type === 'ml') {
+      todayEntry.picks.push({ type: 'ml', team, matchup: '', line: betText, odds: '-110', confidence: 'med', thesis: 'Home court edge', result: 'pending', score: '' });
+    } else if (type === 'over') {
+      todayEntry.picks.push({ type: 'over', team: 'OVER ' + line, matchup: '', line: 'O ' + line, odds: '-110', confidence: 'med', thesis: 'Pace projection', result: 'pending', score: '' });
+    }
+  });
+
+  // Grab prop picks from the table
+  document.querySelectorAll('[data-prop-player]').forEach(row => {
+    const player = row.dataset.propPlayer;
+    const stat = row.dataset.propType;
+    const line = row.dataset.propLine;
+    todayEntry.picks.push({ type: 'prop', team: player + ' O ' + line + ' ' + stat, matchup: '', line: 'O ' + line, odds: '-110', confidence: 'med', thesis: 'Model projection', result: 'pending', score: '' });
+  });
+}
+
 async function autoGradePendingDays() {
   for (const day of NBA_TRACKER_DATA) {
     if (!day.picks.some(p => p.result === 'pending')) continue;
@@ -1090,27 +1121,37 @@ async function autoGradePendingDays() {
 }
 
 function renderNBATracker() {
-  // Remove empty days
   const days = NBA_TRACKER_DATA.filter(d => d.picks.length > 0);
-  let totalW = 0, totalL = 0;
-  for (const d of days) { for (const p of d.picks) { if (p.result === 'win') totalW++; else if (p.result === 'loss') totalL++; } }
+  let totalW = 0, totalL = 0, totalPend = 0;
+  for (const d of days) { for (const p of d.picks) { if (p.result === 'win') totalW++; else if (p.result === 'loss') totalL++; else totalPend++; } }
   const pct = (totalW + totalL) > 0 ? ((totalW / (totalW + totalL)) * 100).toFixed(1) : '0';
 
-  document.getElementById('nba-stats-banner').innerHTML = '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#3fb950">' + totalW + '</div><div style="font-size:0.8em;color:#8b949e">Wins</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f85149">' + totalL + '</div><div style="font-size:0.8em;color:#8b949e">Losses</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#d2a8ff">' + pct + '%</div><div style="font-size:0.8em;color:#8b949e">Win Rate</div></div>';
+  document.getElementById('nba-stats-banner').innerHTML = '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#3fb950">' + totalW + '</div><div style="font-size:0.8em;color:#8b949e">Wins</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f85149">' + totalL + '</div><div style="font-size:0.8em;color:#8b949e">Losses</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#d2a8ff">' + pct + '%</div><div style="font-size:0.8em;color:#8b949e">Win Rate</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f59e0b">' + totalPend + '</div><div style="font-size:0.8em;color:#8b949e">Pending</div></div>';
 
   let html = '';
-  for (const day of days) {
+  for (let i = 0; i < days.length; i++) {
+    const day = days[i];
+    const isToday = day.date === '${today}';
+    const isOpen = i === 0;
     const dW = day.picks.filter(p => p.result === 'win').length;
     const dL = day.picks.filter(p => p.result === 'loss').length;
     const dP = day.picks.filter(p => p.result === 'pending').length;
     const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    html += '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px;overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\\'none\\'?\\'block\\':\\'none\\'"><h4 style="font-size:0.95em">' + dateLabel + '</h4><span style="font-size:0.85em;color:#8b949e"><span style="color:#3fb950">' + dW + 'W</span> <span style="color:#f85149">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '</span></div>';
-    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse;font-size:0.85em;min-width:650px">';
-    html += '<thead><tr><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Type</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Pick</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Line</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Score</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Result</th></tr></thead><tbody>';
+    const dayId = 'nba-tracker-' + day.date;
+
+    html += '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer;user-select:none;border-radius:10px 10px 0 0" onclick="var b=document.getElementById(\\'' + dayId + '\\');b.style.display=b.style.display===\\'none\\'?\\'block\\':\\'none\\';this.querySelector(\\'.chv\\').style.transform=b.style.display===\\'none\\'?\\'rotate(-90deg)\\':\\'rotate(0deg)\\'">';
+    html += '<div style="display:flex;align-items:center;gap:10px"><h4 style="font-size:0.95em">' + dateLabel + (isToday ? ' (Today)' : '') + '</h4></div>';
+    html += '<div style="display:flex;align-items:center;gap:12px"><span style="font-size:0.85em"><span style="color:#3fb950;font-weight:600">' + dW + 'W</span> <span style="color:#f85149;font-weight:600">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '</span><span class="chv" style="color:#8b949e;transition:transform 0.2s;display:inline-block;' + (isOpen ? '' : 'transform:rotate(-90deg)') + '">&#9660;</span></div>';
+    html += '</div>';
+
+    html += '<div id="' + dayId + '" style="overflow-x:auto;-webkit-overflow-scrolling:touch;' + (isOpen ? '' : 'display:none') + '">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:0.85em;min-width:650px">';
+    html += '<thead><tr><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Type</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Pick</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Line</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Thesis</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Score</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Result</th></tr></thead><tbody>';
     for (const p of day.picks) {
-      const bg = p.result === 'win' ? 'background:rgba(52,211,153,0.06);border-left:3px solid #34d399' : p.result === 'loss' ? 'background:rgba(248,113,113,0.06);border-left:3px solid #f87171' : '';
+      const bg = p.result === 'win' ? 'background:rgba(52,211,153,0.06);border-left:3px solid #34d399' : p.result === 'loss' ? 'background:rgba(248,113,113,0.06);border-left:3px solid #f87171' : 'border-left:3px solid transparent';
       const badge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">PEND</span>';
-      html += '<tr style="' + bg + '"><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.type.toUpperCase() + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;font-weight:600">' + p.team + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.line + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e">' + (p.score || '—') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + badge + '</td></tr>';
+      html += '<tr style="' + bg + '"><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap"><span style="background:' + (p.type === 'prop' ? '#2d2a1f;color:#f0883e' : p.type === 'spread' ? '#2d1f3d;color:#d2a8ff' : p.type === 'ml' ? '#1f3a5f;color:#58a6ff' : '#1a4023;color:#3fb950') + ';padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:600">' + p.type.toUpperCase() + '</span></td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;font-weight:600">' + p.team + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.line + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e;font-size:0.85em">' + (p.thesis || '') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e">' + (p.score || '—') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + badge + '</td></tr>';
     }
     html += '</tbody></table></div></div>';
   }
@@ -1127,6 +1168,7 @@ async function refreshTrackerResults() {
 }
 
 // Load tracker on page init
+loadTodayPicks();
 autoGradePendingDays().then(() => renderNBATracker());
 </script>
 </body>

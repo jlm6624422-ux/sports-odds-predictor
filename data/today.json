@@ -1,6 +1,6 @@
 {
   "date": "2026-05-21",
-  "generatedAt": "2026-05-21T14:44:55.378Z",
+  "generatedAt": "2026-05-21T15:01:50.792Z",
   "mlb": [
     {
       "home": "Detroit Tigers",
@@ -170,25 +170,25 @@
       "homePitcher": "Dustin May",
       "awayPitcher": "Braxton Ashcraft",
       "prediction": {
-        "homeWinProb": 53.3,
-        "awayWinProb": 46.7,
+        "homeWinProb": 53.5,
+        "awayWinProb": 46.5,
         "expectedTotal": 8.9,
         "expectedHomeRuns": 4.1,
         "expectedAwayRuns": 4.7
       },
       "edge": {
-        "home": 4.4,
-        "away": -4.4
+        "home": 4.2,
+        "away": -4.2
       },
       "kelly": {
-        "betSize": 21.18,
-        "kellyPct": 8.47,
-        "fractionalKellyPct": 2.12,
-        "edge": 4.32,
-        "impliedProb": 49,
-        "modelProb": 53.3,
+        "betSize": 20.7,
+        "kellyPct": 8.28,
+        "fractionalKellyPct": 2.07,
+        "edge": 4.2,
+        "impliedProb": 49.3,
+        "modelProb": 53.5,
         "recommendation": "SMALL BET",
-        "expectedValue": 0.0881,
+        "expectedValue": 0.0853,
         "side": "home",
         "team": "St. Louis Cardinals"
       },
@@ -196,11 +196,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 7.5,
-      "homeML": 105,
-      "awayML": -126,
+      "homeML": 102,
+      "awayML": -123,
       "pick": "St. Louis Cardinals",
       "pickSide": "home",
-      "conf": 53.3,
+      "conf": 53.5,
       "rosterImpact": {
         "home": {
           "teamName": "St. Louis Cardinals",
@@ -286,25 +286,25 @@
       "homePitcher": "Cade Cavalli",
       "awayPitcher": "David Peterson",
       "prediction": {
-        "homeWinProb": 55.9,
-        "awayWinProb": 44.1,
+        "homeWinProb": 56,
+        "awayWinProb": 44,
         "expectedTotal": 9.7,
         "expectedHomeRuns": 4.7,
         "expectedAwayRuns": 5
       },
       "edge": {
-        "home": 4.2,
-        "away": -4.2
+        "home": 4.1,
+        "away": -4.1
       },
       "kelly": {
-        "betSize": 21.78,
-        "kellyPct": 8.71,
-        "fractionalKellyPct": 2.18,
-        "edge": 4.21,
-        "impliedProb": 51.7,
-        "modelProb": 55.9,
+        "betSize": 21,
+        "kellyPct": 8.4,
+        "fractionalKellyPct": 2.1,
+        "edge": 4.04,
+        "impliedProb": 51.9,
+        "modelProb": 56,
         "recommendation": "SMALL BET",
-        "expectedValue": 0.0814,
+        "expectedValue": 0.0778,
         "side": "home",
         "team": "Washington Nationals"
       },
@@ -312,11 +312,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 8,
-      "homeML": -106,
-      "awayML": -114,
+      "homeML": -108,
+      "awayML": -112,
       "pick": "Washington Nationals",
       "pickSide": "home",
-      "conf": 55.9,
+      "conf": 56,
       "rosterImpact": {
         "home": {
           "teamName": "Washington Nationals",
@@ -839,7 +839,7 @@
       "confidence": "low",
       "modelsUsed": 4,
       "coinFlip": false,
-      "ouLine": 8,
+      "ouLine": 8.5,
       "homeML": -110,
       "awayML": -109,
       "pick": "Athletics",
@@ -935,8 +935,8 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 9.5,
-      "homeML": -206,
-      "awayML": 168,
+      "homeML": -207,
+      "awayML": 169,
       "pick": "Arizona Diamondbacks",
       "pickSide": "home",
       "conf": 63.1,
@@ -1103,7 +1103,7 @@
       "spread": "-6.5",
       "homeML": "-245",
       "awayML": "+200",
-      "ou": "215.5",
+      "ou": "216.5",
       "time": "5/21 - 8:00 PM EDT",
       "homeHomeRecord": "30-10",
       "awayRoadRecord": "25-16"
@@ -1114,15 +1114,15 @@
       "label": "Parlay A — Safe 2-Leg",
       "legs": "New York Knicks ML + Arizona Diamondbacks ML",
       "stake": 50,
-      "odds": 2.0917376659401623,
-      "payout": 105,
+      "odds": 2.0884353741496597,
+      "payout": 104,
       "prob": "44.8",
-      "ev": "-3.13",
+      "ev": "-3.21",
       "best": true
     },
     {
       "label": "Parlay B — SGP Value",
-      "legs": "Cleveland Cavaliers +6.5 + Over 215.5",
+      "legs": "Cleveland Cavaliers +6.5 + Over 216.5",
       "stake": 50,
       "odds": 3.569169960474308,
       "payout": 178,
@@ -1133,19 +1133,19 @@
       "label": "Parlay C — Cross-Sport 3-Leg",
       "legs": "Cleveland Cavaliers +6.5 + Arizona Diamondbacks ML + New York Yankees ML",
       "stake": 30,
-      "odds": 4.6409608449179975,
+      "odds": 4.633634014623851,
       "payout": 139,
       "prob": "20.0",
-      "ev": "-2.16"
+      "ev": "-2.20"
     },
     {
       "label": "Parlay D — Dogs Longshot",
       "legs": "Cleveland Cavaliers ML + St. Louis Cardinals ML",
       "stake": 20,
-      "odds": 6.1499999999999995,
-      "payout": 123,
-      "prob": "14.2",
-      "ev": "-2.52"
+      "odds": 6.0600000000000005,
+      "payout": 121,
+      "prob": "14.3",
+      "ev": "-2.71"
     }
   ]
 }
