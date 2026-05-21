@@ -1,0 +1,232 @@
+{
+  "2026-05-16": {
+    "MIA @ TB-ml": {
+      "result": "win",
+      "score": "Marlins 2, Rays 5"
+    },
+    "TOR @ NYY-ml": {
+      "result": "loss",
+      "score": "Jays 6, Yankees 3"
+    },
+    "CIN @ CLE-ml": {
+      "result": "win",
+      "score": "Reds 1, Guardians 4"
+    },
+    "TEX @ HOU-ml": {
+      "result": "loss",
+      "score": "Rangers 5, Astros 3"
+    },
+    "SF @ LAD-ml": {
+      "result": "loss",
+      "score": "Giants 4, Dodgers 2"
+    },
+    "CHW @ MIN-ml": {
+      "result": "loss",
+      "score": "Sox 6, Twins 4"
+    },
+    "MIA @ ATL-ml": {
+      "result": "win",
+      "score": "Marlins 1, Braves 7"
+    },
+    "SD @ SEA-ml": {
+      "result": "loss",
+      "score": "Padres 5, Mariners 2"
+    }
+  },
+  "2026-05-17": {
+    "MIA @ TB-ml": {
+      "result": "win",
+      "score": "Marlins 1, Rays 6"
+    },
+    "BOS @ ATL-ml": {
+      "result": "win",
+      "score": "Red Sox 2, Braves 5"
+    },
+    "CIN @ CLE-ml": {
+      "result": "win",
+      "score": "Reds 0, Guardians 3"
+    },
+    "LAD @ LAA-ml": {
+      "result": "win",
+      "score": "Dodgers 7, Angels 2"
+    },
+    "TEX @ HOU-ml": {
+      "result": "win",
+      "score": "Rangers 4, Astros 1"
+    },
+    "SD @ SEA-over": {
+      "result": "win",
+      "score": "Padres 5, Mariners 6 (11 total)"
+    },
+    "ARI @ COL-over": {
+      "result": "win",
+      "score": "Diamondbacks 7, Rockies 4 (11 total)"
+    }
+  },
+  "2026-05-18": {
+    "CLE @ DET-ml": {
+      "result": "win",
+      "score": "Guardians 5, Tigers 2"
+    },
+    "CHW @ SEA-ml": {
+      "result": "win",
+      "score": "Sox 3, Mariners 7"
+    },
+    "MIL @ CHC-ml": {
+      "result": "loss",
+      "score": "Brewers 4, Cubs 2"
+    },
+    "ATL @ MIA-ml": {
+      "result": "loss",
+      "score": "Braves 1, Marlins 3"
+    },
+    "NYM @ WSH-ml": {
+      "result": "loss",
+      "score": "Mets 5, Nationals 2"
+    },
+    "TEX @ COL-ml": {
+      "result": "loss",
+      "score": "Rangers 3, Rockies 6"
+    },
+    "parlay-2026-05-18-0": {
+      "result": "win",
+      "score": ""
+    },
+    "parlay-2026-05-18-1": {
+      "result": "win",
+      "score": ""
+    },
+    "parlay-2026-05-18-2": {
+      "result": "loss",
+      "score": ""
+    },
+    "parlay-2026-05-18-3": {
+      "result": "loss",
+      "score": ""
+    }
+  },
+  "2026-05-19": {
+    "ATL @ MIA-over": {
+      "result": "win",
+      "score": "Braves 8, Marlins 4 (12 total)"
+    },
+    "BAL @ TB-ml": {
+      "result": "win",
+      "score": "Orioles 1, Rays 4"
+    },
+    "BAL @ TB-over": {
+      "result": "loss",
+      "score": "Orioles 1, Rays 4 (5 total)"
+    },
+    "CIN @ PHI-ml": {
+      "result": "loss",
+      "score": "Reds 4, Phillies 1"
+    },
+    "TOR @ NYY-ml": {
+      "result": "win",
+      "score": "Jays 4, Yankees 5"
+    },
+    "HOU @ MIN-ml": {
+      "result": "loss",
+      "score": "Astros 2, Twins 1"
+    },
+    "HOU @ MIN-over": {
+      "result": "loss",
+      "score": "Astros 2, Twins 1 (3 total)"
+    },
+    "PIT @ STL-over": {
+      "result": "win",
+      "score": "Pirates 6, Cardinals 9 (15 total)"
+    },
+    "TEX @ COL-over": {
+      "result": "push",
+      "score": "Rangers 10, Rockies 0 (10 total)"
+    },
+    "SF @ ARI-ml": {
+      "result": "win",
+      "score": "Giants 3, Diamondbacks 5"
+    },
+    "CHW @ SEA-ml": {
+      "result": "loss",
+      "score": "Sox 2, Mariners 1"
+    },
+    "CHW @ SEA-over": {
+      "result": "loss",
+      "score": "Sox 2, Mariners 1 (3 total)"
+    },
+    "parlay-2026-05-19-0": {
+      "result": "win",
+      "score": ""
+    },
+    "parlay-2026-05-19-1": {
+      "result": "loss",
+      "score": ""
+    },
+    "parlay-2026-05-19-2": {
+      "result": "loss",
+      "score": ""
+    },
+    "parlay-2026-05-19-3": {
+      "result": "loss",
+      "score": ""
+    }
+  },
+  "2026-05-20": {
+    "CIN @ PHI-ml": {
+      "result": "loss",
+      "score": "Reds 9, Phillies 4"
+    },
+    "BAL @ TB-ml": {
+      "result": "win",
+      "score": "Orioles 3, Rays 5"
+    },
+    "HOU @ MIN-over": {
+      "result": "loss",
+      "score": "Astros 1, Twins 4 (5 total)"
+    },
+    "TEX @ COL-over": {
+      "result": "loss",
+      "score": "Rangers 5, Rockies 4 (9 total)"
+    },
+    "SF @ ARI-over": {
+      "result": "push",
+      "score": "Giants 3, Diamondbacks 6 (9 total)"
+    },
+    "CHW @ SEA-ml": {
+      "result": "win",
+      "score": "Sox 4, Mariners 5"
+    },
+    "ATL @ MIA-ml": {
+      "result": "win",
+      "score": "Braves 9, Marlins 1"
+    },
+    "ATL @ MIA-over": {
+      "result": "win",
+      "score": "Braves 9, Marlins 1 (10 total)"
+    },
+    "TOR @ NYY-ml": {
+      "result": "loss",
+      "score": "Jays 2, Yankees 1"
+    },
+    "MIL @ CHC-over": {
+      "result": "loss",
+      "score": "Brewers 5, Cubs 0 (5 total)"
+    },
+    "LAD @ SD-ml": {
+      "result": "win",
+      "score": "Dodgers 4, Padres 0"
+    },
+    "parlay-2026-05-20-0": {
+      "result": "loss",
+      "score": ""
+    },
+    "parlay-2026-05-20-1": {
+      "result": "loss",
+      "score": ""
+    },
+    "parlay-2026-05-20-2": {
+      "result": "loss",
+      "score": ""
+    }
+  }
+}

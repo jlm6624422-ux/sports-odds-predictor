@@ -12,8 +12,13 @@ venv/
 *.db
 *.db-journal
 
-# Prediction cache (regenerated daily)
-data/
+# Prediction cache (today.json regenerated daily)
+data/today.json
+
+# Keep history and results for tracker
+!data/
+!data/history/
+!data/results.json
 
 # Build outputs
 client/dist/

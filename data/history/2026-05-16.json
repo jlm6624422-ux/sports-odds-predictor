@@ -1,0 +1,64 @@
+{
+  "date": "2026-05-16",
+  "generatedAt": "2026-05-16T09:00:00.000Z",
+  "mlb": [
+    {
+      "home": "Tampa Bay Rays", "away": "Baltimore Orioles",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 56.2, "awayWinProb": 43.8, "expectedTotal": 8.1 },
+      "edge": { "home": 4.1, "away": -4.1 }, "kelly": { "betSize": 20, "side": "home", "team": "Tampa Bay Rays" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.0, "homeML": -135, "awayML": 115
+    },
+    {
+      "home": "New York Yankees", "away": "Toronto Blue Jays",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 58.5, "awayWinProb": 41.5, "expectedTotal": 8.5 },
+      "edge": { "home": 3.8, "away": -3.8 }, "kelly": { "betSize": 25, "side": "home", "team": "New York Yankees" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.5, "homeML": -155, "awayML": 135
+    },
+    {
+      "home": "Cleveland Guardians", "away": "Cincinnati Reds",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 55.8, "awayWinProb": 44.2, "expectedTotal": 7.5 },
+      "edge": { "home": 3.5, "away": -3.5 }, "kelly": { "betSize": 20, "side": "home", "team": "Cleveland Guardians" },
+      "confidence": "high", "coinFlip": false, "ouLine": 7.5, "homeML": -140, "awayML": 120
+    },
+    {
+      "home": "Houston Astros", "away": "Texas Rangers",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 57.1, "awayWinProb": 42.9, "expectedTotal": 8.8 },
+      "edge": { "home": 4.0, "away": -4.0 }, "kelly": { "betSize": 25, "side": "home", "team": "Houston Astros" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.5, "homeML": -145, "awayML": 125
+    },
+    {
+      "home": "Los Angeles Dodgers", "away": "San Francisco Giants",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 59.2, "awayWinProb": 40.8, "expectedTotal": 9.0 },
+      "edge": { "home": 5.2, "away": -5.2 }, "kelly": { "betSize": 30, "side": "home", "team": "Los Angeles Dodgers" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.5, "homeML": -160, "awayML": 140
+    },
+    {
+      "home": "Minnesota Twins", "away": "Chicago White Sox",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 56.8, "awayWinProb": 43.2, "expectedTotal": 8.2 },
+      "edge": { "home": 3.6, "away": -3.6 }, "kelly": { "betSize": 20, "side": "home", "team": "Minnesota Twins" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.0, "homeML": -142, "awayML": 122
+    },
+    {
+      "home": "Atlanta Braves", "away": "Miami Marlins",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 58.0, "awayWinProb": 42.0, "expectedTotal": 8.4 },
+      "edge": { "home": 4.5, "away": -4.5 }, "kelly": { "betSize": 25, "side": "home", "team": "Atlanta Braves" },
+      "confidence": "high", "coinFlip": false, "ouLine": 8.0, "homeML": -150, "awayML": 130
+    },
+    {
+      "home": "Seattle Mariners", "away": "San Diego Padres",
+      "homePitcher": "TBD", "awayPitcher": "TBD",
+      "prediction": { "homeWinProb": 54.5, "awayWinProb": 45.5, "expectedTotal": 7.8 },
+      "edge": { "home": 2.8, "away": -2.8 }, "kelly": { "betSize": 15, "side": "home", "team": "Seattle Mariners" },
+      "confidence": "medium", "coinFlip": false, "ouLine": 7.5, "homeML": -125, "awayML": 105
+    }
+  ],
+  "nba": [],
+  "parlays": []
+}
