@@ -140,13 +140,17 @@ function ensembleMLB(params) {
   finalHomeProb = Math.min(0.85, Math.max(0.15, finalHomeProb));
 
   // --- TOTALS MODEL (separate from sides) ---
-  const homeRPG = homeGames > 0 ? (homeTeam.runsScored || 0) / homeGames : 4.5;
-  const awayRPG = awayGames > 0 ? (awayTeam.runsScored || 0) / awayGames : 4.5;
-  const homeRAPG = homeGames > 0 ? (homeTeam.runsAllowed || 0) / homeGames : 4.5;
-  const awayRAPG = awayGames > 0 ? (awayTeam.runsAllowed || 0) / awayGames : 4.5;
+  // 2026 league environment: ~4.3 R/G average. Raw RPG over-projects by ~10%.
+  const LEAGUE_RUN_DEFLATOR = 0.88;
+  const MAX_TEAM_RUNS = 6.5;
 
-  let expectedHomeRuns = (homeRPG + awayRAPG) / 2;
-  let expectedAwayRuns = (awayRPG + homeRAPG) / 2;
+  const homeRPG = homeGames > 0 ? (homeTeam.runsScored || 0) / homeGames : 4.3;
+  const awayRPG = awayGames > 0 ? (awayTeam.runsScored || 0) / awayGames : 4.3;
+  const homeRAPG = homeGames > 0 ? (homeTeam.runsAllowed || 0) / homeGames : 4.3;
+  const awayRAPG = awayGames > 0 ? (awayTeam.runsAllowed || 0) / awayGames : 4.3;
+
+  let expectedHomeRuns = Math.min(MAX_TEAM_RUNS, ((homeRPG + awayRAPG) / 2) * LEAGUE_RUN_DEFLATOR);
+  let expectedAwayRuns = Math.min(MAX_TEAM_RUNS, ((awayRPG + homeRAPG) / 2) * LEAGUE_RUN_DEFLATOR);
 
   // Pitcher adjustment on totals
   if (subModels.pitcher) {
@@ -195,44 +199,63 @@ function ensembleMLB(params) {
 
   let expectedTotal = expectedHomeRuns + expectedAwayRuns;
 
-  // Park factor
+  // Park factor (apply at 50% since it's already partially in team stats)
   const parkFactor = PARK_FACTORS[venue] || 1.0;
-  expectedTotal *= parkFactor;
-  expectedHomeRuns *= parkFactor;
-  expectedAwayRuns *= parkFactor;
+  const parkAdj = 1 + (parkFactor - 1) * 0.5;
+  expectedTotal *= parkAdj;
+  expectedHomeRuns *= parkAdj;
+  expectedAwayRuns *= parkAdj;
 
-  // Weather adjustment
+  // Weather adjustment (halved — was double-counting with park factors)
   let weatherAdj = 0;
   if (weather && venue) {
     const impact = calculateWeatherImpact(weather, venue);
-    expectedTotal += impact.totalAdjustment;
-    weatherAdj = impact.totalAdjustment;
+    expectedTotal += impact.totalAdjustment * 0.5;
+    weatherAdj = impact.totalAdjustment * 0.5;
+  }
+
+  // Market anchor: blend model total with market line (60% model, 40% market)
+  // The market already prices in lineups, weather, and bullpen state
+  if (bookmakers && bookmakers.length > 0) {
+    let marketTotal = null;
+    for (const bk of bookmakers) {
+      const totals = bk.markets?.find(m => m.key === 'totals');
+      if (totals) { marketTotal = totals.outcomes?.[0]?.point; break; }
+    }
+    if (marketTotal) {
+      const rawModelTotal = expectedTotal;
+      expectedTotal = rawModelTotal * 0.6 + marketTotal * 0.4;
+      const ratio = expectedTotal / rawModelTotal;
+      expectedHomeRuns *= ratio;
+      expectedAwayRuns *= ratio;
+    }
   }
 
   // --- EDGES ---
-  let mlEdge = null, totalEdge = null;
-  if (marketHomeProb) {
-    mlEdge = {
-      home: parseFloat(((finalHomeProb - marketHomeProb) * 100).toFixed(1)),
-      away: parseFloat((((1 - finalHomeProb) - (1 - marketHomeProb)) * 100).toFixed(1)),
-    };
+  // Calculate market-implied probability from bookmakers (even if consensus module needs 2+)
+  let effectiveMarketProb = marketHomeProb;
+  if (!effectiveMarketProb && bookmakers && bookmakers.length > 0) {
+    for (const bk of bookmakers) {
+      const h2h = bk.markets?.find(m => m.key === 'h2h');
+      if (h2h && h2h.outcomes) {
+        const homeOdds = h2h.outcomes.find(o => o.name === homeTeam.name);
+        if (homeOdds) {
+          const price = homeOdds.price;
+          effectiveMarketProb = price < 0
+            ? Math.abs(price) / (Math.abs(price) + 100)
+            : 100 / (price + 100);
+          break;
+        }
+      }
+    }
   }
 
-  // --- KELLY SIZING (if bankroll provided) ---
-  let kellySizing = null;
-  if (bankroll && mlEdge) {
-    // Determine which side has edge and size it
-    const bestSide = mlEdge.home > mlEdge.away ? 'home' : 'away';
-    const bestProb = bestSide === 'home' ? finalHomeProb : 1 - finalHomeProb;
-    // Estimate odds from market prob
-    const marketProb = bestSide === 'home' ? marketHomeProb : 1 - marketHomeProb;
-    const estimatedOdds = marketProb >= 0.5
-      ? -Math.round((marketProb / (1 - marketProb)) * 100)
-      : Math.round(((1 - marketProb) / marketProb) * 100);
-
-    kellySizing = calculateBetSize(bestProb, estimatedOdds, bankroll);
-    kellySizing.side = bestSide;
-    kellySizing.team = bestSide === 'home' ? homeTeam.name : awayTeam.name;
+  let mlEdge = null, totalEdge = null;
+  if (effectiveMarketProb) {
+    mlEdge = {
+      home: parseFloat(((finalHomeProb - effectiveMarketProb) * 100).toFixed(1)),
+      away: parseFloat((((1 - finalHomeProb) - (1 - effectiveMarketProb)) * 100).toFixed(1)),
+    };
   }
 
   // --- CONFIDENCE ---
@@ -250,6 +273,34 @@ function ensembleMLB(params) {
   else if (modelsUsed >= 4 && probEdge >= 0.10 && modelAgreement >= 0.75) confidence = 'high';
   else if (modelsUsed >= 3 && probEdge >= 0.06 && modelAgreement >= 0.67) confidence = 'medium';
   else if (probEdge >= 0.03) confidence = 'low';
+
+  // --- KELLY SIZING (if bankroll provided) ---
+  // Only size bets when model agreement >= 75% (eliminates conflicted signals)
+  let kellySizing = null;
+  if (bankroll && mlEdge && modelAgreement >= 0.75) {
+    const bestSide = mlEdge.home > mlEdge.away ? 'home' : 'away';
+    const bestProb = bestSide === 'home' ? finalHomeProb : 1 - finalHomeProb;
+    const mktProb = bestSide === 'home' ? effectiveMarketProb : 1 - effectiveMarketProb;
+    const estimatedOdds = mktProb >= 0.5
+      ? -Math.round((mktProb / (1 - mktProb)) * 100)
+      : Math.round(((1 - mktProb) / mktProb) * 100);
+
+    kellySizing = calculateBetSize(bestProb, estimatedOdds, bankroll);
+    kellySizing.side = bestSide;
+    kellySizing.team = bestSide === 'home' ? homeTeam.name : awayTeam.name;
+  } else if (bankroll && mlEdge) {
+    // Models disagree — no bet
+    const bestSide = mlEdge.home > mlEdge.away ? 'home' : 'away';
+    kellySizing = {
+      betSize: 0, kellyPct: 0, fractionalKellyPct: 0,
+      edge: Math.max(mlEdge.home, mlEdge.away),
+      impliedProb: 0, modelProb: 0,
+      recommendation: 'NO BET',
+      reason: `Model agreement ${(modelAgreement * 100).toFixed(0)}% below 75% threshold`,
+      side: bestSide,
+      team: bestSide === 'home' ? homeTeam.name : awayTeam.name,
+    };
+  }
   else confidence = 'coin-flip';
 
   return {

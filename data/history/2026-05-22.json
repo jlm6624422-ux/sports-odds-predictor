@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T13:30:30.726Z",
+  "generatedAt": "2026-05-22T14:21:13.056Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -11,23 +11,23 @@
       "prediction": {
         "homeWinProb": 54.2,
         "awayWinProb": 45.8,
-        "expectedTotal": 11.7,
-        "expectedHomeRuns": 5.4,
-        "expectedAwayRuns": 6.3
+        "expectedTotal": 8.9,
+        "expectedHomeRuns": 4.1,
+        "expectedAwayRuns": 4.8
       },
       "edge": {
         "home": -4.7,
         "away": 4.7
       },
       "kelly": {
-        "betSize": 19.57,
-        "kellyPct": 7.83,
-        "fractionalKellyPct": 1.96,
+        "betSize": 0,
+        "kellyPct": 0,
+        "fractionalKellyPct": 0,
         "edge": 4.61,
         "impliedProb": 41.2,
         "modelProb": 45.8,
-        "recommendation": "SMALL BET",
-        "expectedValue": 0.1119,
+        "recommendation": "NO BET",
+        "reason": "Edge 4.6% below 5% threshold",
         "side": "away",
         "team": "Houston Astros"
       },
@@ -245,25 +245,25 @@
       "homePitcher": "Chris Paddack",
       "awayPitcher": "Kyle Leahy",
       "prediction": {
-        "homeWinProb": 45.1,
-        "awayWinProb": 54.9,
-        "expectedTotal": 11.9,
-        "expectedHomeRuns": 5.9,
-        "expectedAwayRuns": 6
+        "homeWinProb": 45.2,
+        "awayWinProb": 54.8,
+        "expectedTotal": 9.8,
+        "expectedHomeRuns": 4.8,
+        "expectedAwayRuns": 4.9
       },
       "edge": {
-        "home": -8.6,
-        "away": 8.6
+        "home": -8.9,
+        "away": 8.9
       },
       "kelly": {
-        "betSize": 40.03,
-        "kellyPct": 16.01,
-        "fractionalKellyPct": 4,
-        "edge": 8.6,
-        "impliedProb": 46.3,
-        "modelProb": 54.9,
+        "betSize": 30,
+        "kellyPct": 16.44,
+        "fractionalKellyPct": 3,
+        "edge": 8.9,
+        "impliedProb": 45.9,
+        "modelProb": 54.8,
         "recommendation": "STANDARD BET",
-        "expectedValue": 0.1857,
+        "expectedValue": 0.194,
         "side": "away",
         "team": "St. Louis Cardinals"
       },
@@ -271,11 +271,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 9.5,
-      "homeML": -122,
-      "awayML": 101,
+      "homeML": -126,
+      "awayML": 104,
       "pick": "St. Louis Cardinals",
       "pickSide": "away",
-      "conf": 54.9,
+      "conf": 54.8,
       "rosterImpact": {
         "home": {
           "teamName": "Cincinnati Reds",
@@ -361,25 +361,25 @@
       "homePitcher": "Cristopher Sánchez",
       "awayPitcher": "Gavin Williams",
       "prediction": {
-        "homeWinProb": 58.3,
-        "awayWinProb": 41.7,
-        "expectedTotal": 8.1,
-        "expectedHomeRuns": 4.5,
-        "expectedAwayRuns": 3.7
+        "homeWinProb": 58.4,
+        "awayWinProb": 41.6,
+        "expectedTotal": 6.8,
+        "expectedHomeRuns": 3.7,
+        "expectedAwayRuns": 3.1
       },
       "edge": {
-        "home": -7.2,
-        "away": 7.2
+        "home": -7.5,
+        "away": 7.5
       },
       "kelly": {
-        "betSize": 27.52,
-        "kellyPct": 11.01,
-        "fractionalKellyPct": 2.75,
-        "edge": 7.21,
-        "impliedProb": 34.5,
-        "modelProb": 41.7,
+        "betSize": 28.26,
+        "kellyPct": 11.3,
+        "fractionalKellyPct": 2.83,
+        "edge": 7.45,
+        "impliedProb": 34.1,
+        "modelProb": 41.6,
         "recommendation": "STANDARD BET",
-        "expectedValue": 0.2092,
+        "expectedValue": 0.2181,
         "side": "away",
         "team": "Cleveland Guardians"
       },
@@ -387,11 +387,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 6.5,
-      "homeML": -186,
-      "awayML": 153,
+      "homeML": -193,
+      "awayML": 158,
       "pick": "Philadelphia Phillies",
       "pickSide": "home",
-      "conf": 58.3,
+      "conf": 58.4,
       "rosterImpact": {
         "home": {
           "teamName": "Philadelphia Phillies",
@@ -464,9 +464,9 @@
       "prediction": {
         "homeWinProb": 51.3,
         "awayWinProb": 48.7,
-        "expectedTotal": 10.1,
-        "expectedHomeRuns": 5.2,
-        "expectedAwayRuns": 4.9
+        "expectedTotal": 8.4,
+        "expectedHomeRuns": 4.3,
+        "expectedAwayRuns": 4.1
       },
       "edge": {
         "home": -9.7,
@@ -629,9 +629,9 @@
       "prediction": {
         "homeWinProb": 47.6,
         "awayWinProb": 52.4,
-        "expectedTotal": 9.9,
-        "expectedHomeRuns": 5.5,
-        "expectedAwayRuns": 4.4
+        "expectedTotal": 8.4,
+        "expectedHomeRuns": 4.7,
+        "expectedAwayRuns": 3.7
       },
       "edge": {
         "home": -14.7,
@@ -642,8 +642,8 @@
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 8,
-      "homeML": -167,
-      "awayML": 138,
+      "homeML": -168,
+      "awayML": 139,
       "pick": "Pittsburgh Pirates",
       "pickSide": "away",
       "conf": 52.4,
@@ -809,9 +809,9 @@
       "prediction": {
         "homeWinProb": 51.8,
         "awayWinProb": 48.2,
-        "expectedTotal": 9.1,
-        "expectedHomeRuns": 4.7,
-        "expectedAwayRuns": 4.4
+        "expectedTotal": 7.7,
+        "expectedHomeRuns": 4,
+        "expectedAwayRuns": 3.7
       },
       "edge": {
         "home": -9.7,
@@ -1002,37 +1002,37 @@
       "homePitcher": "Eury Pérez",
       "awayPitcher": "Tobias Myers",
       "prediction": {
-        "homeWinProb": 56.5,
-        "awayWinProb": 43.5,
-        "expectedTotal": 10.1,
-        "expectedHomeRuns": 4.8,
-        "expectedAwayRuns": 5.4
+        "homeWinProb": 56.9,
+        "awayWinProb": 43.1,
+        "expectedTotal": 8.6,
+        "expectedHomeRuns": 4,
+        "expectedAwayRuns": 4.5
       },
       "edge": {
-        "home": 7.3,
-        "away": -7.3
+        "home": 6.3,
+        "away": -6.3
       },
       "kelly": {
-        "betSize": 35.46,
-        "kellyPct": 14.18,
-        "fractionalKellyPct": 3.55,
-        "edge": 7.2,
-        "impliedProb": 49.3,
-        "modelProb": 56.5,
-        "recommendation": "STANDARD BET",
-        "expectedValue": 0.1461,
+        "betSize": 30,
+        "kellyPct": 12.94,
+        "fractionalKellyPct": 3,
+        "edge": 6.41,
+        "impliedProb": 50.5,
+        "modelProb": 56.9,
+        "recommendation": "SMALL BET",
+        "expectedValue": 0.1269,
         "side": "home",
         "team": "Miami Marlins"
       },
-      "confidence": "low",
+      "confidence": "medium",
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 8,
-      "homeML": -102,
-      "awayML": -119,
+      "homeML": -114,
+      "awayML": -105,
       "pick": "Miami Marlins",
       "pickSide": "home",
-      "conf": 56.5,
+      "conf": 56.9,
       "rosterImpact": {
         "home": {
           "teamName": "Miami Marlins",
@@ -1195,23 +1195,23 @@
       "prediction": {
         "homeWinProb": 53.9,
         "awayWinProb": 46.1,
-        "expectedTotal": 10.4,
-        "expectedHomeRuns": 5.1,
-        "expectedAwayRuns": 5.3
+        "expectedTotal": 8.9,
+        "expectedHomeRuns": 4.4,
+        "expectedAwayRuns": 4.6
       },
       "edge": {
         "home": -3.9,
         "away": 3.9
       },
       "kelly": {
-        "betSize": 16.94,
-        "kellyPct": 6.77,
-        "fractionalKellyPct": 1.69,
+        "betSize": 0,
+        "kellyPct": 0,
+        "fractionalKellyPct": 0,
         "edge": 3.92,
         "impliedProb": 42.2,
         "modelProb": 46.1,
-        "recommendation": "SMALL BET",
-        "expectedValue": 0.0928,
+        "recommendation": "NO BET",
+        "reason": "Edge 3.9% below 5% threshold",
         "side": "away",
         "team": "Detroit Tigers"
       },
@@ -1461,9 +1461,9 @@
       "prediction": {
         "homeWinProb": 67,
         "awayWinProb": 33,
-        "expectedTotal": 10.2,
-        "expectedHomeRuns": 5.7,
-        "expectedAwayRuns": 4.5
+        "expectedTotal": 9,
+        "expectedHomeRuns": 5,
+        "expectedAwayRuns": 4
       },
       "edge": {
         "home": -1.9,
@@ -1477,7 +1477,7 @@
         "impliedProb": 31.1,
         "modelProb": 33,
         "recommendation": "NO BET",
-        "reason": "Edge 1.9% below 3% threshold",
+        "reason": "Edge 1.9% below 5% threshold",
         "side": "away",
         "team": "Washington Nationals"
       },
@@ -1575,26 +1575,26 @@
       "homePitcher": "Noah Cameron",
       "awayPitcher": "Logan Gilbert",
       "prediction": {
-        "homeWinProb": 49.4,
-        "awayWinProb": 50.6,
-        "expectedTotal": 8.6,
-        "expectedHomeRuns": 4.2,
-        "expectedAwayRuns": 4.4
+        "homeWinProb": 49.8,
+        "awayWinProb": 50.2,
+        "expectedTotal": 7.9,
+        "expectedHomeRuns": 3.9,
+        "expectedAwayRuns": 4
       },
       "edge": {
-        "home": 2,
-        "away": -2
+        "home": 1.2,
+        "away": -1.2
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 8,
-      "homeML": 109,
-      "awayML": -132,
+      "homeML": -101,
+      "awayML": -120,
       "pick": "Seattle Mariners",
       "pickSide": "away",
-      "conf": 50.6,
+      "conf": 50.2,
       "rosterImpact": {
         "home": {
           "teamName": "Kansas City Royals",
@@ -1772,23 +1772,23 @@
       "prediction": {
         "homeWinProb": 46.3,
         "awayWinProb": 53.7,
-        "expectedTotal": 8.4,
-        "expectedHomeRuns": 4.2,
-        "expectedAwayRuns": 4.3
+        "expectedTotal": 7.8,
+        "expectedHomeRuns": 3.9,
+        "expectedAwayRuns": 4
       },
       "edge": {
         "home": -4.3,
         "away": 4.3
       },
       "kelly": {
-        "betSize": 20.93,
-        "kellyPct": 8.37,
-        "fractionalKellyPct": 2.09,
+        "betSize": 0,
+        "kellyPct": 0,
+        "fractionalKellyPct": 0,
         "edge": 4.23,
         "impliedProb": 49.5,
         "modelProb": 53.7,
-        "recommendation": "SMALL BET",
-        "expectedValue": 0.0854,
+        "recommendation": "NO BET",
+        "reason": "Edge 4.2% below 5% threshold",
         "side": "away",
         "team": "Los Angeles Dodgers"
       },
@@ -1978,9 +1978,9 @@
       "prediction": {
         "homeWinProb": 47.3,
         "awayWinProb": 52.7,
-        "expectedTotal": 8.7,
-        "expectedHomeRuns": 3.9,
-        "expectedAwayRuns": 4.8
+        "expectedTotal": 7.7,
+        "expectedHomeRuns": 3.4,
+        "expectedAwayRuns": 4.2
       },
       "edge": {
         "home": 5.9,
@@ -2126,25 +2126,25 @@
       "homePitcher": "Michael Soroka",
       "awayPitcher": "Tomoyuki Sugano",
       "prediction": {
-        "homeWinProb": 64.1,
-        "awayWinProb": 35.9,
-        "expectedTotal": 10.7,
-        "expectedHomeRuns": 6.4,
-        "expectedAwayRuns": 4.3
+        "homeWinProb": 64.4,
+        "awayWinProb": 35.6,
+        "expectedTotal": 9.1,
+        "expectedHomeRuns": 5.5,
+        "expectedAwayRuns": 3.7
       },
       "edge": {
-        "home": -3.2,
-        "away": 3.2
+        "home": -3.6,
+        "away": 3.6
       },
       "kelly": {
-        "betSize": 11.78,
-        "kellyPct": 4.71,
-        "fractionalKellyPct": 1.18,
-        "edge": 3.17,
-        "impliedProb": 32.7,
-        "modelProb": 35.9,
-        "recommendation": "SMALL BET",
-        "expectedValue": 0.0971,
+        "betSize": 0,
+        "kellyPct": 0,
+        "fractionalKellyPct": 0,
+        "edge": 3.69,
+        "impliedProb": 31.9,
+        "modelProb": 35.6,
+        "recommendation": "NO BET",
+        "reason": "Edge 3.7% below 5% threshold",
         "side": "away",
         "team": "Colorado Rockies"
       },
@@ -2152,11 +2152,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 9,
-      "homeML": -205,
-      "awayML": 168,
+      "homeML": -218,
+      "awayML": 178,
       "pick": "Arizona Diamondbacks",
       "pickSide": "home",
-      "conf": 64.1,
+      "conf": 64.4,
       "rosterImpact": {
         "home": {
           "teamName": "Arizona Diamondbacks",
@@ -2334,9 +2334,9 @@
       "prediction": {
         "homeWinProb": 49,
         "awayWinProb": 51,
-        "expectedTotal": 8.4,
-        "expectedHomeRuns": 4.4,
-        "expectedAwayRuns": 4.1
+        "expectedTotal": 7.9,
+        "expectedHomeRuns": 4.1,
+        "expectedAwayRuns": 3.8
       },
       "edge": {
         "home": -8.3,
@@ -2431,26 +2431,26 @@
       "homePitcher": "Trevor McDonald",
       "awayPitcher": "Davis Martin",
       "prediction": {
-        "homeWinProb": 52.5,
-        "awayWinProb": 47.5,
-        "expectedTotal": 7.1,
-        "expectedHomeRuns": 3.1,
+        "homeWinProb": 52.4,
+        "awayWinProb": 47.6,
+        "expectedTotal": 7,
+        "expectedHomeRuns": 3,
         "expectedAwayRuns": 4
       },
       "edge": {
-        "home": 1.3,
-        "away": -1.3
+        "home": 1.5,
+        "away": -1.5
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
-      "ouLine": 7,
-      "homeML": -108,
-      "awayML": -112,
+      "ouLine": 7.5,
+      "homeML": -105,
+      "awayML": -114,
       "pick": "San Francisco Giants",
       "pickSide": "home",
-      "conf": 52.5,
+      "conf": 52.4,
       "rosterImpact": {
         "home": {
           "teamName": "San Francisco Giants",
@@ -2584,19 +2584,19 @@
       "label": "Parlay C — Cross-Sport 3-Leg",
       "legs": "Oklahoma City Thunder +1.5 + Atlanta Braves ML + Arizona Diamondbacks ML",
       "stake": 30,
-      "odds": 4.023310861990607,
-      "payout": 121,
-      "prob": "22.8",
-      "ev": "-2.53"
+      "odds": 3.9446478431819467,
+      "payout": 118,
+      "prob": "22.9",
+      "ev": "-2.94"
     },
     {
       "label": "Parlay D — Dogs Longshot",
       "legs": "Oklahoma City Thunder ML + St. Louis Cardinals ML",
       "stake": 20,
-      "odds": 4.120499999999999,
-      "payout": 82,
+      "odds": 4.1819999999999995,
+      "payout": 84,
       "prob": "11.2",
-      "ev": "-10.73"
+      "ev": "-10.61"
     }
   ]
 }

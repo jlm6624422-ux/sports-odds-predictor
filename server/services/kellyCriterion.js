@@ -7,8 +7,8 @@
  */
 
 const DEFAULT_FRACTION = 0.25; // Quarter Kelly (conservative, industry standard)
-const MAX_BET_PCT = 0.05;     // Never bet more than 5% of bankroll
-const MIN_EDGE_THRESHOLD = 0.03; // Only bet when edge > 3%
+const MAX_BET_PCT = 0.03;     // Never bet more than 3% of bankroll
+const MIN_EDGE_THRESHOLD = 0.05; // Only bet when edge > 5% (was 3% — too many marginal bets)
 
 /**
  * Calculate full Kelly stake percentage.
@@ -81,11 +81,11 @@ function calculateBetSize(modelProb, americanOdds, bankroll, options = {}) {
   // Calculate dollar amount
   const betSize = Math.round(bankroll * fractionalKelly * 100) / 100;
 
-  // Confidence tier
+  // Confidence tier (aligned with 5% min edge)
   let recommendation;
   if (edge >= 0.10) recommendation = 'STRONG BET';
-  else if (edge >= 0.06) recommendation = 'STANDARD BET';
-  else if (edge >= 0.03) recommendation = 'SMALL BET';
+  else if (edge >= 0.07) recommendation = 'STANDARD BET';
+  else if (edge >= 0.05) recommendation = 'SMALL BET';
   else recommendation = 'NO BET';
 
   return {
@@ -110,7 +110,7 @@ function calculateBetSize(modelProb, americanOdds, bankroll, options = {}) {
  * @returns {Array} Sized bets with recommendations
  */
 function sizeSlate(bets, bankroll, options = {}) {
-  const maxTotalExposure = options.maxTotalExposure || 0.20; // Max 20% of bankroll at risk
+  const maxTotalExposure = options.maxTotalExposure || 0.12; // Max 12% of bankroll at risk per day
   const minEdge = options.minEdge || MIN_EDGE_THRESHOLD;
 
   // Calculate individual Kelly for each bet
