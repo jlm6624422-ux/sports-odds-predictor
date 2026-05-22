@@ -198,6 +198,17 @@ async function main() {
     });
   }
 
+  // --- FETCH NBA PROPS EARLY (needed for SGP parlays) ---
+  let nbaPropsArr = [];
+  try {
+    nbaPropsArr = await generateNBAProps(nbaGames, today);
+    console.log(`[props] ${nbaPropsArr.length} NBA props evaluated`);
+  } catch (e) { console.log('[props] NBA props fetch failed:', e.message); }
+
+  // High-edge props for SGP: edge >= 2.0 (correlation provides extra equity)
+  // Local props format: { player, team, prop, line, avg, edge, confidence }
+  const highEdgeProps = (nbaPropsArr || []).filter(p => (p.confidence === 'high' || p.confidence === 'med') && p.edge >= 2.0);
+
   // --- BUILD SMART PARLAYS ---
   const actionable = mlbPicks.filter(p => !p.coinFlip).sort((a, b) => b.conf - a.conf);
   // Only use legs with edge >= 7% and high confidence (model-validated picks)
@@ -271,6 +282,81 @@ async function main() {
     }
   }
 
+  // --- CORRELATED SGP: Star Player Prop + Team ML ---
+  // When a star scores big, their team usually wins. This correlation gives free equity.
+  if (highEdgeProps.length > 0 && nbaGames.length > 0) {
+    for (const nba of nbaGames) {
+      const homeML = parseInt(nba.homeML);
+      const awayML = parseInt(nba.awayML);
+      if (isNaN(homeML) || isNaN(awayML)) continue;
+
+      // Find high-edge props for players on the favored team
+      const favTeamName = homeML < 0 ? nba.home : nba.away;
+      const favML = homeML < 0 ? homeML : awayML;
+      const favTeamShort = favTeamName.split(' ').pop();
+
+      // Get best prop for a player on the favored team (match by team short name)
+      const teamProps = highEdgeProps.filter(p => p.team === favTeamShort);
+
+      if (teamProps.length === 0) continue;
+
+      // Best prop (highest edge)
+      const bestProp = teamProps[0];
+      const propOdds = -115;
+      const propLine = `${bestProp.player} Over ${bestProp.line} ${bestProp.prop}`;
+
+      // Correlated SGP: prop + team ML
+      // Correlation bonus: when star goes over, team wins ~65% vs ~60% independent
+      const correlationBoost = 0.05;
+      const propHitProb = Math.min(0.70, 0.50 + (bestProp.edge / 20));
+      const mlProb = americanToImplied(favML);
+      const correlatedProb = (propHitProb * mlProb) + (correlationBoost * propHitProb);
+
+      const legs = [{ name: propLine, odds: propOdds }, { name: `${favTeamName} ML`, odds: favML }];
+      const dec = parlayDecimal(legs);
+      const ev = (correlatedProb * (dec - 1) * 35) - ((1 - correlatedProb) * 35);
+
+      if (correlatedProb > 0.30 && ev > 0) {
+        parlays.push({
+          label: `SGP — ${bestProp.player.split(' ')[0]} Props + ${favTeamShort} ML`,
+          legs: legs.map(l => l.name).join(' + '),
+          stake: 35, odds: dec, payout: Math.round(35 * dec),
+          prob: (correlatedProb * 100).toFixed(1), ev: ev.toFixed(2),
+        });
+      }
+
+      // 3-Leg SGP: Two props from same team + team ML
+      if (teamProps.length >= 2) {
+        const prop1 = teamProps[0];
+        const prop2 = teamProps[1];
+        const prop1Line = `${prop1.player} Over ${prop1.line} ${prop1.prop}`;
+        const prop2Line = `${prop2.player} Over ${prop2.line} ${prop2.prop}`;
+
+        const legs3 = [
+          { name: prop1Line, odds: -115 },
+          { name: prop2Line, odds: -115 },
+          { name: `${favTeamName} ML`, odds: favML },
+        ];
+        const dec3 = parlayDecimal(legs3);
+        const prop1Prob = Math.min(0.70, 0.50 + (prop1.edge / 20));
+        const prop2Prob = Math.min(0.70, 0.50 + (prop2.edge / 20));
+        const corr3Prob = (prop1Prob * prop2Prob * mlProb) + (correlationBoost * 2 * prop1Prob * prop2Prob);
+
+        const ev3 = (corr3Prob * (dec3 - 1) * 25) - ((1 - corr3Prob) * 25);
+        if (corr3Prob > 0.18 && ev3 > 0) {
+          parlays.push({
+            label: `SGP 3-Leg — ${favTeamShort} Stars + ML`,
+            legs: legs3.map(l => l.name).join(' + '),
+            stake: 25, odds: dec3, payout: Math.round(25 * dec3),
+            prob: (corr3Prob * 100).toFixed(1), ev: ev3.toFixed(2),
+          });
+        }
+      }
+
+      break; // Only build SGP for first NBA game
+    }
+  }
+
   // --- READ TRACKER FOR RUNNING TOTALS ---
   let runningTotal = 0, daysActive = 0;
   try {
@@ -315,11 +401,10 @@ async function main() {
   fs.writeFileSync(path.join(dataDir, 'today.json'), JSON.stringify(output, null, 2));
   fs.writeFileSync(historyPath, JSON.stringify(output, null, 2));
 
-  // Fetch NBA player props for best bets
-  const nbaProps = await generateNBAProps(nbaGames, today);
+  // NBA props already fetched earlier for SGP parlays (nbaPropsArr)
 
   // Generate NBA page
-  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today), nbaProps);
+  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today), nbaPropsArr);
   fs.writeFileSync(path.join(__dirname, 'nba-picks.html'), nbaPageHTML);
 
   const totalExposure = kellyBets.reduce((s, p) => s + (p.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0);

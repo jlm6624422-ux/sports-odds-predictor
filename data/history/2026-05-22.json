@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T15:23:16.289Z",
+  "generatedAt": "2026-05-22T15:34:06.172Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -2433,9 +2433,9 @@
       "prediction": {
         "homeWinProb": 52.5,
         "awayWinProb": 47.5,
-        "expectedTotal": 7,
+        "expectedTotal": 6.8,
         "expectedHomeRuns": 3,
-        "expectedAwayRuns": 4
+        "expectedAwayRuns": 3.9
       },
       "edge": {
         "home": 1.3,
@@ -2445,7 +2445,7 @@
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
-      "ouLine": 7.5,
+      "ouLine": 7,
       "homeML": -108,
       "awayML": -112,
       "pick": "San Francisco Giants",
@@ -2570,6 +2570,15 @@
       "prob": "31.9",
       "ev": "0.11",
       "best": true
+    },
+    {
+      "label": "SGP — Victor Props + Spurs ML",
+      "legs": "Victor Wembanyama Over 34.5 PTS+REB+AST + San Antonio Spurs ML",
+      "stake": 35,
+      "odds": 3.3652173913043475,
+      "payout": 118,
+      "prob": "36.3",
+      "ev": "7.79"
     },
     {
       "label": "Parlay A — Safe 2-Leg",
