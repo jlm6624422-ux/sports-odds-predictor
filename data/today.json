@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T15:45:17.031Z",
+  "generatedAt": "2026-05-22T16:00:11.050Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -475,16 +475,16 @@
         "expectedAwayRuns": 4.1
       },
       "edge": {
-        "home": -9.7,
-        "away": 9.7
+        "home": -9.6,
+        "away": 9.6
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 3,
       "coinFlip": true,
       "ouLine": 8,
-      "homeML": -157,
-      "awayML": 130,
+      "homeML": -156,
+      "awayML": 129,
       "gameTime": "7:05 PM",
       "gameHour": 19,
       "pick": "New York Yankees",
