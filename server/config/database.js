@@ -105,7 +105,11 @@ function migrateFromJSON(db) {
           const resultKey = `${matchupStr}-ml`;
           const pickResult = dayResults[resultKey]?.result || 'pending';
           const score = dayResults[resultKey]?.score || null;
-          insertPick.run(predId, gameRow.id, date, 'ml', team, side, matchupStr, odds, kelly.impliedProb || 0, kelly.modelProb || 50, kelly.edge || 0, kelly.fractionalKellyPct || 0, kelly.betSize || 0, kelly.recommendation || 'NO BET', odds, pickResult, score, null);
+          const modelProb = kelly.modelProb || (side === 'home' ? prediction.homeWinProb : prediction.awayWinProb) || 50;
+          const stake = kelly.betSize || 25;
+          const dec = odds > 0 ? (odds / 100) + 1 : (100 / Math.abs(odds)) + 1;
+          const pnl = pickResult === 'win' ? parseFloat((stake * (dec - 1)).toFixed(2)) : pickResult === 'loss' ? -stake : null;
+          insertPick.run(predId, gameRow.id, date, 'ml', team, side, matchupStr, odds, kelly.impliedProb || 0, modelProb, kelly.edge || 0, kelly.fractionalKellyPct || 0, stake, kelly.recommendation || 'NO BET', odds, pickResult, score, pnl);
           totalPicks++;
         }
 
@@ -114,7 +118,8 @@ function migrateFromJSON(db) {
         if (ouLine && totalEdge >= 1.5) {
           const resultKey = `${matchupStr}-over`;
           const pickResult = dayResults[resultKey]?.result || 'pending';
-          insertPick.run(predResult.lastInsertRowid, gameRow.id, date, 'over', `OVER ${ouLine}`, 'over', matchupStr, -110, 0.524, 0, totalEdge, 0, 20, 'SMALL BET', -110, pickResult, null, null);
+          const ouPnl = pickResult === 'win' ? 18.18 : pickResult === 'loss' ? -20 : null;
+          insertPick.run(predResult.lastInsertRowid, gameRow.id, date, 'over', `OVER ${ouLine}`, 'over', matchupStr, -110, 0.524, 55, totalEdge, 0, 20, 'SMALL BET', -110, pickResult, dayResults[resultKey]?.score || null, ouPnl);
           totalPicks++;
         }
       }

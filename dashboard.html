@@ -140,6 +140,8 @@ async function loadDashboard() {
         labels: clvTrend.map(d => d.date.slice(5)),
         datasets: [{ label: 'Avg CLV %', data: clvTrend.map(d => d.avg_clv), borderColor: '#58a6ff', tension: 0.3, fill: false }]
       });
+    } else {
+      document.getElementById('clv-chart').parentElement.innerHTML = '<p style="color:#8b949e;text-align:center;padding:40px 0;font-size:0.9em">CLV data collecting — closing lines captured at 6:45pm ET daily.<br>Chart appears after first full day cycle.</p>';
     }
 
     // P&L chart
