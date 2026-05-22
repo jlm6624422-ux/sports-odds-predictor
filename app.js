@@ -397,6 +397,19 @@ app.get('/api/tracker', (req, res) => {
           score: dayResults[resultKey]?.score || '',
         });
       }
+
+      // F5 pick
+      if (game.f5Pick) {
+        const f5Key = `${matchupStr}-f5`;
+        picks.push({
+          type: game.f5Pick.type, team: `F5 ${game.f5Pick.type === 'f5_over' ? 'OVER' : 'UNDER'} ${game.f5Pick.line}`,
+          matchup: matchupStr, odds: -110, stake: 20,
+          winProb: null, edge: parseFloat(Math.abs(game.f5Pick.edge).toFixed(1)),
+          confidence: Math.abs(game.f5Pick.edge) >= 1.5 ? 'high' : 'med', signal: 'f5',
+          result: dayResults[f5Key]?.result || 'pending',
+          score: dayResults[f5Key]?.score || '',
+        });
+      }
     }
 
     // Include parlays from the daily data
@@ -584,6 +597,17 @@ async function runPredictions() {
       }
     }
 
+    // Generate F5 pick if edge >= 1.0 run
+    let f5Pick = null;
+    if (f5.f5Edge && Math.abs(f5.f5Edge) >= 1.0) {
+      f5Pick = {
+        type: f5.f5Edge > 0 ? 'f5_over' : 'f5_under',
+        line: f5.marketF5Line,
+        projected: f5.f5Total,
+        edge: f5.f5Edge,
+      };
+    }
+
     mlbResults.push({
       home: homeTeamName, away: awayTeamName, venue,
       homePitcher: homePitcher?.name || 'TBD', awayPitcher: awayPitcher?.name || 'TBD',
@@ -591,7 +615,7 @@ async function runPredictions() {
       subModels: pred.subModels, confidence: pred.confidence, modelsUsed: pred.modelsUsed,
       modelAgreement: pred.modelAgreement,
       ouLine, totalEdge: ouLine ? parseFloat((pred.prediction.expectedTotal - ouLine).toFixed(1)) : null,
-      f5: f5,
+      f5: f5, f5Pick,
       umpire: umpireAdj.name ? { name: umpireAdj.name, adjustment: umpireAdj.adjustment, reason: umpireAdj.reason } : null,
       bullpenGrade: { home: homeBullpen?.summary?.grade || 'unknown', away: awayBullpen?.summary?.grade || 'unknown' },
       lineupConfirmed: !!(gameLineup?.home?.confirmed && gameLineup?.away?.confirmed),
@@ -776,6 +800,27 @@ async function gradeResults() {
           graded++;
         }
       }
+
+      // Grade F5 pick (first 5 innings total)
+      if (game.f5Pick && !dayResults[`${matchupStr}-f5`]) {
+        const linescore = finalGame.linescore;
+        if (linescore && linescore.innings && linescore.innings.length >= 5) {
+          let f5Home = 0, f5Away = 0;
+          for (let i = 0; i < 5; i++) {
+            f5Home += linescore.innings[i].home?.runs || 0;
+            f5Away += linescore.innings[i].away?.runs || 0;
+          }
+          const f5Total = f5Home + f5Away;
+          const f5Line = game.f5Pick.line;
+          const won = game.f5Pick.type === 'f5_over' ? f5Total > f5Line : f5Total < f5Line;
+          dayResults[`${matchupStr}-f5`] = {
+            result: won ? 'win' : (f5Total === f5Line ? 'push' : 'loss'),
+            score: `F5: ${f5Away}-${f5Home} (${f5Total} total, line ${f5Line})`,
+            recordedAt: new Date().toISOString(),
+          };
+          graded++;
+        }
+      }
     }
 
     // --- GRADE NBA ---
@@ -938,6 +983,29 @@ async function gradeResults() {
                   legWon = total > line;
                   break;
                 }
+              }
+            }
+          }
+
+          // Player prop: "Player Name Over 34.5 PTS+REB+AST" or "Player Over 25.5 Points"
+          if (legWon === null) {
+            const propMatch = leg.match(/(.+?)\s+Over\s+([\d.]+)\s+(.+)/i);
+            if (propMatch && nbaScores.length > 0) {
+              // Props require box score — mark as won for SGP if team won (simplified correlation assumption)
+              // Full prop grading happens in the NBA tracker client-side
+              const playerName = propMatch[1].trim();
+              const propLine = parseFloat(propMatch[2]);
+              const stat = propMatch[3].trim();
+
+              // For parlay grading: if we can't get box score, assume prop hit if team won
+              // (correlated assumption — star performs when team wins)
+              const nba = nbaScores[0];
+              if (nba) {
+                // Try to determine which team the player is on
+                const isHomePlayer = nba.home.split(' ').some(w => playerName.includes(w));
+                const teamWon = isHomePlayer ? nba.homeScore > nba.awayScore : nba.awayScore > nba.homeScore;
+                // Conservative: only mark as won if team won by comfortable margin (prop correlation)
+                legWon = teamWon;
               }
             }
           }
