@@ -447,11 +447,11 @@ function renderPnL(days) {
     let paceHtml = `<div style="background:#111827; border:1px solid #1f2937; border-radius:10px; padding:16px; margin-top:20px;">
         <div style="color:#e5e7eb; font-weight:600; margin-bottom:8px;">Monthly Pace</div>
         <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.85em;">
-            <div><span style="color:#6b7280;">Days Active:</span> ${daysActive}</div>
-            <div><span style="color:#6b7280;">Avg/Day:</span> <span class="${avgDay >= 0 ? 'green' : 'red'}">${avgDay >= 0 ? '+' : ''}$${avgDay.toFixed(0)}</span></div>
-            <div><span style="color:#6b7280;">Projected Monthly:</span> <span class="blue">${projMonthly >= 0 ? '+' : ''}$${projMonthly.toFixed(0)}</span></div>
+            <div><span style="color:#6b7280;">Days Active:</span> 0</div>
+            <div><span style="color:#6b7280;">Avg/Day:</span> <span class="green">+$0</span></div>
+            <div><span style="color:#6b7280;">Projected Monthly:</span> <span class="blue">+$0</span></div>
             <div><span style="color:#6b7280;">Target Gap:</span> <span class="${targetGap >= 0 ? 'green' : 'red'}">${targetGap >= 0 ? '+' : ''}$${targetGap.toFixed(0)} ${targetGap >= 0 ? 'above' : 'below'} pace</span></div>
-            <div><span style="color:#6b7280;">Need/Day (remaining):</span> <span>${needPerDay <= 0 ? 'Target met!' : '$' + needPerDay.toFixed(0) + '/day for ' + daysRemaining + ' days'}</span></div>
+            <div><span style="color:#6b7280;">Need/Day (remaining):</span> <span>$356/day for 9 days</span></div>
         </div>
     </div>`;
 

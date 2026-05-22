@@ -662,53 +662,62 @@ async function gradeResults() {
 }
 
 function scheduleDailyRun() {
-  const checkInterval = 60 * 1000; // Check every minute
+  const checkInterval = 60 * 1000;
   let lastRunDate = null;
   let lastGradeDate = null;
 
-  // Startup catch-up: if past 5am ET and today's predictions don't exist, run immediately
-  const startupNow = new Date();
-  const etNow = new Date(startupNow.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const etHourNow = etNow.getHours();
-  const todayDate = startupNow.toISOString().split('T')[0];
-  const historyPath = path.join(__dirname, 'data', 'history', `${todayDate}.json`);
-
-  if (etHourNow >= 5 && !fs.existsSync(historyPath)) {
-    console.log(`[CRON] Startup catch-up: it's ${etHourNow}:00 ET and no predictions for ${todayDate}, running now...`);
-    runPredictions().catch(e => console.error('[CRON] Startup catch-up failed:', e.message));
-    lastRunDate = todayDate;
-  } else if (fs.existsSync(historyPath)) {
-    lastRunDate = todayDate;
+  function getETHour() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })).getHours();
   }
 
-  if (etHourNow >= 2) {
+  function getTodayDate() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function todayHistoryExists() {
+    return fs.existsSync(path.join(__dirname, 'data', 'history', `${getTodayDate()}.json`));
+  }
+
+  // Startup catch-up
+  const etHourNow = getETHour();
+  const todayDate = getTodayDate();
+
+  if (etHourNow >= 2 && !todayHistoryExists()) {
+    console.log(`[CRON] Startup: grading previous days...`);
+    gradeResults().catch(e => console.error('[CRON] Startup grade failed:', e.message));
     lastGradeDate = todayDate;
-    if (etHourNow >= 2 && etHourNow < 5) {
-      gradeResults().catch(e => console.error('[CRON] Startup grade failed:', e.message));
-    }
+  }
+
+  if (etHourNow >= 5 && !todayHistoryExists()) {
+    console.log(`[CRON] Startup catch-up: no predictions for ${todayDate}, running now...`);
+    runPredictions().catch(e => console.error('[CRON] Startup catch-up failed:', e.message));
+    lastRunDate = todayDate;
+  } else if (todayHistoryExists()) {
+    lastRunDate = todayDate;
   }
 
   setInterval(() => {
-    const now = new Date();
-    const etHour = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' })).getHours();
-    const todayStr = now.toISOString().split('T')[0];
+    const etHour = getETHour();
+    const todayStr = getTodayDate();
 
-    // 2am ET: grade yesterday's results
-    if (etHour === 2 && lastGradeDate !== todayStr) {
+    // Grade: fires at 2am ET, or any time after 2am if not yet graded today
+    if (etHour >= 2 && lastGradeDate !== todayStr) {
       lastGradeDate = todayStr;
       console.log(`[CRON] Auto-grading results for previous days`);
       gradeResults().catch(e => console.error('[CRON] Grade failed:', e.message));
     }
 
-    // 5am ET: run new predictions
-    if (etHour === 5 && lastRunDate !== todayStr) {
+    // Predictions: fires at 5am ET, or any time after 5am if file missing
+    if (etHour >= 5 && lastRunDate !== todayStr && !todayHistoryExists()) {
       lastRunDate = todayStr;
       console.log(`[CRON] Auto-running predictions for ${todayStr}`);
       runPredictions().catch(e => console.error('[CRON] Failed:', e.message));
+    } else if (todayHistoryExists()) {
+      lastRunDate = todayStr;
     }
   }, checkInterval);
 
-  console.log('[CRON] Scheduled: grade results at 2:00 AM ET, predictions at 5:00 AM ET');
+  console.log('[CRON] Scheduled: grade at 2am+ ET, predictions at 5am+ ET (with catch-up)');
 }
 
 function getLastPredictionTime() {
