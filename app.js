@@ -49,6 +49,57 @@ app.get('/mlb/today', (req, res) => {
   res.sendFile(path.join(__dirname, 'mlb-today.html'));
 });
 
+app.get('/early', (req, res) => {
+  res.sendFile(path.join(__dirname, 'early-action.html'));
+});
+
+// API: Get early games (before 4pm ET) with model picks
+app.get('/api/early-action', (req, res) => {
+  const cachePath = path.join(__dirname, 'data', 'today.json');
+  if (!fs.existsSync(cachePath)) return res.json({ games: [], message: 'No predictions yet' });
+
+  const data = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+  const earlyGames = (data.mlb || []).filter(g => g.gameHour && g.gameHour < 16).sort((a, b) => a.gameHour - b.gameHour);
+
+  const picks = earlyGames.map(g => {
+    const kelly = g.kelly || {};
+    const edge = kelly.edge || Math.abs((g.edge?.home || 0));
+    return {
+      time: g.gameTime,
+      away: g.away,
+      home: g.home,
+      venue: g.venue,
+      awayPitcher: g.awayPitcher,
+      homePitcher: g.homePitcher,
+      pick: g.pick,
+      pickSide: g.pickSide,
+      confidence: g.confidence,
+      winProb: g.conf,
+      edge: edge,
+      kelly: kelly.recommendation || 'LEAN',
+      betSize: kelly.betSize || 0,
+      homeML: g.homeML,
+      awayML: g.awayML,
+      ouLine: g.ouLine,
+      expectedTotal: g.prediction?.expectedTotal,
+      totalEdge: g.ouLine ? (g.prediction?.expectedTotal - g.ouLine).toFixed(1) : null,
+      coinFlip: g.coinFlip,
+    };
+  });
+
+  res.json({
+    date: data.date,
+    generatedAt: data.generatedAt,
+    earlyGames: picks.length,
+    picks,
+    recommendation: picks.length === 0
+      ? 'No early games today — first pitch after 4pm ET.'
+      : picks.filter(p => !p.coinFlip && p.edge >= 5).length > 0
+        ? 'Early action available! High-edge picks below.'
+        : 'Early games available but edges are thin — proceed with caution.',
+  });
+});
+
 // API: Health check
 app.get('/api/health', (req, res) => {
   res.json({

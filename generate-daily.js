@@ -97,6 +97,8 @@ async function main() {
     const homeTeamName = game.teams.home.team.name;
     const awayTeamName = game.teams.away.team.name;
     const venue = game.venue?.name || '';
+    const gameTimeET = game.gameDate ? new Date(game.gameDate).toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true }) : '';
+    const gameHourET = game.gameDate ? new Date(game.gameDate).toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }) : 99;
     const homeStats = standings.get(homeTeamName) || { wins: 20, losses: 20, runsScored: 180, runsAllowed: 180 };
     const awayStats = standings.get(awayTeamName) || { wins: 20, losses: 20, runsScored: 180, runsAllowed: 180 };
 
@@ -166,6 +168,7 @@ async function main() {
       prediction: pred.prediction, edge: pred.edge, kelly: pred.kelly,
       confidence: pred.confidence, modelsUsed: pred.modelsUsed, coinFlip: pred.coinFlip,
       ouLine, homeML, awayML,
+      gameTime: gameTimeET, gameHour: parseInt(gameHourET),
       pick: pred.prediction.homeWinProb > 50 ? homeTeamName : awayTeamName,
       pickSide: pred.prediction.homeWinProb > 50 ? 'home' : 'away',
       conf: Math.max(pred.prediction.homeWinProb, pred.prediction.awayWinProb),

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Early Action — MLB Day Games</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #0d1117; color: #e6edf3; padding: 20px; min-height: 100vh; }
+.header { text-align: center; margin-bottom: 24px; }
+.header h1 { font-size: 1.6em; }
+.header .sunrise { font-size: 2em; }
+.header p { color: #8b949e; font-size: 0.9em; margin-top: 4px; }
+.recommendation { text-align: center; padding: 16px; margin-bottom: 24px; border-radius: 10px; font-weight: 600; font-size: 1.1em; }
+.rec-hot { background: linear-gradient(135deg, #064e3b, #065f46); border: 1px solid #34d399; color: #34d399; }
+.rec-caution { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid #f59e0b; color: #fbbf24; }
+.rec-none { background: #161b22; border: 1px solid #30363d; color: #8b949e; }
+.game-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+.game-card.has-edge { border-color: #238636; }
+.game-card.coin-flip { border-color: #30363d; opacity: 0.7; }
+.game-time { font-size: 0.85em; color: #f0883e; font-weight: 700; margin-bottom: 8px; }
+.matchup { font-size: 1.3em; font-weight: 700; margin-bottom: 6px; }
+.pitchers { color: #8b949e; font-size: 0.85em; margin-bottom: 12px; }
+.pick-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.pick-badge { padding: 4px 12px; border-radius: 6px; font-size: 0.85em; font-weight: 700; }
+.pick-strong { background: #064e3b; color: #34d399; }
+.pick-standard { background: #0c4a6e; color: #38bdf8; }
+.pick-small { background: #1e1b4b; color: #a78bfa; }
+.pick-lean { background: #1c1917; color: #a8a29e; }
+.pick-coinflip { background: #1f2937; color: #6b7280; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+.stat { text-align: center; background: #0d1117; padding: 8px; border-radius: 6px; }
+.stat .val { font-size: 1.1em; font-weight: 700; }
+.stat .lbl { font-size: 0.7em; color: #8b949e; text-transform: uppercase; }
+.green { color: #3fb950; }
+.red { color: #f85149; }
+.blue { color: #58a6ff; }
+.orange { color: #f0883e; }
+.totals-pick { margin-top: 10px; padding: 8px 12px; background: #0d1117; border-radius: 6px; border-left: 3px solid #58a6ff; }
+.nav { text-align: center; margin-top: 20px; }
+.nav a { color: #58a6ff; text-decoration: none; margin: 0 12px; font-size: 0.9em; }
+.refresh-btn { display: block; margin: 20px auto; padding: 10px 24px; background: #238636; color: #fff; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; }
+.empty-state { text-align: center; padding: 60px 20px; color: #8b949e; }
+.empty-state .icon { font-size: 3em; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="sunrise">&#9728;&#65039;</div>
+  <h1>Early Action</h1>
+  <p>MLB Day Games — Start the day hot</p>
+</div>
+
+<div id="recommendation" class="recommendation rec-none">Loading...</div>
+<div id="games-container"></div>
+
+<button class="refresh-btn" onclick="loadEarlyAction()">Refresh</button>
+
+<div class="nav">
+  <a href="/">All Picks</a>
+  <a href="/mlb">MLB Tracker</a>
+  <a href="/nba">NBA</a>
+  <a href="/tracker">Betting Tracker</a>
+  <a href="/dashboard">Dashboard</a>
+</div>
+
+<script>
+async function loadEarlyAction() {
+  try {
+    const res = await fetch('/api/early-action');
+    const data = await res.json();
+
+    // Recommendation banner
+    const recEl = document.getElementById('recommendation');
+    if (data.earlyGames === 0) {
+      recEl.className = 'recommendation rec-none';
+      recEl.textContent = data.recommendation;
+    } else if (data.picks.some(p => !p.coinFlip && p.edge >= 5)) {
+      recEl.className = 'recommendation rec-hot';
+      recEl.innerHTML = '&#128293; ' + data.recommendation;
+    } else {
+      recEl.className = 'recommendation rec-caution';
+      recEl.innerHTML = '&#9888;&#65039; ' + data.recommendation;
+    }
+
+    // Game cards
+    const container = document.getElementById('games-container');
+    if (data.picks.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="icon">&#127748;</div><p>No early games today.<br>First pitch is after 4pm ET.</p><p style="margin-top:12px;font-size:0.85em">Check back tomorrow — day games are common on Wednesdays, Sundays, and getaway days.</p></div>';
+      return;
+    }
+
+    let html = '';
+    for (const pick of data.picks) {
+      const cardClass = pick.coinFlip ? 'game-card coin-flip' : pick.edge >= 5 ? 'game-card has-edge' : 'game-card';
+      const badgeClass = pick.kelly === 'STRONG BET' ? 'pick-strong'
+        : pick.kelly === 'STANDARD BET' ? 'pick-standard'
+        : pick.kelly === 'SMALL BET' ? 'pick-small'
+        : pick.coinFlip ? 'pick-coinflip' : 'pick-lean';
+      const badgeText = pick.coinFlip ? 'COIN FLIP' : pick.kelly;
+
+      html += '<div class="' + cardClass + '">';
+      html += '<div class="game-time">' + pick.time + ' ET</div>';
+      html += '<div class="matchup">' + pick.away + ' @ ' + pick.home + '</div>';
+      html += '<div class="pitchers">' + pick.awayPitcher + ' vs ' + pick.homePitcher + ' | ' + pick.venue + '</div>';
+
+      html += '<div class="pick-row">';
+      html += '<span class="pick-badge ' + badgeClass + '">' + badgeText + '</span>';
+      if (!pick.coinFlip) {
+        html += '<span style="font-weight:700;font-size:1.1em">' + pick.pick + '</span>';
+        html += '<span class="' + (pick.edge >= 5 ? 'green' : 'orange') + '">' + pick.winProb.toFixed(1) + '% model</span>';
+      } else {
+        html += '<span style="color:#6b7280">No clear edge — skip or lean</span>';
+      }
+      html += '</div>';
+
+      html += '<div class="stats-grid">';
+      html += '<div class="stat"><div class="val ' + (pick.edge >= 5 ? 'green' : pick.edge >= 3 ? 'blue' : '') + '">' + pick.edge.toFixed(1) + '%</div><div class="lbl">Edge</div></div>';
+      html += '<div class="stat"><div class="val">' + (pick.homeML > 0 ? '+' : '') + pick.homeML + '</div><div class="lbl">Home ML</div></div>';
+      html += '<div class="stat"><div class="val">' + (pick.awayML > 0 ? '+' : '') + pick.awayML + '</div><div class="lbl">Away ML</div></div>';
+      if (pick.betSize > 0) {
+        html += '<div class="stat"><div class="val green">$' + pick.betSize.toFixed(0) + '</div><div class="lbl">Kelly Size</div></div>';
+      }
+      html += '</div>';
+
+      if (pick.ouLine && pick.totalEdge) {
+        const tEdge = parseFloat(pick.totalEdge);
+        if (Math.abs(tEdge) >= 1.0) {
+          const dir = tEdge > 0 ? 'OVER' : 'UNDER';
+          html += '<div class="totals-pick"><span class="blue">' + dir + ' ' + pick.ouLine + '</span> — Model total: ' + pick.expectedTotal.toFixed(1) + ' (edge: ' + (tEdge > 0 ? '+' : '') + tEdge + ')</div>';
+        }
+      }
+
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  } catch (e) {
+    document.getElementById('games-container').innerHTML = '<div class="empty-state"><p>Error loading early action data.</p></div>';
+  }
+}
+
+loadEarlyAction();
+</script>
+</body>
+</html>
