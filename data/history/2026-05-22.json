@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T15:03:37.585Z",
+  "generatedAt": "2026-05-22T15:23:16.289Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -1976,26 +1976,26 @@
       "homePitcher": "Grayson Rodriguez",
       "awayPitcher": "Jacob deGrom",
       "prediction": {
-        "homeWinProb": 47.9,
-        "awayWinProb": 52.1,
+        "homeWinProb": 47.8,
+        "awayWinProb": 52.2,
         "expectedTotal": 7.7,
         "expectedHomeRuns": 3.4,
         "expectedAwayRuns": 4.2
       },
       "edge": {
-        "home": 4.7,
-        "away": -4.7
+        "home": 5,
+        "away": -5
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 7.5,
-      "homeML": 124,
-      "awayML": -149,
+      "homeML": 129,
+      "awayML": -156,
       "pick": "Texas Rangers",
       "pickSide": "away",
-      "conf": 52.1,
+      "conf": 52.2,
       "rosterImpact": {
         "home": {
           "teamName": "Los Angeles Angels",
@@ -2431,26 +2431,26 @@
       "homePitcher": "Trevor McDonald",
       "awayPitcher": "Davis Martin",
       "prediction": {
-        "homeWinProb": 52.4,
-        "awayWinProb": 47.6,
+        "homeWinProb": 52.5,
+        "awayWinProb": 47.5,
         "expectedTotal": 7,
         "expectedHomeRuns": 3,
         "expectedAwayRuns": 4
       },
       "edge": {
-        "home": 1.5,
-        "away": -1.5
+        "home": 1.3,
+        "away": -1.3
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 7.5,
-      "homeML": -105,
-      "awayML": -114,
+      "homeML": -108,
+      "awayML": -112,
       "pick": "San Francisco Giants",
       "pickSide": "home",
-      "conf": 52.4,
+      "conf": 52.5,
       "rosterImpact": {
         "home": {
           "teamName": "San Francisco Giants",

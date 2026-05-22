@@ -391,29 +391,61 @@ async function runPredictions() {
 
   const mlb = new MlbStatsService();
   const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+  const todayFormatted = today.slice(0, 4) + '-' + today.slice(4, 6) + '-' + today.slice(6, 8);
 
-  console.log(`[${new Date().toISOString()}] Running predictions for ${today}...`);
+  console.log(`[${new Date().toISOString()}] Running predictions for ${todayFormatted}...`);
 
-  // Fetch all data
-  const [{ ratings: eloRatings }, standings, pitcherData] = await Promise.all([
+  // Fetch all core data in parallel
+  const { fetchESPNOdds } = require('./server/services/espnOdds');
+  const { fetchTodaysUmpires, getUmpireRunAdjustment } = require('./server/services/umpireData');
+  const { fetchConfirmedLineups, getLineupAdjustment } = require('./server/services/lineupFetcher');
+  const { projectF5Total } = require('./server/services/f5Projection');
+  const { assessBullpenState, fetchRecentBullpenUsage, getBullpenRunAdjustment } = require('./server/services/bullpenTracker');
+
+  const [{ ratings: eloRatings }, standings, pitcherData, umpireAssignments, lineupData] = await Promise.all([
     buildCurrentElo('MLB'),
     fetchTeamRunDifferentials(),
-    mlb.getProbablePitchers(today.slice(0, 4) + '-' + today.slice(4, 6) + '-' + today.slice(6, 8)),
+    mlb.getProbablePitchers(todayFormatted),
+    fetchTodaysUmpires(todayFormatted).catch(() => new Map()),
+    fetchConfirmedLineups(todayFormatted).catch(() => new Map()),
   ]);
 
-  // Fetch live odds (ESPN DraftKings lines — no DNS issues)
-  const { fetchESPNOdds } = require('./server/services/espnOdds');
+  // Fetch live odds
   let oddsData = [];
   try {
-    oddsData = await fetchESPNOdds('MLB', today.slice(0,4) + '-' + today.slice(4,6) + '-' + today.slice(6,8));
+    oddsData = await fetchESPNOdds('MLB', todayFormatted);
     console.log(`[odds] ESPN odds fetched: ${oddsData.filter(g => g.bookmakers.length > 0).length} games with lines`);
   } catch (e) { console.log('ESPN odds fetch failed, continuing without market data:', e.message); }
 
   const oddsMap = new Map();
   for (const g of oddsData) oddsMap.set(g.home_team, g);
 
-  // Run ensemble for each game
+  // Fetch bullpen state for all teams playing (batch)
+  const bullpenStates = new Map();
   const games = pitcherData.dates?.[0]?.games || [];
+  try {
+    const teamIds = new Set();
+    for (const game of games) {
+      teamIds.add({ id: game.teams.home.team.id, name: game.teams.home.team.name });
+      teamIds.add({ id: game.teams.away.team.id, name: game.teams.away.team.name });
+    }
+    const bullpenPromises = [...teamIds].map(async ({ id, name }) => {
+      try {
+        const usage = await fetchRecentBullpenUsage(id, 3);
+        if (usage && usage.length > 0) {
+          const state = assessBullpenState(usage, []);
+          bullpenStates.set(name, state);
+        }
+      } catch (e) {}
+    });
+    await Promise.all(bullpenPromises);
+    console.log(`[bullpen] Fetched state for ${bullpenStates.size} teams`);
+  } catch (e) { console.log('[bullpen] Bulk fetch failed:', e.message); }
+
+  console.log(`[umpire] ${umpireAssignments.size} umpire assignments loaded`);
+  console.log(`[lineup] ${lineupData.size} confirmed lineups loaded`);
+
+  // Run ensemble for each game
   const mlbResults = [];
 
   for (const game of games) {
@@ -457,16 +489,41 @@ async function runPredictions() {
 
     const bookmakers = oddsMap.get(homeTeamName)?.bookmakers || null;
     let weather = null;
-    try { const wi = await getGameWeatherImpact(venue, `${today.slice(0,4)}-${today.slice(4,6)}-${today.slice(6,8)}T19:00`); weather = wi.weather; } catch(e) {}
+    try { const wi = await getGameWeatherImpact(venue, `${todayFormatted}T19:00`); weather = wi.weather; } catch(e) {}
+
+    // Umpire adjustment
+    const umpire = umpireAssignments.get(homeTeamName);
+    const umpireAdj = umpire ? getUmpireRunAdjustment(umpire.name) : { adjustment: 0 };
+
+    // Confirmed lineups → real platoon splits
+    const gameLineup = lineupData.get(homeTeamName);
+    let homeLeftPct = 0.45, awayLeftPct = 0.45;
+    if (gameLineup?.home?.confirmed) homeLeftPct = gameLineup.home.leftHandedPct;
+    if (gameLineup?.away?.confirmed) awayLeftPct = gameLineup.away.leftHandedPct;
+
+    // Bullpen state
+    const homeBullpen = bullpenStates.get(homeTeamName) || null;
+    const awayBullpen = bullpenStates.get(awayTeamName) || null;
 
     const pred = ensembleMLB({
-      homeTeam: { name: homeTeamName, ...homeStats, leftPct: 0.45 },
-      awayTeam: { name: awayTeamName, ...awayStats, leftPct: 0.45 },
+      homeTeam: { name: homeTeamName, ...homeStats, leftPct: homeLeftPct },
+      awayTeam: { name: awayTeamName, ...awayStats, leftPct: awayLeftPct },
       homePitcher, awayPitcher,
       homeElo: eloRatings.get(homeTeamName) || 1500,
       awayElo: eloRatings.get(awayTeamName) || 1500,
-      bookmakers, venue, weather, homeBullpen: null, awayBullpen: null, bankroll: 1000,
+      bookmakers, venue, weather, homeBullpen, awayBullpen, bankroll: 1000,
     });
+
+    // Apply umpire adjustment to totals (post-ensemble)
+    if (umpireAdj.adjustment !== 0) {
+      pred.prediction.expectedTotal = parseFloat((pred.prediction.expectedTotal + umpireAdj.adjustment).toFixed(1));
+      pred.prediction.expectedHomeRuns = parseFloat((pred.prediction.expectedHomeRuns + umpireAdj.adjustment / 2).toFixed(1));
+      pred.prediction.expectedAwayRuns = parseFloat((pred.prediction.expectedAwayRuns + umpireAdj.adjustment / 2).toFixed(1));
+    }
+
+    // F5 projection
+    const f5 = projectF5Total(homePitcher, awayPitcher, venue, bookmakers);
+    pred.f5Prediction = f5;
 
     let ouLine = null;
     if (bookmakers) {
@@ -481,13 +538,20 @@ async function runPredictions() {
       homePitcher: homePitcher?.name || 'TBD', awayPitcher: awayPitcher?.name || 'TBD',
       prediction: pred.prediction, edge: pred.edge, kelly: pred.kelly,
       subModels: pred.subModels, confidence: pred.confidence, modelsUsed: pred.modelsUsed,
+      modelAgreement: pred.modelAgreement,
       ouLine, totalEdge: ouLine ? parseFloat((pred.prediction.expectedTotal - ouLine).toFixed(1)) : null,
+      f5: f5,
+      umpire: umpireAdj.name ? { name: umpireAdj.name, adjustment: umpireAdj.adjustment, reason: umpireAdj.reason } : null,
+      bullpenGrade: { home: homeBullpen?.summary?.grade || 'unknown', away: awayBullpen?.summary?.grade || 'unknown' },
+      lineupConfirmed: !!(gameLineup?.home?.confirmed && gameLineup?.away?.confirmed),
     });
   }
 
-  // NBA (fetch from ESPN)
+  // NBA (fetch from ESPN + rest/travel adjustments)
   let nbaGames = [];
   let nbaProps = [];
+  const { calculateRestTravelAdj } = require('./server/services/nbaRestTravel');
+
   try {
     const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
     const nbaData = await nbaRes.json();
@@ -515,6 +579,20 @@ async function runPredictions() {
         };
       });
     } catch(e2) {}
+  }
+
+  // Apply NBA rest/travel adjustments
+  for (const game of nbaGames) {
+    try {
+      // Fetch recent schedule for rest days (simplified: use ESPN recent games)
+      const homeAdj = calculateRestTravelAdj({ team: game.home, daysRest: 1, lastGameLocation: null, currentOpponent: game.away, isHome: true });
+      const awayAdj = calculateRestTravelAdj({ team: game.away, daysRest: 1, lastGameLocation: game.away, currentOpponent: game.home, isHome: false });
+      game.restTravel = {
+        home: { adj: homeAdj.pointAdjustment, factors: homeAdj.factors, fatigue: homeAdj.fatigueScore },
+        away: { adj: awayAdj.pointAdjustment, factors: awayAdj.factors, fatigue: awayAdj.fatigueScore },
+        netAdj: parseFloat((homeAdj.pointAdjustment - awayAdj.pointAdjustment).toFixed(1)),
+      };
+    } catch (e) {}
   }
 
   // Build parlays from actionable bets
