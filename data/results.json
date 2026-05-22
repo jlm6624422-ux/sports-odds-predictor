@@ -169,6 +169,16 @@
     "parlay-2026-05-19-3": {
       "result": "loss",
       "score": ""
+    },
+    "nba-2026-05-19-spread": {
+      "result": "loss",
+      "score": "Cavaliers 104, Knicks 115",
+      "recordedAt": "2026-05-22T13:51:31.192Z"
+    },
+    "nba-2026-05-19-over": {
+      "result": "win",
+      "score": "Cavaliers 104, Knicks 115 (219 total)",
+      "recordedAt": "2026-05-22T13:51:31.192Z"
     }
   },
   "2026-05-20": {
@@ -227,6 +237,11 @@
     "parlay-2026-05-20-2": {
       "result": "loss",
       "score": ""
+    },
+    "nba-2026-05-20-over": {
+      "result": "win",
+      "score": "Spurs 113, Thunder 122 (235 total)",
+      "recordedAt": "2026-05-22T13:51:30.992Z"
     }
   },
   "2026-05-21": {
@@ -384,6 +399,103 @@
         "result": "lost",
         "pnl": -30
       }
-    ]
+    ],
+    "CLE @ DET-ml": {
+      "result": "win",
+      "score": "Guardians 3, Tigers 1",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "PIT @ STL-ml": {
+      "result": "loss",
+      "score": "Pirates 6, Cardinals 2",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "PIT @ STL-over": {
+      "result": "win",
+      "score": "Pirates 6, Cardinals 2 (8 total)",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "NYM @ WSH-ml": {
+      "result": "loss",
+      "score": "Mets 2, Nationals 1",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "NYM @ WSH-over": {
+      "result": "loss",
+      "score": "Mets 2, Nationals 1 (3 total)",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "ATL @ MIA-over": {
+      "result": "win",
+      "score": "Braves 9, Marlins 3 (12 total)",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "TOR @ NYY-over": {
+      "result": "loss",
+      "score": "Jays 2, Yankees 0 (2 total)",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "ATH @ LAA-ml": {
+      "result": "win",
+      "score": "Athletics 3, Angels 2",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "COL @ ARI-ml": {
+      "result": "win",
+      "score": "Rockies 1, Diamondbacks 2",
+      "recordedAt": "2026-05-22T13:51:30.785Z"
+    },
+    "nba-2026-05-21-spread": {
+      "result": "loss",
+      "score": "Cavaliers 93, Knicks 109",
+      "recordedAt": "2026-05-22T13:51:30.818Z"
+    },
+    "nba-2026-05-21-over": {
+      "result": "loss",
+      "score": "Cavaliers 93, Knicks 109 (202 total)",
+      "recordedAt": "2026-05-22T13:51:30.818Z"
+    },
+    "parlay-2026-05-21-0": {
+      "result": "win",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "parlay-2026-05-21-1": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "parlay-2026-05-21-2": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "parlay-2026-05-21-3": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "parlay-2026-05-21-4": {
+      "result": "win",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "parlay-2026-05-21-5": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.847Z"
+    }
+  },
+  "2026-05-22": {
+    "parlay-2026-05-22-0": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.744Z"
+    },
+    "parlay-2026-05-22-1": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.745Z"
+    },
+    "parlay-2026-05-22-2": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.745Z"
+    },
+    "parlay-2026-05-22-3": {
+      "result": "loss",
+      "recordedAt": "2026-05-22T13:51:30.745Z"
+    }
   }
 }

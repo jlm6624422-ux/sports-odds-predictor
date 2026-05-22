@@ -577,37 +577,32 @@ async function gradeResults() {
   };
   const getAbbrev = (name) => TEAM_ABBREVS[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
 
-  // Grade the last 3 days of history that have ungraded picks
-  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 3);
+  // Grade the last 5 days of history that have ungraded picks
+  const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 5);
   let graded = 0;
 
   for (const f of files) {
     const date = f.replace('.json', '');
     const dayResults = results[date] || {};
+    const historyData = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
 
-    // Fetch final scores for this date
-    let games;
+    // --- GRADE MLB ---
+    let mlbGames = [];
     try {
       const res = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${date}&hydrate=linescore`);
       const data = await res.json();
-      games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
-    } catch (e) { continue; }
-
-    if (games.length === 0) continue;
-
-    const historyData = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
+      mlbGames = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+    } catch (e) {}
 
     for (const game of (historyData.mlb || [])) {
       const prediction = game.prediction || {};
-      const edge = game.edge || {};
       const ouLine = game.ouLine;
       const expectedTotal = prediction.expectedTotal || 0;
       const totalEdge = ouLine ? expectedTotal - ouLine : 0;
       const confidence = game.confidence || 'low';
       const matchupStr = `${getAbbrev(game.away)} @ ${getAbbrev(game.home)}`;
 
-      // Find the matching final game
-      const finalGame = games.find(g =>
+      const finalGame = mlbGames.find(g =>
         getAbbrev(g.teams.away.team.name) === getAbbrev(game.away) &&
         getAbbrev(g.teams.home.team.name) === getAbbrev(game.home)
       );
@@ -619,7 +614,6 @@ async function gradeResults() {
       const winner = homeScore > awayScore ? finalGame.teams.home.team.name : finalGame.teams.away.team.name;
       const score = `${finalGame.teams.away.team.name.split(' ').pop()} ${awayScore}, ${finalGame.teams.home.team.name.split(' ').pop()} ${homeScore}`;
 
-      // Grade ML pick (kelly bets or high confidence)
       const kelly = game.kelly;
       if (((kelly && kelly.betSize > 0) || confidence === 'high') && !game.coinFlip) {
         const resultKey = `${matchupStr}-ml`;
@@ -632,7 +626,6 @@ async function gradeResults() {
         }
       }
 
-      // Grade O/U pick
       if (ouLine && totalEdge >= 1.5) {
         const resultKey = `${matchupStr}-over`;
         if (!dayResults[resultKey]) {
@@ -645,6 +638,181 @@ async function gradeResults() {
         if (!dayResults[resultKey]) {
           const won = total < ouLine;
           dayResults[resultKey] = { result: won ? 'win' : (total === ouLine ? 'push' : 'loss'), score: `${score} (${total} total)`, recordedAt: new Date().toISOString() };
+          graded++;
+        }
+      }
+    }
+
+    // --- GRADE NBA ---
+    if (historyData.nba && historyData.nba.length > 0) {
+      let nbaScores = [];
+      try {
+        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${date.replace(/-/g, '')}`);
+        const data = await res.json();
+        for (const event of (data.events || [])) {
+          const comp = event.competitions[0];
+          if (!comp.status?.type?.completed) continue;
+          const home = comp.competitors?.find(c => c.homeAway === 'home');
+          const away = comp.competitors?.find(c => c.homeAway === 'away');
+          if (!home || !away) continue;
+          nbaScores.push({
+            home: home.team.displayName, away: away.team.displayName,
+            homeScore: parseInt(home.score), awayScore: parseInt(away.score),
+            winner: parseInt(home.score) > parseInt(away.score) ? home.team.displayName : away.team.displayName,
+            total: parseInt(home.score) + parseInt(away.score),
+            margin: parseInt(home.score) - parseInt(away.score),
+          });
+        }
+      } catch (e) {}
+
+      for (const nbaGame of historyData.nba) {
+        if (!nbaGame.home || !nbaGame.away) continue;
+        const finalNBA = nbaScores.find(s =>
+          s.home.includes(nbaGame.home.split(' ').pop()) || nbaGame.home.includes(s.home.split(' ').pop())
+        );
+        if (!finalNBA) continue;
+
+        const scoreStr = `${finalNBA.away.split(' ').pop()} ${finalNBA.awayScore}, ${finalNBA.home.split(' ').pop()} ${finalNBA.homeScore}`;
+
+        // Grade NBA spread pick if spread data exists
+        if (nbaGame.spread) {
+          const spreadVal = parseFloat(nbaGame.spread);
+          if (!isNaN(spreadVal)) {
+            const resultKey = `nba-${date}-spread`;
+            if (!dayResults[resultKey]) {
+              // Away team gets the spread (negative spread means home favored)
+              const awayMargin = finalNBA.awayScore - finalNBA.homeScore;
+              const won = (awayMargin + Math.abs(spreadVal)) > 0;
+              // If spread is negative, home is favored — away covers if margin + spread > 0
+              const coverTeam = spreadVal < 0 ? nbaGame.home : nbaGame.away;
+              dayResults[resultKey] = { result: won ? 'win' : 'loss', score: scoreStr, recordedAt: new Date().toISOString() };
+              graded++;
+            }
+          }
+        }
+
+        // Grade NBA over/under
+        if (nbaGame.ou) {
+          const ouVal = parseFloat(nbaGame.ou);
+          if (!isNaN(ouVal)) {
+            const resultKey = `nba-${date}-over`;
+            if (!dayResults[resultKey]) {
+              const won = finalNBA.total > ouVal;
+              dayResults[resultKey] = { result: won ? 'win' : (finalNBA.total === ouVal ? 'push' : 'loss'), score: `${scoreStr} (${finalNBA.total} total)`, recordedAt: new Date().toISOString() };
+              graded++;
+            }
+          }
+        }
+      }
+    }
+
+    // --- GRADE PARLAYS ---
+    if (historyData.parlays && historyData.parlays.length > 0) {
+      // We need both MLB and NBA final scores for parlay grading
+      let nbaScores = [];
+      if (!dayResults['_nba_fetched']) {
+        try {
+          const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${date.replace(/-/g, '')}`);
+          const data = await res.json();
+          for (const event of (data.events || [])) {
+            const comp = event.competitions[0];
+            if (!comp.status?.type?.completed) continue;
+            const home = comp.competitors?.find(c => c.homeAway === 'home');
+            const away = comp.competitors?.find(c => c.homeAway === 'away');
+            if (!home || !away) continue;
+            nbaScores.push({
+              home: home.team.displayName, away: away.team.displayName,
+              homeScore: parseInt(home.score), awayScore: parseInt(away.score),
+              winner: parseInt(home.score) > parseInt(away.score) ? home.team.displayName : away.team.displayName,
+              total: parseInt(home.score) + parseInt(away.score),
+              margin: parseInt(home.score) - parseInt(away.score),
+            });
+          }
+        } catch (e) {}
+      }
+
+      for (let i = 0; i < historyData.parlays.length; i++) {
+        const resultKey = `parlay-${date}-${i}`;
+        if (dayResults[resultKey]) continue;
+
+        const parlay = historyData.parlays[i];
+        const legs = (parlay.legs || '').split(' + ');
+        let allWon = true;
+        let allGraded = true;
+
+        for (const leg of legs) {
+          let legWon = null;
+
+          // NBA spread: "Cleveland Cavaliers +6.5"
+          const spreadMatch = leg.match(/(.+?)\s+([+-][\d.]+)$/);
+          if (spreadMatch && nbaScores.length > 0) {
+            const teamName = spreadMatch[1].trim();
+            const line = parseFloat(spreadMatch[2]);
+            const nba = nbaScores.find(s => s.home.includes(teamName.split(' ').pop()) || s.away.includes(teamName.split(' ').pop()));
+            if (nba) {
+              const isHome = nba.home.includes(teamName.split(' ').pop());
+              const teamMargin = isHome ? nba.margin : -nba.margin;
+              legWon = (teamMargin + line) > 0;
+            }
+          }
+
+          // NBA ML: "New York Knicks ML"
+          const mlMatch = leg.match(/(.+?)\s+ML$/);
+          if (mlMatch) {
+            const teamName = mlMatch[1].trim();
+            // Check NBA first
+            const nba = nbaScores.find(s => s.home.includes(teamName.split(' ').pop()) || s.away.includes(teamName.split(' ').pop()));
+            if (nba) {
+              legWon = nba.winner.includes(teamName.split(' ').pop());
+            } else {
+              // Check MLB
+              const mlbGame = mlbGames.find(g =>
+                g.teams.home.team.name.includes(teamName.split(' ').pop()) ||
+                g.teams.away.team.name.includes(teamName.split(' ').pop())
+              );
+              if (mlbGame) {
+                const mlbWinner = mlbGame.teams.home.score > mlbGame.teams.away.score
+                  ? mlbGame.teams.home.team.name : mlbGame.teams.away.team.name;
+                legWon = mlbWinner.includes(teamName.split(' ').pop());
+              }
+            }
+          }
+
+          // Over: "Over 217.5" or "PIT@STL Over 7.5"
+          const overMatch = leg.match(/(?:.*?)?Over\s+([\d.]+)/i);
+          if (overMatch) {
+            const line = parseFloat(overMatch[1]);
+            if (line > 100 && nbaScores.length > 0) {
+              const nba = nbaScores[0];
+              legWon = nba.total > line;
+            } else {
+              // MLB over — match by teams in leg text
+              for (const mlbGame of mlbGames) {
+                const homeAbbr = getAbbrev(mlbGame.teams.home.team.name);
+                const awayAbbr = getAbbrev(mlbGame.teams.away.team.name);
+                if (leg.includes(homeAbbr) || leg.includes(awayAbbr) || leg.includes(mlbGame.teams.home.team.name.split(' ').pop()) || leg.includes(mlbGame.teams.away.team.name.split(' ').pop())) {
+                  const total = mlbGame.teams.home.score + mlbGame.teams.away.score;
+                  legWon = total > line;
+                  break;
+                }
+              }
+              // Fallback: match by line proximity for generic "Over X"
+              if (legWon === null && line < 20) {
+                for (const mlbGame of mlbGames) {
+                  const total = mlbGame.teams.home.score + mlbGame.teams.away.score;
+                  legWon = total > line;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (legWon === null) { allGraded = false; allWon = false; break; }
+          if (legWon === false) { allWon = false; break; }
+        }
+
+        if (allGraded || !allWon) {
+          dayResults[resultKey] = { result: allWon ? 'win' : 'loss', recordedAt: new Date().toISOString() };
           graded++;
         }
       }

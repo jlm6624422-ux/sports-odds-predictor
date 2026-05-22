@@ -1019,6 +1019,11 @@ async function refreshNBA() {
 // NBA BEST BETS TRACKER
 let NBA_TRACKER_DATA = [
   { date: "${today}", picks: [] },
+  { date: "2026-05-21", picks: [
+    { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +6.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight — road dogs cover", result: "pending", score: "" },
+    { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -238", odds: "-238", confidence: "high", thesis: "Home court + series lead", result: "pending", score: "" },
+    { type: "over", team: "OVER 216.5", matchup: "CLE @ NYK", line: "O 216.5", odds: "-110", confidence: "med", thesis: "Series pace trending up", result: "pending", score: "" }
+  ]},
   { date: "2026-05-20", picks: [
     { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
     { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
