@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T15:34:06.172Z",
+  "generatedAt": "2026-05-22T15:38:20.959Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -2562,6 +2562,43 @@
   ],
   "parlays": [
     {
+      "label": "Parlay A — Safe 2-Leg",
+      "legs": "San Antonio Spurs ML + Atlanta Braves ML",
+      "stake": 50,
+      "odds": 2.618181818181818,
+      "payout": 131,
+      "prob": "37.2",
+      "ev": "-1.35",
+      "best": true
+    },
+    {
+      "label": "Parlay B — SGP Value",
+      "legs": "Oklahoma City Thunder +1.5 + Over 217.5",
+      "stake": 50,
+      "odds": 3.569169960474308,
+      "payout": 178,
+      "prob": "26.5",
+      "ev": "-2.71"
+    },
+    {
+      "label": "Parlay C — Cross-Sport 3-Leg",
+      "legs": "Oklahoma City Thunder +1.5 + Atlanta Braves ML + Arizona Diamondbacks ML",
+      "stake": 30,
+      "odds": 3.966783914131341,
+      "payout": 119,
+      "prob": "22.8",
+      "ev": "-2.83"
+    },
+    {
+      "label": "Parlay D — Dogs Longshot",
+      "legs": "Oklahoma City Thunder ML + St. Louis Cardinals ML",
+      "stake": 20,
+      "odds": 4.1819999999999995,
+      "payout": 84,
+      "prob": "11.2",
+      "ev": "-10.61"
+    },
+    {
       "label": "Parlay A — High-Edge 2-Leg",
       "legs": "St. Louis Cardinals ML + Philadelphia Phillies ML",
       "stake": 50,
@@ -2579,43 +2616,6 @@
       "payout": 118,
       "prob": "36.3",
       "ev": "7.79"
-    },
-    {
-      "label": "Parlay A — Safe 2-Leg",
-      "legs": "San Antonio Spurs ML + Atlanta Braves ML",
-      "stake": 50,
-      "odds": 2.6035714285714286,
-      "payout": 130,
-      "prob": "37.2",
-      "ev": "-1.54",
-      "best": true
-    },
-    {
-      "label": "Parlay B — SGP Value",
-      "legs": "Oklahoma City Thunder +1.5 + Over 217.5",
-      "stake": 50,
-      "odds": 3.569169960474308,
-      "payout": 178,
-      "prob": "26.5",
-      "ev": "-2.71"
-    },
-    {
-      "label": "Parlay C — Cross-Sport 3-Leg",
-      "legs": "Oklahoma City Thunder +1.5 + Atlanta Braves ML + Arizona Diamondbacks ML",
-      "stake": 30,
-      "odds": 3.9446478431819467,
-      "payout": 118,
-      "prob": "22.9",
-      "ev": "-2.94"
-    },
-    {
-      "label": "Parlay D — Dogs Longshot",
-      "legs": "Oklahoma City Thunder ML + St. Louis Cardinals ML",
-      "stake": 20,
-      "odds": 4.1819999999999995,
-      "payout": 84,
-      "prob": "11.2",
-      "ev": "-10.61"
     }
   ]
 }
