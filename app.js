@@ -1242,6 +1242,57 @@ app.get('/api/dashboard/backtest', (req, res) => {
   }
 });
 
+app.post('/api/dashboard/run-backtest', (req, res) => {
+  try {
+    const picks = db.prepare(`
+      SELECT p.*, g.home_team, g.away_team, g.home_score, g.away_score, g.status
+      FROM picks p JOIN games g ON p.game_id = g.id
+      WHERE p.result IN ('win', 'loss', 'push')
+      ORDER BY p.date
+    `).all();
+
+    if (picks.length === 0) return res.json({ success: false, error: 'No graded picks' });
+
+    let wins = 0, losses = 0, pushes = 0, flatPnl = 0, kellyPnl = 0;
+    const byType = {}, byConf = {};
+
+    for (const pick of picks) {
+      if (pick.result === 'win') wins++;
+      else if (pick.result === 'loss') losses++;
+      else pushes++;
+
+      const stake = pick.kelly_bet_size || 25;
+      const odds = pick.odds_american || -110;
+      const dec = odds > 0 ? (odds / 100) + 1 : (100 / Math.abs(odds)) + 1;
+      const flat = pick.result === 'win' ? 100 * (dec - 1) : pick.result === 'loss' ? -100 : 0;
+      const kelly = pick.result === 'win' ? stake * (dec - 1) : pick.result === 'loss' ? -stake : 0;
+      flatPnl += flat;
+      kellyPnl += kelly;
+    }
+
+    const winRate = wins / (wins + losses) * 100;
+    const roi = flatPnl / (picks.length * 100) * 100;
+    const dates = picks.map(p => p.date);
+
+    db.prepare(`
+      INSERT INTO backtest_runs (run_date, model_version, date_range_start, date_range_end,
+        total_picks, wins, losses, pushes, win_rate, roi, avg_clv, flat_pnl, kelly_pnl,
+        calibration_json, metrics_json, duration_ms)
+      VALUES (?, 'ensemble-v3', ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, '{}', '{}', 0)
+    `).run(
+      new Date().toISOString().split('T')[0],
+      dates[0], dates[dates.length - 1],
+      picks.length, wins, losses, pushes,
+      parseFloat(winRate.toFixed(2)), parseFloat(roi.toFixed(2)),
+      parseFloat(flatPnl.toFixed(2)), parseFloat(kellyPnl.toFixed(2))
+    );
+
+    res.json({ success: true, record: `${wins}-${losses}`, kellyPnl: kellyPnl.toFixed(0), winRate: winRate.toFixed(1) });
+  } catch (e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
 // --- CLV CAPTURE ---
 async function captureClosingLines() {
   const today = new Date().toISOString().split('T')[0];

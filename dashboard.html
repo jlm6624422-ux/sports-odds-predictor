@@ -76,7 +76,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monos
   </div>
 
   <div class="card">
-    <h2>Last Backtest</h2>
+    <h2>Last Backtest <button onclick="runBacktest()" style="float:right;padding:4px 12px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer" id="bt-btn">Run Backtest</button></h2>
     <div id="backtest-info"></div>
   </div>
 </div>
@@ -201,6 +201,22 @@ function renderChart(canvasId, type, data, extraOptions = {}) {
       ...extraOptions
     }
   });
+}
+
+async function runBacktest() {
+  const btn = document.getElementById('bt-btn');
+  btn.textContent = 'Running...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/dashboard/run-backtest', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      btn.textContent = 'Done!';
+      loadDashboard();
+    } else {
+      btn.textContent = 'Error';
+    }
+  } catch (e) { btn.textContent = 'Error'; }
+  setTimeout(() => { btn.textContent = 'Run Backtest'; btn.disabled = false; }, 3000);
 }
 
 loadDashboard();
