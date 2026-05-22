@@ -1,14 +1,20 @@
 /**
- * Sports Odds Predictor — PWA Server
+ * Sports Odds Predictor — PWA Server v3
  *
  * Serves daily predictions, runs ensemble model on-demand and via cron.
- * Deployable to Railway/Render with auto-predictions at 5am ET daily.
+ * SQLite for persistence, CLV tracking, F5 projections, full dashboard.
+ * Deployable to Railway with persistent volume at /data.
  */
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
+
+// Initialize SQLite database
+const { initDatabase } = require('./server/config/database');
+const db = initDatabase();
+const dbService = require('./server/services/dbService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -864,6 +870,8 @@ function scheduleDailyRun() {
     lastRunDate = todayDate;
   }
 
+  let lastClvDate = null;
+
   setInterval(() => {
     const etHour = getETHour();
     const todayStr = getTodayDate();
@@ -883,9 +891,16 @@ function scheduleDailyRun() {
     } else if (todayHistoryExists()) {
       lastRunDate = todayStr;
     }
+
+    // CLV: capture closing lines at 6:45pm and 10pm ET
+    if ((etHour === 18 || etHour === 22) && lastClvDate !== todayStr + '-' + etHour) {
+      lastClvDate = todayStr + '-' + etHour;
+      console.log(`[CRON] Capturing closing lines (${etHour}:00 ET)`);
+      captureClosingLines().catch(e => console.error('[CRON] CLV capture failed:', e.message));
+    }
   }, checkInterval);
 
-  console.log('[CRON] Scheduled: grade at 2am+ ET, predictions at 10am+ ET (post-lineup)');
+  console.log('[CRON] Scheduled: grade 2am, predictions 10am, CLV 6:45pm+10pm ET');
 }
 
 function getLastPredictionTime() {
@@ -897,9 +912,175 @@ function getLastPredictionTime() {
   return null;
 }
 
+// --- DASHBOARD ---
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboard.html'));
+});
+
+app.get('/api/dashboard/summary', (req, res) => {
+  try {
+    const allPicks = db.prepare(`
+      SELECT result, pick_type, pnl, clv, kelly_bet_size, odds_american, date
+      FROM picks WHERE result IN ('win', 'loss', 'push')
+      ORDER BY date
+    `).all();
+
+    const wins = allPicks.filter(p => p.result === 'win').length;
+    const losses = allPicks.filter(p => p.result === 'loss').length;
+    const kellyPnl = allPicks.reduce((s, p) => {
+      if (!p.kelly_bet_size) return s;
+      const dec = p.odds_american > 0 ? (p.odds_american / 100) + 1 : (100 / Math.abs(p.odds_american)) + 1;
+      return s + (p.result === 'win' ? p.kelly_bet_size * (dec - 1) : p.result === 'loss' ? -p.kelly_bet_size : 0);
+    }, 0);
+    const clvPicks = allPicks.filter(p => p.clv !== null);
+    const avgCLV = clvPicks.length > 0 ? clvPicks.reduce((s, p) => s + p.clv, 0) / clvPicks.length : null;
+    const dates = allPicks.map(p => p.date);
+    const roi = allPicks.length > 0 ? (kellyPnl / allPicks.reduce((s, p) => s + (p.kelly_bet_size || 25), 0)) * 100 : 0;
+
+    res.json({
+      wins, losses, total: wins + losses,
+      winRate: wins / (wins + losses) * 100,
+      kellyPnl, roi, avgCLV,
+      dateRange: { start: dates[0], end: dates[dates.length - 1] },
+      daysActive: new Set(dates).size,
+    });
+  } catch (e) {
+    res.json({ wins: 0, losses: 0, total: 0, winRate: 0, kellyPnl: 0, roi: 0, avgCLV: null, dateRange: {}, daysActive: 0 });
+  }
+});
+
+app.get('/api/dashboard/by-category', (req, res) => {
+  try {
+    const picks = db.prepare(`
+      SELECT p.pick_type, p.result, p.pnl, p.kelly_recommendation, p.odds_american, p.kelly_bet_size, g.sport
+      FROM picks p JOIN games g ON p.game_id = g.id
+      WHERE p.result IN ('win', 'loss')
+    `).all();
+
+    const byType = {}, byConfidence = {}, bySport = {};
+    for (const p of picks) {
+      const type = p.pick_type;
+      if (!byType[type]) byType[type] = { wins: 0, losses: 0, pnl: 0 };
+      byType[type][p.result === 'win' ? 'wins' : 'losses']++;
+
+      const conf = p.kelly_recommendation || 'NO BET';
+      if (!byConfidence[conf]) byConfidence[conf] = { wins: 0, losses: 0, pnl: 0 };
+      byConfidence[conf][p.result === 'win' ? 'wins' : 'losses']++;
+
+      const sport = p.sport || 'MLB';
+      if (!bySport[sport]) bySport[sport] = { wins: 0, losses: 0, pnl: 0 };
+      bySport[sport][p.result === 'win' ? 'wins' : 'losses']++;
+    }
+
+    res.json({ byType, byConfidence, bySport });
+  } catch (e) {
+    res.json({ byType: {}, byConfidence: {}, bySport: {} });
+  }
+});
+
+app.get('/api/dashboard/clv-trend', (req, res) => {
+  try {
+    const trend = db.prepare(`
+      SELECT date, AVG(clv) as avg_clv, COUNT(*) as picks
+      FROM picks WHERE clv IS NOT NULL
+      GROUP BY date ORDER BY date
+    `).all();
+    res.json(trend);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
+app.get('/api/dashboard/roi-curve', (req, res) => {
+  try {
+    const curve = db.prepare(`
+      SELECT date, SUM(CASE WHEN result='win' THEN 1 ELSE 0 END) as wins,
+        SUM(CASE WHEN result='loss' THEN 1 ELSE 0 END) as losses,
+        COUNT(*) as picks,
+        SUM(pnl) as day_pnl
+      FROM picks WHERE result IN ('win', 'loss') AND pnl IS NOT NULL
+      GROUP BY date ORDER BY date
+    `).all();
+    res.json(curve);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
+app.get('/api/dashboard/calibration', (req, res) => {
+  try {
+    const cal = db.prepare(`
+      SELECT
+        CAST(ROUND(model_prob / 5) * 5 AS INTEGER) as prob_bucket,
+        COUNT(*) as count,
+        SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) as wins,
+        AVG(model_prob) as avg_predicted
+      FROM picks WHERE result IN ('win', 'loss') AND model_prob > 0
+      GROUP BY prob_bucket ORDER BY prob_bucket
+    `).all();
+    res.json(cal);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
+// --- CLV CAPTURE ---
+async function captureClosingLines() {
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    const { fetchESPNOdds } = require('./server/services/espnOdds');
+    const oddsData = await fetchESPNOdds('MLB', today);
+
+    const pendingPicks = db.prepare(
+      "SELECT * FROM picks WHERE date = ? AND closing_line IS NULL AND result = 'pending'"
+    ).all(today);
+
+    if (pendingPicks.length === 0) return;
+
+    const { calculateBetCLV } = require('./server/services/clvTracker');
+    let updated = 0;
+
+    for (const pick of pendingPicks) {
+      const game = db.prepare('SELECT * FROM games WHERE id = ?').get(pick.game_id);
+      if (!game) continue;
+
+      const oddsGame = oddsData.find(g =>
+        g.home_team === game.home_team || g.away_team === game.away_team
+      );
+      if (!oddsGame || !oddsGame.bookmakers || oddsGame.bookmakers.length === 0) continue;
+
+      let closingOdds = null;
+      for (const bk of oddsGame.bookmakers) {
+        if (pick.pick_type === 'ml') {
+          const h2h = bk.markets?.find(m => m.key === 'h2h');
+          if (h2h) {
+            const outcome = h2h.outcomes?.find(o => o.name === pick.team);
+            if (outcome) { closingOdds = outcome.price; break; }
+          }
+        } else if (pick.pick_type === 'over' || pick.pick_type === 'under') {
+          const totals = bk.markets?.find(m => m.key === 'totals');
+          if (totals) { closingOdds = -110; break; }
+        }
+      }
+
+      if (closingOdds && pick.opening_line) {
+        const clvResult = calculateBetCLV(pick.opening_line, closingOdds);
+        db.prepare('UPDATE picks SET closing_line = ?, clv = ? WHERE id = ?')
+          .run(closingOdds, clvResult.clv, pick.id);
+        updated++;
+      }
+    }
+
+    if (updated > 0) console.log(`[CLV] Captured closing lines for ${updated} picks`);
+  } catch (e) {
+    console.error('[CLV] Capture failed:', e.message);
+  }
+}
+
 // Start server
 app.listen(PORT, () => {
-  console.log(`Sports Odds Predictor running on port ${PORT}`);
-  console.log(`Open: http://localhost:${PORT}`);
+  console.log(`Sports Odds Predictor v3 running on port ${PORT}`);
+  console.log(`Dashboard: http://localhost:${PORT}/dashboard`);
   scheduleDailyRun();
 });

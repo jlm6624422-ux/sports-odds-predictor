@@ -1,6 +1,6 @@
 {
   "date": "2026-05-22",
-  "generatedAt": "2026-05-22T14:21:13.056Z",
+  "generatedAt": "2026-05-22T15:03:37.585Z",
   "mlb": [
     {
       "home": "Chicago Cubs",
@@ -361,25 +361,25 @@
       "homePitcher": "Cristopher Sánchez",
       "awayPitcher": "Gavin Williams",
       "prediction": {
-        "homeWinProb": 58.4,
-        "awayWinProb": 41.6,
+        "homeWinProb": 58.3,
+        "awayWinProb": 41.7,
         "expectedTotal": 6.8,
         "expectedHomeRuns": 3.7,
         "expectedAwayRuns": 3.1
       },
       "edge": {
-        "home": -7.5,
-        "away": 7.5
+        "home": -7.2,
+        "away": 7.2
       },
       "kelly": {
-        "betSize": 28.26,
-        "kellyPct": 11.3,
-        "fractionalKellyPct": 2.83,
-        "edge": 7.45,
-        "impliedProb": 34.1,
-        "modelProb": 41.6,
+        "betSize": 27.52,
+        "kellyPct": 11.01,
+        "fractionalKellyPct": 2.75,
+        "edge": 7.21,
+        "impliedProb": 34.5,
+        "modelProb": 41.7,
         "recommendation": "STANDARD BET",
-        "expectedValue": 0.2181,
+        "expectedValue": 0.2092,
         "side": "away",
         "team": "Cleveland Guardians"
       },
@@ -387,11 +387,11 @@
       "modelsUsed": 4,
       "coinFlip": false,
       "ouLine": 6.5,
-      "homeML": -193,
-      "awayML": 158,
+      "homeML": -186,
+      "awayML": 153,
       "pick": "Philadelphia Phillies",
       "pickSide": "home",
-      "conf": 58.4,
+      "conf": 58.3,
       "rosterImpact": {
         "home": {
           "teamName": "Philadelphia Phillies",
@@ -822,8 +822,8 @@
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 7.5,
-      "homeML": -157,
-      "awayML": 130,
+      "homeML": -156,
+      "awayML": 129,
       "pick": "Boston Red Sox",
       "pickSide": "home",
       "conf": 51.8,
@@ -1220,7 +1220,7 @@
       "coinFlip": false,
       "ouLine": 8.5,
       "homeML": -143,
-      "awayML": 118,
+      "awayML": 119,
       "pick": "Baltimore Orioles",
       "pickSide": "home",
       "conf": 53.9,
@@ -1459,25 +1459,25 @@
       "homePitcher": "TBD",
       "awayPitcher": "Miles Mikolas",
       "prediction": {
-        "homeWinProb": 67,
-        "awayWinProb": 33,
+        "homeWinProb": 66.9,
+        "awayWinProb": 33.1,
         "expectedTotal": 9,
         "expectedHomeRuns": 5,
         "expectedAwayRuns": 4
       },
       "edge": {
-        "home": -1.9,
-        "away": 1.9
+        "home": -1.8,
+        "away": 1.8
       },
       "kelly": {
         "betSize": 0,
         "kellyPct": 0,
         "fractionalKellyPct": 0,
-        "edge": 1.95,
-        "impliedProb": 31.1,
-        "modelProb": 33,
+        "edge": 1.73,
+        "impliedProb": 31.3,
+        "modelProb": 33.1,
         "recommendation": "NO BET",
-        "reason": "Edge 1.9% below 5% threshold",
+        "reason": "Edge 1.7% below 5% threshold",
         "side": "away",
         "team": "Washington Nationals"
       },
@@ -1485,11 +1485,11 @@
       "modelsUsed": 3,
       "coinFlip": false,
       "ouLine": 9,
-      "homeML": -224,
-      "awayML": 182,
+      "homeML": -220,
+      "awayML": 179,
       "pick": "Atlanta Braves",
       "pickSide": "home",
-      "conf": 67,
+      "conf": 66.9,
       "rosterImpact": {
         "home": {
           "teamName": "Atlanta Braves",
@@ -1582,16 +1582,16 @@
         "expectedAwayRuns": 4
       },
       "edge": {
-        "home": 1.2,
-        "away": -1.2
+        "home": 1.1,
+        "away": -1.1
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 8,
-      "homeML": -101,
-      "awayML": -120,
+      "homeML": -102,
+      "awayML": -119,
       "pick": "Seattle Mariners",
       "pickSide": "away",
       "conf": 50.2,
@@ -1976,26 +1976,26 @@
       "homePitcher": "Grayson Rodriguez",
       "awayPitcher": "Jacob deGrom",
       "prediction": {
-        "homeWinProb": 47.3,
-        "awayWinProb": 52.7,
+        "homeWinProb": 47.9,
+        "awayWinProb": 52.1,
         "expectedTotal": 7.7,
         "expectedHomeRuns": 3.4,
         "expectedAwayRuns": 4.2
       },
       "edge": {
-        "home": 5.9,
-        "away": -5.9
+        "home": 4.7,
+        "away": -4.7
       },
       "kelly": null,
       "confidence": "coin-flip",
       "modelsUsed": 4,
       "coinFlip": true,
       "ouLine": 7.5,
-      "homeML": 144,
-      "awayML": -175,
+      "homeML": 124,
+      "awayML": -149,
       "pick": "Texas Rangers",
       "pickSide": "away",
-      "conf": 52.7,
+      "conf": 52.1,
       "rosterImpact": {
         "home": {
           "teamName": "Los Angeles Angels",
@@ -2561,6 +2561,16 @@
     }
   ],
   "parlays": [
+    {
+      "label": "Parlay A — High-Edge 2-Leg",
+      "legs": "St. Louis Cardinals ML + Philadelphia Phillies ML",
+      "stake": 50,
+      "odds": 3.136774193548387,
+      "payout": 157,
+      "prob": "31.9",
+      "ev": "0.11",
+      "best": true
+    },
     {
       "label": "Parlay A — Safe 2-Leg",
       "legs": "San Antonio Spurs ML + Atlanta Braves ML",

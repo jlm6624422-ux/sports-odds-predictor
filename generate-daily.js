@@ -198,115 +198,17 @@ async function main() {
     });
   }
 
-  // --- BUILD PARLAYS ---
+  // --- BUILD SMART PARLAYS ---
   const actionable = mlbPicks.filter(p => !p.coinFlip).sort((a, b) => b.conf - a.conf);
-  const kellyBets = actionable.filter(p => p.kelly && p.kelly.betSize > 0);
-  const topMLB = actionable.slice(0, 3);
-
+  // Only use legs with edge >= 7% and high confidence (model-validated picks)
+  const kellyBets = mlbPicks.filter(p => p.kelly && p.kelly.betSize > 0).sort((a, b) => b.kelly.edge - a.kelly.edge);
+  const highEdgeLegs = kellyBets.filter(p => p.kelly.edge >= 7);
   const parlays = [];
 
-  // Parlay A: If NBA game exists, NBA fav ML + best MLB pick
-  if (nbaGames.length > 0 && topMLB.length > 0) {
-    const nba = nbaGames[0];
-    const nbaFavML = parseInt(nba.homeML) < 0 ? parseInt(nba.homeML) : parseInt(nba.awayML);
-    const nbaFavName = parseInt(nba.homeML) < 0 ? nba.home : nba.away;
-    const mlbBest = topMLB[0];
-    const mlbOdds = mlbBest.pickSide === 'home' ? (mlbBest.homeML || -130) : (mlbBest.awayML || -130);
-
-    const legs = [{ name: `${nbaFavName} ML`, odds: nbaFavML }, { name: `${mlbBest.pick} ML`, odds: mlbOdds }];
-    const dec = parlayDecimal(legs);
-    const prob = americanToImplied(nbaFavML) * (mlbBest.conf / 100);
-    const ev = (prob * (dec - 1) * 50) - ((1 - prob) * 50);
-
-    parlays.push({
-      label: 'Parlay A — Safe 2-Leg',
-      legs: legs.map(l => l.name).join(' + '),
-      stake: 50, odds: dec, payout: Math.round(50 * dec),
-      prob: (prob * 100).toFixed(1), ev: ev.toFixed(2), best: true,
-    });
-  }
-
-  // Parlay B: NBA spread + O/U (SGP)
-  if (nbaGames.length > 0) {
-    const nba = nbaGames[0];
-    const spreadVal = parseFloat(nba.spread);
-    const dogName = spreadVal < 0 ? nba.away : nba.home;
-    const spreadLine = spreadVal < 0 ? `${nba.away} +${Math.abs(spreadVal)}` : `${nba.home} +${spreadVal}`;
-    const ouVal = parseFloat(nba.ou);
-
-    const legs = [{ name: `${spreadLine}`, odds: -115 }, { name: `Over ${ouVal}`, odds: -110 }];
-    const dec = parlayDecimal(legs);
-    const prob = 0.53 * 0.50;
-    const ev = (prob * (dec - 1) * 50) - ((1 - prob) * 50);
-
-    parlays.push({
-      label: 'Parlay B — SGP Value',
-      legs: legs.map(l => l.name).join(' + '),
-      stake: 50, odds: dec, payout: Math.round(50 * dec),
-      prob: (prob * 100).toFixed(1), ev: ev.toFixed(2),
-    });
-  }
-
-  // Parlay C: Cross-sport 3-leg (NBA spread + 2 best MLB)
-  if (nbaGames.length > 0 && topMLB.length >= 2) {
-    const nba = nbaGames[0];
-    const spreadVal = parseFloat(nba.spread);
-    const spreadLine = spreadVal < 0 ? `${nba.away} +${Math.abs(spreadVal)}` : `${nba.home} +${spreadVal}`;
-    const mlb1 = topMLB[0];
-    const mlb2 = topMLB[1];
-    const mlb1Odds = mlb1.pickSide === 'home' ? (mlb1.homeML || -130) : (mlb1.awayML || -130);
-    const mlb2Odds = mlb2.pickSide === 'home' ? (mlb2.homeML || -130) : (mlb2.awayML || -130);
-
-    const legs = [
-      { name: spreadLine, odds: -115 },
-      { name: `${mlb1.pick} ML`, odds: mlb1Odds },
-      { name: `${mlb2.pick} ML`, odds: mlb2Odds },
-    ];
-    const dec = parlayDecimal(legs);
-    const prob = 0.53 * (mlb1.conf / 100) * (mlb2.conf / 100);
-    const ev = (prob * (dec - 1) * 30) - ((1 - prob) * 30);
-
-    parlays.push({
-      label: 'Parlay C — Cross-Sport 3-Leg',
-      legs: legs.map(l => l.name).join(' + '),
-      stake: 30, odds: dec, payout: Math.round(30 * dec),
-      prob: (prob * 100).toFixed(1), ev: ev.toFixed(2),
-    });
-  }
-
-  // Parlay D: Dogs longshot — NBA dog + any MLB dog with model edge
-  if (nbaGames.length > 0) {
-    const nba = nbaGames[0];
-    const dogML = parseInt(nba.homeML) > 0 ? parseInt(nba.homeML) : parseInt(nba.awayML);
-    const dogName = parseInt(nba.homeML) > 0 ? nba.home : nba.away;
-    const mlbDog = kellyBets.find(p => {
-      const odds = p.pickSide === 'home' ? p.homeML : p.awayML;
-      return odds && parseInt(odds) > 0;
-    }) || actionable.find(p => {
-      const odds = p.pickSide === 'home' ? p.homeML : p.awayML;
-      return odds && parseInt(odds) > 0;
-    });
-
-    if (mlbDog) {
-      const mlbDogOdds = mlbDog.pickSide === 'home' ? parseInt(mlbDog.homeML) : parseInt(mlbDog.awayML);
-      const legs = [{ name: `${dogName} ML`, odds: dogML }, { name: `${mlbDog.pick} ML`, odds: mlbDogOdds }];
-      const dec = parlayDecimal(legs);
-      const prob = (1 - americanToImplied(dogML)) * 0.4 * (mlbDog.conf / 100);
-      const ev = (prob * (dec - 1) * 20) - ((1 - prob) * 20);
-
-      parlays.push({
-        label: 'Parlay D — Dogs Longshot',
-        legs: legs.map(l => l.name).join(' + '),
-        stake: 20, odds: dec, payout: Math.round(20 * dec),
-        prob: (prob * 100).toFixed(1), ev: ev.toFixed(2),
-      });
-    }
-  }
-
-  // If no NBA, build MLB-only parlays
-  if (nbaGames.length === 0 && topMLB.length >= 2) {
-    const mlb1 = topMLB[0];
-    const mlb2 = topMLB[1];
+  // Parlay A: Best 2 MLB Kelly picks (highest edges, must both have 7%+ edge)
+  if (highEdgeLegs.length >= 2) {
+    const mlb1 = highEdgeLegs[0];
+    const mlb2 = highEdgeLegs[1];
     const mlb1Odds = mlb1.pickSide === 'home' ? (mlb1.homeML || -130) : (mlb1.awayML || -130);
     const mlb2Odds = mlb2.pickSide === 'home' ? (mlb2.homeML || -130) : (mlb2.awayML || -130);
 
@@ -314,26 +216,58 @@ async function main() {
     const dec = parlayDecimal(legs);
     const prob = (mlb1.conf / 100) * (mlb2.conf / 100);
     const ev = (prob * (dec - 1) * 50) - ((1 - prob) * 50);
-    parlays.push({ label: 'Parlay A — MLB 2-Leg', legs: legs.map(l => l.name).join(' + '), stake: 50, odds: dec, payout: Math.round(50 * dec), prob: (prob * 100).toFixed(1), ev: ev.toFixed(2), best: true });
 
-    if (topMLB.length >= 3) {
-      const mlb3 = topMLB[2];
+    if (prob > 0.25 && ev > 0) {
+      parlays.push({
+        label: 'Parlay A — High-Edge 2-Leg',
+        legs: legs.map(l => l.name).join(' + '),
+        stake: 50, odds: dec, payout: Math.round(50 * dec),
+        prob: (prob * 100).toFixed(1), ev: ev.toFixed(2), best: true,
+      });
+    }
+
+    // 3-leg only if combined probability > 20% and positive EV
+    if (highEdgeLegs.length >= 3) {
+      const mlb3 = highEdgeLegs[2];
       const mlb3Odds = mlb3.pickSide === 'home' ? (mlb3.homeML || -130) : (mlb3.awayML || -130);
       const legs3 = [...legs, { name: `${mlb3.pick} ML`, odds: mlb3Odds }];
       const dec3 = parlayDecimal(legs3);
       const prob3 = prob * (mlb3.conf / 100);
       const ev3 = (prob3 * (dec3 - 1) * 30) - ((1 - prob3) * 30);
-      parlays.push({ label: 'Parlay B — MLB 3-Leg', legs: legs3.map(l => l.name).join(' + '), stake: 30, odds: dec3, payout: Math.round(30 * dec3), prob: (prob3 * 100).toFixed(1), ev: ev3.toFixed(2) });
-    }
 
-    // Totals parlay
-    const overPlays = mlbPicks.filter(p => !p.coinFlip && p.ouLine && (p.prediction.expectedTotal - p.ouLine) > 1.5).slice(0, 2);
-    if (overPlays.length >= 2) {
-      const oLegs = overPlays.map(p => ({ name: `Over ${p.ouLine} (${p.away.split(' ').pop()}@${p.home.split(' ').pop()})`, odds: -110 }));
-      const oDec = parlayDecimal(oLegs);
-      const oProb = 0.55 * 0.55;
-      const oEv = (oProb * (oDec - 1) * 30) - ((1 - oProb) * 30);
-      parlays.push({ label: 'Parlay C — Totals', legs: oLegs.map(l => l.name).join(' + '), stake: 30, odds: oDec, payout: Math.round(30 * oDec), prob: (oProb * 100).toFixed(1), ev: oEv.toFixed(2) });
+      if (prob3 > 0.20 && ev3 > 0) {
+        parlays.push({
+          label: 'Parlay B — High-Edge 3-Leg',
+          legs: legs3.map(l => l.name).join(' + '),
+          stake: 30, odds: dec3, payout: Math.round(30 * dec3),
+          prob: (prob3 * 100).toFixed(1), ev: ev3.toFixed(2),
+        });
+      }
+    }
+  }
+
+  // Cross-sport parlay: NBA fav + best MLB (only if NBA fav is heavy -200+)
+  if (nbaGames.length > 0 && highEdgeLegs.length >= 1) {
+    const nba = nbaGames[0];
+    const nbaFavML = parseInt(nba.homeML) < 0 ? parseInt(nba.homeML) : parseInt(nba.awayML);
+    const nbaFavName = parseInt(nba.homeML) < 0 ? nba.home : nba.away;
+
+    if (nbaFavML <= -200) {
+      const mlbBest = highEdgeLegs[0];
+      const mlbOdds = mlbBest.pickSide === 'home' ? (mlbBest.homeML || -130) : (mlbBest.awayML || -130);
+      const legs = [{ name: `${nbaFavName} ML`, odds: nbaFavML }, { name: `${mlbBest.pick} ML`, odds: mlbOdds }];
+      const dec = parlayDecimal(legs);
+      const prob = americanToImplied(nbaFavML) * (mlbBest.conf / 100);
+      const ev = (prob * (dec - 1) * 40) - ((1 - prob) * 40);
+
+      if (prob > 0.35 && ev > 0) {
+        parlays.push({
+          label: 'Parlay C — Cross-Sport Chalk',
+          legs: legs.map(l => l.name).join(' + '),
+          stake: 40, odds: dec, payout: Math.round(40 * dec),
+          prob: (prob * 100).toFixed(1), ev: ev.toFixed(2),
+        });
+      }
     }
   }
 

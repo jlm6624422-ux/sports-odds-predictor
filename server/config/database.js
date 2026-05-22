@@ -2,24 +2,32 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
+let _db = null;
+
 function initDatabase() {
-  const dataDir = path.resolve(__dirname, '../data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  if (_db) return _db;
+
+  const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/sports_odds.db');
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
   }
 
-  const dbPath = process.env.DB_PATH || path.join(dataDir, 'sports_odds.db');
-  const db = new Database(dbPath);
+  _db = new Database(dbPath);
+  _db.pragma('journal_mode = WAL');
+  _db.pragma('foreign_keys = ON');
+  _db.pragma('busy_timeout = 5000');
 
-  // Enable WAL mode for better concurrent performance
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-
-  // Run schema
   const schema = fs.readFileSync(path.resolve(__dirname, '../models/schema.sql'), 'utf-8');
-  db.exec(schema);
+  _db.exec(schema);
 
-  return db;
+  console.log(`[DB] SQLite initialized at ${dbPath}`);
+  return _db;
 }
 
-module.exports = { initDatabase };
+function getDatabase() {
+  if (!_db) return initDatabase();
+  return _db;
+}
+
+module.exports = { initDatabase, getDatabase };

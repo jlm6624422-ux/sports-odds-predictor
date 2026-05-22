@@ -13,10 +13,12 @@
     "props": "node run-nba-props.js"
   },
   "dependencies": {
-    "express": "^4.21.1",
-    "cors": "^2.8.5"
+    "better-sqlite3": "^12.10.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.1"
   },
   "devDependencies": {
+    "@railway/cli": "^4.59.0",
     "concurrently": "^8.2.2"
   },
   "engines": {

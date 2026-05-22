@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Performance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #0d1117; color: #e6edf3; padding: 20px; }
+.header { text-align: center; margin-bottom: 30px; }
+.header h1 { font-size: 1.8em; color: #58a6ff; }
+.header p { color: #8b949e; margin-top: 5px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; }
+.card h2 { font-size: 1em; color: #8b949e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #21262d; }
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: #8b949e; }
+.stat-value { font-weight: 700; }
+.green { color: #3fb950; }
+.red { color: #f85149; }
+.blue { color: #58a6ff; }
+.yellow { color: #d29922; }
+.big-number { font-size: 2.5em; font-weight: 700; text-align: center; margin: 10px 0; }
+.chart-container { position: relative; height: 250px; }
+.refresh-btn { position: fixed; top: 15px; right: 20px; padding: 8px 16px; background: #238636; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.refresh-btn:hover { background: #2ea043; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; }
+.badge-win { background: #064e3b; color: #34d399; }
+.badge-loss { background: #7f1d1d; color: #f87171; }
+</style>
+</head>
+<body>
+<button class="refresh-btn" onclick="loadDashboard()">Refresh</button>
+<div class="header">
+  <h1>Model Performance Dashboard</h1>
+  <p id="date-range">Loading...</p>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>Overall Record</h2>
+    <div id="overall-record" class="big-number">—</div>
+    <div id="overall-stats"></div>
+  </div>
+
+  <div class="card">
+    <h2>Win Rate by Type</h2>
+    <div id="by-type"></div>
+  </div>
+
+  <div class="card">
+    <h2>CLV Trend (Closing Line Value)</h2>
+    <div class="chart-container"><canvas id="clv-chart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Cumulative P&L</h2>
+    <div class="chart-container"><canvas id="pnl-chart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Calibration</h2>
+    <div class="chart-container"><canvas id="cal-chart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>By Confidence Tier</h2>
+    <div id="by-confidence"></div>
+  </div>
+
+  <div class="card">
+    <h2>NBA Performance</h2>
+    <div id="nba-stats"></div>
+  </div>
+
+  <div class="card">
+    <h2>Last Backtest</h2>
+    <div id="backtest-info"></div>
+  </div>
+</div>
+
+<script>
+let charts = {};
+
+async function loadDashboard() {
+  try {
+    const [summary, byCategory, clvTrend, roiCurve, calibration] = await Promise.all([
+      fetch('/api/dashboard/summary').then(r => r.json()),
+      fetch('/api/dashboard/by-category').then(r => r.json()),
+      fetch('/api/dashboard/clv-trend').then(r => r.json()),
+      fetch('/api/dashboard/roi-curve').then(r => r.json()),
+      fetch('/api/dashboard/calibration').then(r => r.json()),
+    ]);
+
+    // Overall record
+    const wr = summary.total > 0 ? ((summary.wins / (summary.wins + summary.losses)) * 100).toFixed(1) : '0';
+    document.getElementById('overall-record').innerHTML = `<span class="${parseFloat(wr) >= 53 ? 'green' : parseFloat(wr) >= 50 ? 'yellow' : 'red'}">${summary.wins}-${summary.losses}</span>`;
+    document.getElementById('overall-stats').innerHTML = `
+      <div class="stat-row"><span class="stat-label">Win Rate</span><span class="stat-value ${parseFloat(wr) >= 53 ? 'green' : ''}">${wr}%</span></div>
+      <div class="stat-row"><span class="stat-label">Kelly P&L</span><span class="stat-value ${summary.kellyPnl >= 0 ? 'green' : 'red'}">$${summary.kellyPnl?.toFixed(0) || 0}</span></div>
+      <div class="stat-row"><span class="stat-label">Flat ROI</span><span class="stat-value ${summary.roi >= 0 ? 'green' : 'red'}">${summary.roi?.toFixed(1) || 0}%</span></div>
+      <div class="stat-row"><span class="stat-label">Avg CLV</span><span class="stat-value ${(summary.avgCLV || 0) >= 0 ? 'green' : 'red'}">${summary.avgCLV?.toFixed(2) || 'N/A'}%</span></div>
+      <div class="stat-row"><span class="stat-label">Total Picks</span><span class="stat-value">${summary.total}</span></div>
+    `;
+    document.getElementById('date-range').textContent = `${summary.dateRange?.start || ''} → ${summary.dateRange?.end || ''} (${summary.daysActive || 0} days)`;
+
+    // By type
+    let typeHtml = '';
+    for (const [type, stats] of Object.entries(byCategory.byType || {})) {
+      const typeWr = stats.wins / (stats.wins + stats.losses) * 100;
+      typeHtml += `<div class="stat-row"><span class="stat-label">${type.toUpperCase()}</span><span class="stat-value">${stats.wins}-${stats.losses} <span class="${typeWr >= 53 ? 'green' : typeWr >= 50 ? 'yellow' : 'red'}">(${typeWr.toFixed(0)}%)</span></span></div>`;
+    }
+    document.getElementById('by-type').innerHTML = typeHtml || '<p style="color:#8b949e">No data yet</p>';
+
+    // By confidence
+    let confHtml = '';
+    for (const [conf, stats] of Object.entries(byCategory.byConfidence || {})) {
+      const confWr = stats.wins / (stats.wins + stats.losses) * 100;
+      confHtml += `<div class="stat-row"><span class="stat-label">${conf}</span><span class="stat-value">${stats.wins}-${stats.losses} <span class="${confWr >= 55 ? 'green' : ''}">(${confWr.toFixed(0)}%)</span></span></div>`;
+    }
+    document.getElementById('by-confidence').innerHTML = confHtml || '<p style="color:#8b949e">No data yet</p>';
+
+    // NBA stats
+    const nbaStats = byCategory.bySport?.NBA;
+    if (nbaStats) {
+      const nbaWr = nbaStats.wins / (nbaStats.wins + nbaStats.losses) * 100;
+      document.getElementById('nba-stats').innerHTML = `
+        <div class="stat-row"><span class="stat-label">Record</span><span class="stat-value">${nbaStats.wins}-${nbaStats.losses} (${nbaWr.toFixed(0)}%)</span></div>
+        <div class="stat-row"><span class="stat-label">P&L</span><span class="stat-value ${nbaStats.pnl >= 0 ? 'green' : 'red'}">$${nbaStats.pnl?.toFixed(0) || 0}</span></div>
+      `;
+    } else {
+      document.getElementById('nba-stats').innerHTML = '<p style="color:#8b949e">No NBA data yet</p>';
+    }
+
+    // CLV chart
+    if (clvTrend.length > 0) {
+      renderChart('clv-chart', 'line', {
+        labels: clvTrend.map(d => d.date.slice(5)),
+        datasets: [{ label: 'Avg CLV %', data: clvTrend.map(d => d.avg_clv), borderColor: '#58a6ff', tension: 0.3, fill: false }]
+      });
+    }
+
+    // P&L chart
+    if (roiCurve.length > 0) {
+      let cum = 0;
+      const cumData = roiCurve.map(d => { cum += d.day_pnl; return cum; });
+      renderChart('pnl-chart', 'line', {
+        labels: roiCurve.map(d => d.date.slice(5)),
+        datasets: [{ label: 'Cumulative P&L ($)', data: cumData, borderColor: cumData[cumData.length-1] >= 0 ? '#3fb950' : '#f85149', tension: 0.3, fill: true, backgroundColor: 'rgba(56,139,253,0.1)' }]
+      });
+    }
+
+    // Calibration chart
+    if (calibration.length > 0) {
+      renderChart('cal-chart', 'scatter', {
+        datasets: [
+          { label: 'Actual vs Predicted', data: calibration.map(d => ({ x: d.avg_predicted * 100, y: (d.wins / d.count) * 100 })), backgroundColor: '#58a6ff' },
+          { label: 'Perfect', data: [{x:40,y:40},{x:50,y:50},{x:60,y:60},{x:70,y:70},{x:80,y:80}], borderColor: '#30363d', showLine: true, pointRadius: 0 }
+        ]
+      }, { scales: { x: { title: { display: true, text: 'Predicted %', color: '#8b949e' }}, y: { title: { display: true, text: 'Actual %', color: '#8b949e' }}}});
+    }
+
+  } catch (e) {
+    console.error('Dashboard load error:', e);
+  }
+}
+
+function renderChart(canvasId, type, data, extraOptions = {}) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type,
+    data,
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#8b949e' }}},
+      scales: {
+        x: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, ...extraOptions.scales?.x },
+        y: { ticks: { color: '#8b949e' }, grid: { color: '#21262d' }, ...extraOptions.scales?.y }
+      },
+      ...extraOptions
+    }
+  });
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
