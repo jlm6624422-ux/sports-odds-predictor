@@ -1221,6 +1221,27 @@ app.get('/api/dashboard/calibration', (req, res) => {
   }
 });
 
+app.get('/api/dashboard/backtest', (req, res) => {
+  try {
+    const run = db.prepare('SELECT * FROM backtest_runs ORDER BY created_at DESC LIMIT 1').get();
+    if (!run) return res.json(null);
+    res.json({
+      runDate: run.run_date,
+      modelVersion: run.model_version,
+      dateRange: { start: run.date_range_start, end: run.date_range_end },
+      record: { wins: run.wins, losses: run.losses, pushes: run.pushes, total: run.total_picks },
+      winRate: run.win_rate,
+      roi: run.roi,
+      avgCLV: run.avg_clv,
+      flatPnl: run.flat_pnl,
+      kellyPnl: run.kelly_pnl,
+      duration: run.duration_ms,
+    });
+  } catch (e) {
+    res.json(null);
+  }
+});
+
 // --- CLV CAPTURE ---
 async function captureClosingLines() {
   const today = new Date().toISOString().split('T')[0];

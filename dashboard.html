@@ -86,12 +86,13 @@ let charts = {};
 
 async function loadDashboard() {
   try {
-    const [summary, byCategory, clvTrend, roiCurve, calibration] = await Promise.all([
+    const [summary, byCategory, clvTrend, roiCurve, calibration, backtest] = await Promise.all([
       fetch('/api/dashboard/summary').then(r => r.json()),
       fetch('/api/dashboard/by-category').then(r => r.json()),
       fetch('/api/dashboard/clv-trend').then(r => r.json()),
       fetch('/api/dashboard/roi-curve').then(r => r.json()),
       fetch('/api/dashboard/calibration').then(r => r.json()),
+      fetch('/api/dashboard/backtest').then(r => r.json()),
     ]);
 
     // Overall record
@@ -132,6 +133,21 @@ async function loadDashboard() {
       `;
     } else {
       document.getElementById('nba-stats').innerHTML = '<p style="color:#8b949e">No NBA data yet</p>';
+    }
+
+    // Backtest
+    if (backtest) {
+      document.getElementById('backtest-info').innerHTML = `
+        <div class="stat-row"><span class="stat-label">Model</span><span class="stat-value">${backtest.modelVersion}</span></div>
+        <div class="stat-row"><span class="stat-label">Period</span><span class="stat-value">${backtest.dateRange.start?.slice(5)} → ${backtest.dateRange.end?.slice(5)}</span></div>
+        <div class="stat-row"><span class="stat-label">Record</span><span class="stat-value">${backtest.record.wins}-${backtest.record.losses} (${backtest.winRate?.toFixed(1)}%)</span></div>
+        <div class="stat-row"><span class="stat-label">Kelly P&L</span><span class="stat-value ${backtest.kellyPnl >= 0 ? 'green' : 'red'}">$${backtest.kellyPnl?.toFixed(0)}</span></div>
+        <div class="stat-row"><span class="stat-label">Flat ROI</span><span class="stat-value ${backtest.roi >= 0 ? 'green' : 'red'}">${backtest.roi?.toFixed(1)}%</span></div>
+        <div class="stat-row"><span class="stat-label">Runtime</span><span class="stat-value">${backtest.duration}ms</span></div>
+        <p style="color:#6b7280;font-size:0.75em;margin-top:8px">Run: node scripts/backtest.js</p>
+      `;
+    } else {
+      document.getElementById('backtest-info').innerHTML = '<p style="color:#8b949e">No backtest run yet.<br><code style="font-size:0.8em">node scripts/backtest.js</code></p>';
     }
 
     // CLV chart
