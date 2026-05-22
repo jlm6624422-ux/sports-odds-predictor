@@ -644,9 +644,11 @@ ${parlaysHTML}
 </div>
 
 <div class="nav-links">
+<a href="/early">Early Action</a>
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
 <a href="/nba">NBA</a>
+<a href="/dashboard">Dashboard</a>
 </div>
 
 <footer>
@@ -996,8 +998,10 @@ ${nbaContent}
 
 <div class="nav-links">
 <a href="/">Daily Picks</a>
+<a href="/early">Early Action</a>
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
+<a href="/dashboard">Dashboard</a>
 </div>
 
 <footer>
