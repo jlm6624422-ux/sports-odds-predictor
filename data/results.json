@@ -475,5 +475,50 @@
       "recordedAt": "2026-05-22T13:51:30.847Z"
     }
   },
-  "2026-05-22": {}
+  "2026-05-22": {
+    "parlay-2026-05-22-0": {
+      "result": "loss",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "parlay-2026-05-22-1": {
+      "result": "win",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "parlay-2026-05-22-2": {
+      "result": "loss",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "parlay-2026-05-22-3": {
+      "result": "pending",
+      "recordedAt": ""
+    },
+    "parlay-2026-05-22-4": {
+      "result": "loss",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "parlay-2026-05-22-5": {
+      "result": "loss",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "HOU @ CHC-over": {
+      "result": "loss",
+      "score": "Astros 4, Cubs 2 (6 total)",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "CLE @ PHI-ml": {
+      "result": "loss",
+      "score": "Guardians 1, Phillies 0",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "NYM @ MIA-ml": {
+      "result": "win",
+      "score": "Mets 1, Marlins 2",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    },
+    "COL @ ARI-ml": {
+      "result": "loss",
+      "score": "Rockies 3, Diamondbacks 2",
+      "recordedAt": "2026-05-23T12:00:00Z"
+    }
+  }
 }
