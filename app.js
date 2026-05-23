@@ -132,7 +132,13 @@ app.get('/api/today', (req, res) => {
 
 app.get('/api/nba-bestbets', (req, res) => {
   const historyDir = path.join(__dirname, 'data', 'history');
+  const resultsPath = path.join(__dirname, 'data', 'results.json');
   if (!fs.existsSync(historyDir)) return res.json({ days: [] });
+
+  let results = {};
+  if (fs.existsSync(resultsPath)) {
+    results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+  }
 
   const files = fs.readdirSync(historyDir).sort().reverse().slice(0, 14);
   const days = [];
@@ -140,10 +146,46 @@ app.get('/api/nba-bestbets', (req, res) => {
     try {
       const data = JSON.parse(fs.readFileSync(path.join(historyDir, f), 'utf8'));
       if (!data.nba || data.nba.length === 0) continue;
+      const date = f.replace('.json', '');
+      const dayResults = results[date] || {};
       const picks = [];
+
       for (const game of data.nba) {
+        // Game-level picks (spread, ML, O/U)
+        if (game.spread) {
+          const spreadKey = `nba-${date}-spread`;
+          picks.push({
+            type: 'spread',
+            team: `${game.away} ${game.spread > 0 ? '+' : ''}${game.spread}`,
+            matchup: `${game.away} @ ${game.home}`,
+            line: `${game.away} ${game.spread > 0 ? '+' : ''}${game.spread}`,
+            odds: '-110',
+            confidence: 'med',
+            thesis: `Spread: ${game.spread}`,
+            result: dayResults[spreadKey]?.result || 'pending',
+            score: dayResults[spreadKey]?.score || '',
+          });
+        }
+        if (game.ou) {
+          const ouKey = `nba-${date}-over`;
+          picks.push({
+            type: 'over',
+            team: `OVER ${game.ou}`,
+            matchup: `${game.away} @ ${game.home}`,
+            line: `O ${game.ou}`,
+            odds: '-110',
+            confidence: 'med',
+            thesis: `Total: ${game.ou}`,
+            result: dayResults[ouKey]?.result || 'pending',
+            score: dayResults[ouKey]?.score || '',
+          });
+        }
+
+        // Prop picks
         if (game.propPicks) {
-          for (const prop of game.propPicks) {
+          for (let pi = 0; pi < game.propPicks.length; pi++) {
+            const prop = game.propPicks[pi];
+            const propKey = `nba-${date}-prop-${pi}`;
             picks.push({
               type: 'prop',
               team: `${prop.name} ${prop.direction} ${prop.line} ${prop.stat}`,
@@ -152,14 +194,14 @@ app.get('/api/nba-bestbets', (req, res) => {
               odds: '-110',
               confidence: prop.confidence?.toLowerCase() || 'med',
               thesis: `Avg ${prop.seasonAvg} → Proj ${prop.projected}`,
-              result: 'pending',
-              score: '',
+              result: dayResults[propKey]?.result || 'pending',
+              score: dayResults[propKey]?.score || '',
             });
           }
         }
       }
       if (picks.length > 0) {
-        days.push({ date: f.replace('.json', ''), picks });
+        days.push({ date, picks });
       }
     } catch (e) {}
   }
@@ -249,9 +291,11 @@ app.get('/api/bestbets', (req, res) => {
         const ml = side === 'home' ? (game.homeML || '') : (game.awayML || '');
         const lineStr = `${abbrevTeam(team)} ${ml > 0 ? '+' : ''}${ml}`;
         const resultKey = `${matchupStr}-ml`;
+        const stake = game.kelly?.betSize || 25;
 
         picks.push({
           type: 'ml', team, matchup: matchupStr, line: lineStr,
+          odds: ml, stake,
           winProb: side === 'home' ? prediction.homeWinProb : prediction.awayWinProb,
           confidence,
           pitchers: `${game.awayPitcher || 'TBD'} vs ${game.homePitcher || 'TBD'}`,
@@ -1010,14 +1054,20 @@ async function gradeResults() {
             }
           }
 
-          if (legWon === null) { allGraded = false; allWon = false; break; }
+          if (legWon === null) { allGraded = false; break; }
           if (legWon === false) { allWon = false; break; }
         }
 
-        if (allGraded || !allWon) {
-          dayResults[resultKey] = { result: allWon ? 'win' : 'loss', recordedAt: new Date().toISOString() };
+        if (!allWon && allGraded !== false) {
+          // A leg confirmed lost — parlay is a loss regardless of remaining legs
+          dayResults[resultKey] = { result: 'loss', recordedAt: new Date().toISOString() };
+          graded++;
+        } else if (allGraded && allWon) {
+          // All legs confirmed won — parlay wins
+          dayResults[resultKey] = { result: 'win', recordedAt: new Date().toISOString() };
           graded++;
         }
+        // Otherwise: ungraded legs remain — leave as pending
       }
     }
 
@@ -1042,7 +1092,7 @@ function scheduleDailyRun() {
   }
 
   function getTodayDate() {
-    return new Date().toISOString().split('T')[0];
+    return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })).toISOString().split('T')[0];
   }
 
   function todayHistoryExists() {
@@ -1068,6 +1118,7 @@ function scheduleDailyRun() {
   }
 
   let lastClvDate = null;
+  let lastLateGrade = null;
 
   setInterval(() => {
     const etHour = getETHour();
@@ -1087,6 +1138,13 @@ function scheduleDailyRun() {
       runPredictions().catch(e => console.error('[CRON] Failed:', e.message));
     } else if (todayHistoryExists()) {
       lastRunDate = todayStr;
+    }
+
+    // Second grading pass at 11pm ET to catch completed games same-day
+    if (etHour >= 23 && lastGradeDate === todayStr && !lastLateGrade) {
+      lastLateGrade = todayStr;
+      console.log(`[CRON] Late-night grading pass for today's games`);
+      gradeResults().catch(e => console.error('[CRON] Late grade failed:', e.message));
     }
 
     // CLV: capture closing lines at 6:45pm and 10pm ET

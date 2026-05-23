@@ -251,11 +251,6 @@
       "l": 4,
       "pnl": 28.010000000000005
     },
-    "parlays": {
-      "w": 0,
-      "l": 6,
-      "pnl": -230
-    },
     "dayTotal": -201.99,
     "runningTotal": -201.99,
     "bets": [
@@ -341,7 +336,7 @@
       },
       {
         "type": "parlay",
-        "label": "Parlay A — Safe 2-Leg",
+        "label": "Parlay A \u2014 Safe 2-Leg",
         "legs": "New York Knicks ML + Arizona Diamondbacks ML",
         "stake": 50,
         "odds": 2.1062395972881904,
@@ -351,7 +346,7 @@
       },
       {
         "type": "parlay",
-        "label": "Parlay B — SGP Value",
+        "label": "Parlay B \u2014 SGP Value",
         "legs": "Cleveland Cavaliers +6.5 + Over 216.5",
         "stake": 50,
         "odds": 3.569169960474308,
@@ -361,7 +356,7 @@
       },
       {
         "type": "parlay",
-        "label": "Parlay C — Cross-Sport 3-Leg",
+        "label": "Parlay C \u2014 Cross-Sport 3-Leg",
         "legs": "Cleveland Cavaliers +6.5 + Arizona Diamondbacks ML + New York Yankees ML",
         "stake": 30,
         "odds": 4.633634014623851,
@@ -371,7 +366,7 @@
       },
       {
         "type": "parlay",
-        "label": "Parlay D — Dogs Longshot",
+        "label": "Parlay D \u2014 Dogs Longshot",
         "legs": "Cleveland Cavaliers ML + St. Louis Cardinals ML",
         "stake": 20,
         "odds": 6.0600000000000005,
@@ -480,22 +475,5 @@
       "recordedAt": "2026-05-22T13:51:30.847Z"
     }
   },
-  "2026-05-22": {
-    "parlay-2026-05-22-0": {
-      "result": "loss",
-      "recordedAt": "2026-05-22T13:51:30.744Z"
-    },
-    "parlay-2026-05-22-1": {
-      "result": "loss",
-      "recordedAt": "2026-05-22T13:51:30.745Z"
-    },
-    "parlay-2026-05-22-2": {
-      "result": "loss",
-      "recordedAt": "2026-05-22T13:51:30.745Z"
-    },
-    "parlay-2026-05-22-3": {
-      "result": "loss",
-      "recordedAt": "2026-05-22T13:51:30.745Z"
-    }
-  }
+  "2026-05-22": {}
 }

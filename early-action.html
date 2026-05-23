@@ -11,13 +11,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monos
 .header h1 { font-size: 1.6em; }
 .header .sunrise { font-size: 2em; }
 .header p { color: #8b949e; font-size: 0.9em; margin-top: 4px; }
+.summary-bar { display: flex; justify-content: center; gap: 20px; padding: 12px 16px; background: #161b22; border: 1px solid #30363d; border-radius: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.summary-bar .stat { text-align: center; }
+.summary-bar .stat .val { font-size: 1.3em; font-weight: 700; }
+.summary-bar .stat .lbl { font-size: 0.7em; color: #8b949e; text-transform: uppercase; }
 .recommendation { text-align: center; padding: 16px; margin-bottom: 24px; border-radius: 10px; font-weight: 600; font-size: 1.1em; }
 .rec-hot { background: linear-gradient(135deg, #064e3b, #065f46); border: 1px solid #34d399; color: #34d399; }
 .rec-caution { background: linear-gradient(135deg, #451a03, #78350f); border: 1px solid #f59e0b; color: #fbbf24; }
 .rec-none { background: #161b22; border: 1px solid #30363d; color: #8b949e; }
-.game-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+.game-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; margin-bottom: 16px; transition: border-color 0.3s; }
 .game-card.has-edge { border-color: #238636; }
 .game-card.coin-flip { border-color: #30363d; opacity: 0.7; }
+.game-card.graded-win { border-color: #34d399; border-width: 2px; background: linear-gradient(135deg, #0d1117, #061a12); }
+.game-card.graded-loss { border-color: #f87171; border-width: 2px; background: linear-gradient(135deg, #0d1117, #1a0608); }
 .game-time { font-size: 0.85em; color: #f0883e; font-weight: 700; margin-bottom: 8px; }
 .matchup { font-size: 1.3em; font-weight: 700; margin-bottom: 6px; }
 .pitchers { color: #8b949e; font-size: 0.85em; margin-bottom: 12px; }
@@ -37,9 +43,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monos
 .blue { color: #58a6ff; }
 .orange { color: #f0883e; }
 .totals-pick { margin-top: 10px; padding: 8px 12px; background: #0d1117; border-radius: 6px; border-left: 3px solid #58a6ff; }
+.result-row { margin-top: 12px; padding: 10px 14px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; }
+.result-row.win { background: rgba(52,211,153,0.1); border: 1px solid #34d399; }
+.result-row.loss { background: rgba(248,113,113,0.1); border: 1px solid #f87171; }
+.result-badge { padding: 4px 12px; border-radius: 6px; font-weight: 800; font-size: 0.9em; }
+.result-badge.win { background: #064e3b; color: #34d399; }
+.result-badge.loss { background: #7f1d1d; color: #f87171; }
+.winnings { font-size: 1.2em; font-weight: 800; }
+.score-text { color: #8b949e; font-size: 0.85em; }
+.history-section { margin-top: 32px; border-top: 1px solid #30363d; padding-top: 24px; }
+.history-section h2 { color: #8b949e; font-size: 1.1em; margin-bottom: 16px; }
+.day-group { margin-bottom: 12px; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; }
+.day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #161b22; cursor: pointer; user-select: none; }
+.day-header:hover { background: #1c2128; }
+.day-header h4 { font-size: 0.9em; color: #e6edf3; }
+.day-header .day-summary { display: flex; gap: 12px; font-size: 0.8em; align-items: center; }
+.day-header .chevron { color: #8b949e; transition: transform 0.2s; }
+.day-header .chevron.open { transform: rotate(180deg); }
+.day-body { display: none; padding: 12px 16px; }
+.day-body.open { display: block; }
+.day-pick { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; }
+.day-pick.win { background: rgba(52,211,153,0.06); border-left: 3px solid #34d399; }
+.day-pick.loss { background: rgba(248,113,113,0.06); border-left: 3px solid #f87171; }
+.day-pick.pending { background: rgba(245,158,11,0.06); border-left: 3px solid #f59e0b; }
 .nav { text-align: center; margin-top: 20px; }
 .nav a { color: #58a6ff; text-decoration: none; margin: 0 12px; font-size: 0.9em; }
 .refresh-btn { display: block; margin: 20px auto; padding: 10px 24px; background: #238636; color: #fff; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; }
+.refresh-btn:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
 .empty-state { text-align: center; padding: 60px 20px; color: #8b949e; }
 .empty-state .icon { font-size: 3em; margin-bottom: 12px; }
 </style>
@@ -51,26 +81,90 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monos
   <p>MLB Day Games — Start the day hot</p>
 </div>
 
+<div class="summary-bar" id="summary-bar" style="display:none">
+  <div class="stat"><div class="val" id="ea-record">—</div><div class="lbl">Record</div></div>
+  <div class="stat"><div class="val" id="ea-pnl">—</div><div class="lbl">P&L</div></div>
+  <div class="stat"><div class="val" id="ea-games">—</div><div class="lbl">Games</div></div>
+</div>
+
 <div id="recommendation" class="recommendation rec-none">Loading...</div>
 <div id="games-container"></div>
 
-<button class="refresh-btn" onclick="loadEarlyAction()">Refresh</button>
+<button class="refresh-btn" id="refresh-btn" onclick="refreshAll()">Refresh Results</button>
+
+<div class="history-section" id="history-section" style="display:none">
+  <h2>Past Early Action Results</h2>
+  <div id="history-container"></div>
+</div>
 
 <div class="nav">
   <a href="/">All Picks</a>
   <a href="/mlb">MLB Tracker</a>
   <a href="/nba">NBA</a>
   <a href="/tracker">Betting Tracker</a>
-  <a href="/dashboard">Dashboard</a>
 </div>
 
 <script>
+const TEAM_ABBREVS = {
+  'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
+  'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
+  'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
+  'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
+  'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
+  'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
+  'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
+  'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
+  'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
+  'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
+  'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
+  'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
+  'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
+  'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
+};
+
+function getAbbrev(name) {
+  return TEAM_ABBREVS[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
+}
+
+function calcWinnings(odds, stake) {
+  odds = parseInt(odds) || -110;
+  stake = stake || 25;
+  if (odds > 0) return stake * odds / 100;
+  return stake * 100 / Math.abs(odds);
+}
+
+function formatPnl(val) {
+  if (val >= 0) return '+$' + val.toFixed(2);
+  return '-$' + Math.abs(val).toFixed(2);
+}
+
+function findPickResult(trackerDays, pick, date) {
+  if (!trackerDays) return null;
+  const day = trackerDays.find(d => d.date === date);
+  if (!day) return null;
+
+  const homeAbbr = getAbbrev(pick.home);
+  const awayAbbr = getAbbrev(pick.away);
+
+  for (const tp of day.picks) {
+    if (tp.matchup && tp.matchup.includes(homeAbbr) && tp.matchup.includes(awayAbbr)) {
+      if (tp.result !== 'pending') return tp;
+    }
+  }
+  return null;
+}
+
+let trackerData = null;
+
 async function loadEarlyAction() {
   try {
-    const res = await fetch('/api/early-action');
-    const data = await res.json();
+    const [earlyRes, trackerRes] = await Promise.all([
+      fetch('/api/early-action'),
+      fetch('/api/tracker')
+    ]);
+    const data = await earlyRes.json();
+    trackerData = await trackerRes.json();
 
-    // Recommendation banner
     const recEl = document.getElementById('recommendation');
     if (data.earlyGames === 0) {
       recEl.className = 'recommendation rec-none';
@@ -83,16 +177,21 @@ async function loadEarlyAction() {
       recEl.innerHTML = '&#9888;&#65039; ' + data.recommendation;
     }
 
-    // Game cards
     const container = document.getElementById('games-container');
     if (data.picks.length === 0) {
       container.innerHTML = '<div class="empty-state"><div class="icon">&#127748;</div><p>No early games today.<br>First pitch is after 4pm ET.</p><p style="margin-top:12px;font-size:0.85em">Check back tomorrow — day games are common on Wednesdays, Sundays, and getaway days.</p></div>';
       return;
     }
 
+    let wins = 0, losses = 0, totalPnl = 0;
     let html = '';
+
     for (const pick of data.picks) {
-      const cardClass = pick.coinFlip ? 'game-card coin-flip' : pick.edge >= 5 ? 'game-card has-edge' : 'game-card';
+      const result = findPickResult(trackerData.days, pick, data.date);
+      let cardClass = pick.coinFlip ? 'game-card coin-flip' : pick.edge >= 5 ? 'game-card has-edge' : 'game-card';
+      if (result && result.result === 'win') cardClass = 'game-card graded-win';
+      else if (result && result.result === 'loss') cardClass = 'game-card graded-loss';
+
       const badgeClass = pick.kelly === 'STRONG BET' ? 'pick-strong'
         : pick.kelly === 'STANDARD BET' ? 'pick-standard'
         : pick.kelly === 'SMALL BET' ? 'pick-small'
@@ -131,12 +230,113 @@ async function loadEarlyAction() {
         }
       }
 
+      // Result section
+      if (result && result.result !== 'pending') {
+        const isWin = result.result === 'win';
+        const odds = pick.pickSide === 'home' ? pick.homeML : pick.awayML;
+        const stake = pick.betSize > 0 ? pick.betSize : 25;
+        const pnl = isWin ? calcWinnings(odds, stake) : -stake;
+        if (isWin) wins++; else losses++;
+        totalPnl += pnl;
+
+        html += '<div class="result-row ' + result.result + '">';
+        html += '<div><span class="result-badge ' + result.result + '">' + (isWin ? 'W' : 'L') + '</span>';
+        html += ' <span class="score-text">' + (result.score || '') + '</span></div>';
+        html += '<div class="winnings ' + (isWin ? 'green' : 'red') + '">' + formatPnl(pnl) + '</div>';
+        html += '</div>';
+      }
+
       html += '</div>';
     }
 
     container.innerHTML = html;
+
+    // Update summary bar
+    if (wins > 0 || losses > 0) {
+      document.getElementById('summary-bar').style.display = 'flex';
+      document.getElementById('ea-record').innerHTML = '<span class="green">' + wins + 'W</span>-<span class="red">' + losses + 'L</span>';
+      const pnlEl = document.getElementById('ea-pnl');
+      pnlEl.textContent = formatPnl(totalPnl);
+      pnlEl.className = 'val ' + (totalPnl >= 0 ? 'green' : 'red');
+      document.getElementById('ea-games').textContent = data.picks.length;
+    }
+
+    // Render history
+    renderHistory();
   } catch (e) {
     document.getElementById('games-container').innerHTML = '<div class="empty-state"><p>Error loading early action data.</p></div>';
+  }
+}
+
+function renderHistory() {
+  if (!trackerData || !trackerData.days || trackerData.days.length <= 1) return;
+  const section = document.getElementById('history-section');
+  section.style.display = 'block';
+
+  const container = document.getElementById('history-container');
+  let html = '';
+
+  for (const day of trackerData.days.slice(1, 8)) {
+    const earlyPicks = day.picks.filter(p => p.signal === 'kelly' || p.signal === 'lean');
+    if (earlyPicks.length === 0) continue;
+
+    const dayW = earlyPicks.filter(p => p.result === 'win').length;
+    const dayL = earlyPicks.filter(p => p.result === 'loss').length;
+    let dayPnl = 0;
+    earlyPicks.forEach(p => {
+      if (p.result === 'win') dayPnl += calcWinnings(p.odds, p.stake);
+      else if (p.result === 'loss') dayPnl -= p.stake;
+    });
+
+    const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const pnlCls = dayPnl >= 0 ? 'green' : 'red';
+
+    html += '<div class="day-group">';
+    html += '<div class="day-header" onclick="toggleDay(this)"><h4>' + dateLabel + '</h4>';
+    html += '<div class="day-summary"><span class="green">' + dayW + 'W</span>-<span class="red">' + dayL + 'L</span>';
+    html += '<span class="' + pnlCls + '">' + formatPnl(dayPnl) + '</span>';
+    html += '<span class="chevron">&#9660;</span></div></div>';
+    html += '<div class="day-body">';
+
+    for (const p of earlyPicks) {
+      const cls = p.result === 'win' ? 'win' : p.result === 'loss' ? 'loss' : 'pending';
+      const pnl = p.result === 'win' ? calcWinnings(p.odds, p.stake) : p.result === 'loss' ? -p.stake : 0;
+      html += '<div class="day-pick ' + cls + '">';
+      html += '<span style="font-weight:600">' + p.team + ' ' + (p.type === 'ml' ? 'ML' : p.type.toUpperCase()) + '</span>';
+      html += '<span>' + p.matchup + '</span>';
+      if (p.result !== 'pending') {
+        html += '<span class="' + (p.result === 'win' ? 'green' : 'red') + '" style="font-weight:700">' + formatPnl(pnl) + '</span>';
+      } else {
+        html += '<span style="color:#f59e0b">PEND</span>';
+      }
+      html += '</div>';
+    }
+
+    html += '</div></div>';
+  }
+
+  container.innerHTML = html;
+}
+
+function toggleDay(el) {
+  const body = el.nextElementSibling;
+  const chevron = el.querySelector('.chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+async function refreshAll() {
+  const btn = document.getElementById('refresh-btn');
+  btn.textContent = 'Grading...';
+  btn.disabled = true;
+  try {
+    await fetch('/api/grade', { method: 'POST' });
+    await loadEarlyAction();
+    btn.textContent = 'Updated!';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000);
+  } catch (e) {
+    btn.textContent = 'Error';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000);
   }
 }
 
