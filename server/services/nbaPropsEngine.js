@@ -3,12 +3,12 @@
  * Extracted from run-nba-props.js for use in the cron pipeline.
  */
 
-const PLAYOFF_PACE_ADJ = 0.98;
-const STAR_USAGE_BOOST = 1.05;
+const PLAYOFF_PACE_ADJ = 0.96;
+const STAR_USAGE_BOOST = 1.0;
 const GAME1_CONSERVATIVE = 0.97;
 const AVG_NBA_TOTAL = 225;
-const PLAYOFF_MINUTES_BOOST = 1.08; // Stars play ~8% more minutes in playoffs
-const PLAYOFF_AST_DISCOUNT = 0.82; // Assists drop ~18% in playoffs (more iso-heavy)
+const PLAYOFF_MINUTES_BOOST = 1.0;
+const PLAYOFF_AST_DISCOUNT = 0.90;
 
 // Teams that run heavy iso in playoffs (assists will drop more)
 const ISO_HEAVY_TEAMS = ['CLE', 'DAL', 'BOS', 'DEN', 'MIL'];
@@ -94,20 +94,16 @@ function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false)
   if (!player) return null;
 
   const paceMultiplier = projectedTotal / AVG_NBA_TOTAL;
-  const isStar = player.pts >= 20;
-  const ptsAdj = isStar ? STAR_USAGE_BOOST : 1.0;
   const g1Adj = isGame1 ? GAME1_CONSERVATIVE : 1.0;
-
-  // Playoff minutes boost: stars stay in longer during playoffs
-  const minBoost = (isPlayoffs && isStar) ? PLAYOFF_MINUTES_BOOST : 1.0;
 
   // Playoff assists discount: teams go iso-heavy in postseason
   const isIsoTeam = ISO_HEAVY_TEAMS.includes(player.team);
-  const astAdj = isPlayoffs ? (isIsoTeam ? PLAYOFF_AST_DISCOUNT * 0.9 : PLAYOFF_AST_DISCOUNT) : 1.0;
+  const astAdj = isPlayoffs ? (isIsoTeam ? PLAYOFF_AST_DISCOUNT * 0.85 : PLAYOFF_AST_DISCOUNT) : 1.0;
 
-  const projPts = player.pts * paceMultiplier * ptsAdj * g1Adj * minBoost;
-  const projReb = player.reb * paceMultiplier * g1Adj * minBoost;
-  const projAst = player.ast * paceMultiplier * g1Adj * astAdj;
+  // Conservative projections — close to season averages with pace adjustment only
+  const projPts = player.pts * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj;
+  const projReb = player.reb * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj;
+  const projAst = player.ast * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj * astAdj;
   const pra = projPts + projReb + projAst;
 
   return { ...player, name, projPts, projReb, projAst, pra };

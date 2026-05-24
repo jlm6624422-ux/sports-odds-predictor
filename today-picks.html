@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Picks & Projections</title>
+<title>Today's Picks - 2026-05-24</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
@@ -33,13 +33,11 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 
 .top-picks{background:linear-gradient(135deg,#1a2332,#161b22);border:2px solid #3fb950;border-radius:12px;padding:20px;margin-bottom:20px}
 .top-picks h2{color:#3fb950;margin-bottom:12px;font-size:1.2em}
-.pick-item{display:flex;align-items:center;padding:10px 14px;background:rgba(63,185,80,0.05);border-radius:8px;margin-bottom:6px;border-left:3px solid #3fb950;flex-wrap:wrap;gap:8px}
+.pick-item{display:flex;align-items:center;padding:10px 14px;background:rgba(63,185,80,0.05);border-radius:8px;margin-bottom:6px;border-left:3px solid #3fb950}
 .pick-item.nba{border-left-color:#f0883e;background:rgba(240,136,62,0.05)}
 .pick-item.kelly{border-left-color:#ff7b72;background:rgba(255,123,114,0.05)}
 .pick-item.over{border-left-color:#a371f7;background:rgba(163,113,247,0.05)}
-.pick-item.graded-win{background:rgba(52,211,153,0.08);border-left:3px solid #34d399}
-.pick-item.graded-loss{background:rgba(248,113,113,0.08);border-left:3px solid #f87171}
-.pick-details{flex:1;min-width:200px}
+.pick-details{flex:1}
 .pick-game{font-size:0.8em;color:#8b949e}
 .pick-bet{font-weight:600;font-size:1.05em;margin-top:2px}
 .pick-edge{font-weight:700;font-size:1.1em;color:#3fb950;margin:0 12px}
@@ -47,12 +45,9 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 .pick-conf.high{background:rgba(63,185,80,0.2);color:#3fb950}
 .pick-conf.med{background:rgba(210,153,34,0.2);color:#d29922}
 .pick-conf.kelly{background:rgba(255,123,114,0.2);color:#ff7b72}
-.pick-result{display:inline-flex;align-items:center;gap:6px}
-.pick-result .badge{padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700}
-.pick-result .badge.win{background:#064e3b;color:#34d399}
-.pick-result .badge.loss{background:#7f1d1d;color:#f87171}
-.pick-result .winnings{font-weight:800;font-size:0.95em}
-.pick-result .score{color:#8b949e;font-size:0.75em}
+
+.pick-item.graded-win{background:rgba(52,211,153,0.08);border-left:3px solid #34d399}
+.pick-item.graded-loss{background:rgba(248,113,113,0.08);border-left:3px solid #f87171}
 
 .game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
 .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -67,17 +62,12 @@ header .model-badge{display:inline-block;background:rgba(63,185,80,0.15);color:#
 
 .parlay-card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:18px;margin-bottom:10px;border-left:3px solid #a371f7}
 .parlay-card.best{border-color:#3fb950;border-width:2px}
-.parlay-card.graded-win{border-color:#34d399;background:rgba(52,211,153,0.05)}
-.parlay-card.graded-loss{border-color:#f87171;background:rgba(248,113,113,0.05)}
 .parlay-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .parlay-type{font-weight:700;color:#a371f7;font-size:0.95em}
 .parlay-odds{font-weight:700;font-size:1.2em}
 .parlay-legs{color:#8b949e;font-size:0.85em;margin-bottom:6px}
 .parlay-footer{display:flex;gap:16px;font-size:0.8em;color:#8b949e;flex-wrap:wrap}
 .parlay-footer .ev{color:#3fb950;font-weight:600}
-.parlay-result{margin-top:8px;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:6px}
-.parlay-result.win{background:rgba(52,211,153,0.1)}
-.parlay-result.loss{background:rgba(248,113,113,0.1)}
 
 .table-wrapper{overflow-x:auto;border-radius:8px;border:1px solid #21262d;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:0.85em;min-width:750px}
@@ -90,95 +80,89 @@ tr:hover td{background:rgba(88,166,255,0.03)}
 tr.row-win td{background:rgba(52,211,153,0.06);border-left:3px solid #34d399}
 tr.row-loss td{background:rgba(248,113,113,0.06);border-left:3px solid #f87171}
 
-.day-group{margin-bottom:16px;border:1px solid #21262d;border-radius:10px;overflow:hidden}
-.day-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#161b22;cursor:pointer;user-select:none}
-.day-header:hover{background:#1c2128}
-.day-header h4{font-size:0.9em;color:#e1e4e8}
-.day-header .day-summary{display:flex;gap:12px;font-size:0.8em;align-items:center}
-.day-header .chevron{color:#8b949e;transition:transform 0.2s}
-.day-header .chevron.open{transform:rotate(180deg)}
-.day-body{display:none;padding:0;overflow-x:auto}
-.day-body.open{display:block}
-
 .nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
 .nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
 .nav-links a:hover{text-decoration:underline}
 footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
-.btn{padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer}
-.btn:disabled{background:#374151;color:#6b7280;cursor:not-allowed}
-.loading{text-align:center;padding:40px;color:#8b949e}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
 <h1>Daily Picks &amp; Projections</h1>
-<div class="subtitle" id="date-subtitle">Loading...</div>
+<div class="subtitle">Sunday, May 24, 2026</div>
 <div class="model-badge">Ensemble v2.1 | 4/4 Models | ESPN/DK Odds</div>
 </header>
 
 <div class="stats-bar">
 <div class="stat"><div class="val" id="today-record" style="color:#8b949e">—</div><div class="lbl">Today W-L</div></div>
-<div class="stat"><div class="val" id="running-pnl">$0</div><div class="lbl">Running P&L</div></div>
-<div class="stat"><div class="val" id="target-pct">0%</div><div class="lbl">of $3K target</div></div>
-<div class="stat"><div class="val blue" id="picks-count">0</div><div class="lbl">Picks today</div></div>
-<div class="stat"><div class="val" id="parlays-count">0</div><div class="lbl">Parlays</div></div>
-<div class="stat"><div class="val" id="exposure">$0</div><div class="lbl">Exposure</div></div>
+<div class="stat"><div class="val">+$0</div><div class="lbl">Running P&L</div></div>
+<div class="stat"><div class="val">0%</div><div class="lbl">of $3K target</div></div>
+<div class="stat"><div class="val blue">10</div><div class="lbl">Picks today</div></div>
+<div class="stat"><div class="val">4</div><div class="lbl">Parlays</div></div>
+<div class="stat"><div class="val">$224</div><div class="lbl">Exposure</div></div>
 </div>
 
 <div class="tabs">
 <div class="tab active" onclick="switchTab('picks')">Picks</div>
 <div class="tab" onclick="switchTab('projections')">Projections</div>
 <div class="tab" onclick="switchTab('parlays')">Parlays</div>
-<div class="tab" onclick="switchTab('history')">History</div>
+<div class="tab" onclick="switchTab('results')">Results</div>
 </div>
 
-<div class="tab-content active" id="tab-picks"><div class="loading">Loading picks...</div></div>
-<div class="tab-content" id="tab-projections"><div class="loading">Loading projections...</div></div>
-<div class="tab-content" id="tab-parlays"><div class="loading">Loading parlays...</div></div>
-<div class="tab-content" id="tab-history"><div class="loading">Loading history...</div></div>
+<!-- PICKS TAB -->
+<div class="tab-content active" id="tab-picks">
+<div class="top-picks"><h2>&#127942; Today's Best Plays <button id="refresh-btn" onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></h2><div class="pick-item kelly" data-team="Chicago Cubs" data-type="ml" data-home="Chicago Cubs"><div class="pick-details"><div class="pick-game">Houston Astros @ Chicago Cubs &bull; Moneyline (Kelly)</div><div class="pick-bet">Chicago Cubs ML (-180) &mdash; $30</div></div><div class="pick-edge">+7.5%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item kelly" data-team="Miami Marlins" data-type="ml" data-home="Miami Marlins"><div class="pick-details"><div class="pick-game">New York Mets @ Miami Marlins &bull; Moneyline (Kelly)</div><div class="pick-bet">Miami Marlins ML (-124) &mdash; $29</div></div><div class="pick-edge">+5.4%</div><span class="pick-conf kelly">KELLY</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item nba"><div class="pick-details"><div class="pick-game">NBA: Oklahoma City Thunder @ San Antonio Spurs &bull; Spread</div><div class="pick-bet">Oklahoma City Thunder +2.5 (-115)</div></div><div class="pick-edge">+1.5</div><span class="pick-conf med">MED</span></div><div class="pick-item" data-team="Atlanta Braves" data-type="ml" data-home="Atlanta Braves"><div class="pick-details"><div class="pick-game">Washington Nationals @ Atlanta Braves &bull; Lean</div><div class="pick-bet">Atlanta Braves ML (-171)</div></div><div class="pick-edge">63.8%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="Arizona Diamondbacks" data-type="ml" data-home="Arizona Diamondbacks"><div class="pick-details"><div class="pick-game">Colorado Rockies @ Arizona Diamondbacks &bull; Lean</div><div class="pick-bet">Arizona Diamondbacks ML (-205)</div></div><div class="pick-edge">60.5%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div><div class="pick-item" data-team="Los Angeles Dodgers" data-type="ml" data-home="Milwaukee Brewers"><div class="pick-details"><div class="pick-game">Los Angeles Dodgers @ Milwaukee Brewers &bull; Lean</div><div class="pick-bet">Los Angeles Dodgers ML (-163)</div></div><div class="pick-edge">57.4%</div><span class="pick-conf med">LEAN</span><span class="pick-result" style="margin-left:8px"></span></div></div>
+<div class="section"><div class="section-title nba">&#127936; NBA</div><div class="game-card" style="border-color:#f0883e"><div class="game-header"><div class="game-matchup">Oklahoma City Thunder (64-18) @ San Antonio Spurs (62-20)</div><div class="game-time">5/24 - 8:00 PM EDT</div></div><div class="game-details"><div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">San Antonio Spurs -2.5</div></div><div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">219.5</div></div><div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">San Antonio Spurs -142 / Oklahoma City Thunder +120</div></div><div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Oklahoma City Thunder +2.5 (spread value)</div></div></div></div></div>
+</div>
+
+<!-- PROJECTIONS TAB -->
+<div class="tab-content" id="tab-projections">
+<div class="section">
+<div class="section-title" style="display:flex;justify-content:space-between;align-items:center">&#9918; MLB Full Projections &mdash; 16 Games <button onclick="refreshResults()" style="padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
+<div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>ML</th><th>O/U</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Proj Total</th><th>Roster</th><th>Signal</th></tr></thead><tbody><tr data-proj-home="Atlanta Braves" data-proj-pick="Atlanta Braves"><td>Nationals @ Braves</td><td>Griffin vs Pérez</td><td>-171</td><td>8.5</td><td class="edge-positive">Braves</td><td class="edge-positive">63.8%</td><td>+0.4%</td><td>9.2 (+0.7)</td><td><span style="color:#3fb950;font-weight:600" title="Farmer, Murphy, Henry on IL">+1.9%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Arizona Diamondbacks" data-proj-pick="Arizona Diamondbacks"><td>Rockies @ Diamondbacks</td><td>Quintana vs Nelson</td><td>-205</td><td>8.5</td><td class="edge-positive">Diamondbacks</td><td class="edge-positive">60.5%</td><td>+4.9%</td><td>9.4 (+0.9)</td><td><span style="color:#3fb950;font-weight:600" title="Santana, Jr., Vodnik, Doyle on IL">+0.1%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Miami Marlins" data-proj-pick="Miami Marlins"><td class="edge-positive">Mets @ Marlins</td><td>Scott vs Phillips</td><td>-124</td><td>7.5</td><td class="edge-positive">Marlins</td><td class="edge-positive">58.7%</td><td class="edge-high">+5.4%</td><td>7.7 (+0.2)</td><td><span style="color:#3fb950;font-weight:600" title="Jiménez, Conine, Senga, Holmes on IL">+4.8%</span></td><td class="edge-high">&#128293; KELLY</td></tr><tr data-proj-home="Milwaukee Brewers" data-proj-pick="Los Angeles Dodgers"><td>Dodgers @ Brewers</td><td>Yamamoto vs Sproat</td><td>-163</td><td>8</td><td class="edge-positive">Dodgers</td><td class="edge-positive">57.4%</td><td>+0.8%</td><td>8.5 (+0.5)</td><td><span style="color:#f85149;font-weight:600" title="Koenig, Woodruff, Casparius, Snell on IL">-5.7%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Chicago Cubs" data-proj-pick="Chicago Cubs"><td class="edge-positive">Astros @ Cubs</td><td>Lambert vs Imanaga</td><td>-180</td><td>7</td><td class="edge-positive">Cubs</td><td class="edge-positive">56.0%</td><td class="edge-high">+7.5%</td><td>7.7 (+0.7)</td><td><span style="color:#f85149;font-weight:600" title="Harvey, Horton, Brown, Correa on IL">-4.5%</span></td><td class="edge-high">&#128293; KELLY</td></tr><tr data-proj-home="New York Yankees" data-proj-pick="New York Yankees"><td>Rays @ Yankees</td><td>Rasmussen vs Weathers</td><td>-141</td><td>7</td><td class="edge-positive">Yankees</td><td class="edge-positive">54.7%</td><td>+3.4%</td><td>7.7 (+0.7)</td><td><span style="color:#f85149;font-weight:600" title="Fried, Domínguez, Williamson, Fraley on IL">-0.2%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Los Angeles Angels" data-proj-pick="Los Angeles Angels"><td>Rangers @ Angels</td><td>Gore vs Detmers</td><td>-123</td><td>8</td><td class="edge-positive">Angels</td><td class="edge-positive">53.8%</td><td>+1.7%</td><td>7.7 (-0.3)</td><td><span style="color:#3fb950;font-weight:600" title="d'Arnaud, Pomeranz, Garcia, Seager on IL">+2.9%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Baltimore Orioles" data-proj-pick="Baltimore Orioles"><td>Tigers @ Orioles</td><td>TBD vs Rogers</td><td>-126</td><td>8</td><td class="edge-positive">Orioles</td><td class="edge-positive">53.6%</td><td>+1.7%</td><td>8.0 (0.0)</td><td>—</td><td>&#128064; LEAN</td></tr><tr data-proj-home="San Francisco Giants" data-proj-pick="San Francisco Giants"><td>Sox @ Giants</td><td>Schultz vs Ray</td><td>-119</td><td>8</td><td class="edge-positive">Giants</td><td class="edge-positive">53.4%</td><td>+0.6%</td><td>8.3 (+0.3)</td><td><span style="color:#3fb950;font-weight:600" title="Webb, Ramos, Hays, Hicks on IL">+2.9%</span></td><td>&#128064; LEAN</td></tr><tr data-proj-home="Baltimore Orioles" data-proj-pick="Baltimore Orioles"><td>Tigers @ Orioles</td><td>Valdez vs Young</td><td>-126</td><td>8</td><td class="edge-positive">Orioles</td><td class="edge-positive">53.2%</td><td>+2.1%</td><td>8.6 (+0.6)</td><td>—</td><td>&#128064; LEAN</td></tr><tr class="skip" data-proj-home="Toronto Blue Jays" data-proj-pick=""><td>Pirates @ Jays</td><td>Keller vs Cease</td><td>—</td><td>7.5</td><td>—</td><td>52.0%</td><td>—</td><td>—</td><td><span style="color:#f85149;font-weight:600" title="Mantiply, Barger, O'Hearn, Devenski on IL">-7.9%</span></td><td>&#8709; SKIP</td></tr><tr class="skip" data-proj-home="Philadelphia Phillies" data-proj-pick=""><td>Guardians @ Phillies</td><td>Messick vs Painter</td><td>—</td><td>7.5</td><td>—</td><td>51.8%</td><td>—</td><td>—</td><td><span style="color:#3fb950;font-weight:600" title="Pop, Backhus, Arias on IL">+2.3%</span></td><td>&#8709; SKIP</td></tr><tr class="skip" data-proj-home="San Diego Padres" data-proj-pick=""><td>Athletics @ Padres</td><td>Medina vs King</td><td>—</td><td>7.5</td><td>—</td><td>51.8%</td><td>—</td><td>—</td><td><span style="color:#f85149;font-weight:600" title="Pivetta, Campusano on IL">-6.5%</span></td><td>&#8709; SKIP</td></tr><tr class="skip" data-proj-home="Cincinnati Reds" data-proj-pick=""><td>Cardinals @ Reds</td><td>Mautz vs Singer</td><td>—</td><td>10</td><td>—</td><td>51.2%</td><td>—</td><td>—</td><td><span style="color:#f85149;font-weight:600" title="Pagán, Hayes, Church, Urías on IL">-3.2%</span></td><td>&#8709; SKIP</td></tr><tr class="skip" data-proj-home="Boston Red Sox" data-proj-pick=""><td>Twins @ Sox</td><td>Ober vs Gray</td><td>—</td><td>7.5</td><td>—</td><td>51.0%</td><td>—</td><td>—</td><td><span style="color:#f85149;font-weight:600" title="Crochet, Oviedo, Sands, Jeffers on IL">-4%</span></td><td>&#8709; SKIP</td></tr><tr class="skip" data-proj-home="Kansas City Royals" data-proj-pick=""><td>Mariners @ Royals</td><td>Woo vs Lugo</td><td>—</td><td>8.5</td><td>—</td><td>50.1%</td><td>—</td><td>—</td><td>—</td><td>&#8709; SKIP</td></tr></tbody></table></div>
+</div>
+</div>
+
+<!-- PARLAYS TAB -->
+<div class="tab-content" id="tab-parlays">
+<div class="section">
+<div class="section-title parlays" style="display:flex;justify-content:space-between;align-items:center">&#127922; Parlay Plays <button onclick="refreshResults()" style="padding:6px 14px;background:#7c3aed;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
+<div class="parlay-card best"><div class="parlay-header"><div class="parlay-type">&#9733; Parlay A — Safe 2-Leg</div><div class="parlay-odds" class="green">2.70x</div></div><div class="parlay-legs">San Antonio Spurs ML + Atlanta Braves ML</div><div class="parlay-footer"><span>Stake: $50</span><span>Payout: $135</span><span>Win%: 37.4%</span><span class="ev">EV: +$0.55</span></div></div><div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay B — SGP Value</div><div class="parlay-odds" style="color:#f0883e">3.57x</div></div><div class="parlay-legs">Oklahoma City Thunder +2.5 + Over 219.5</div><div class="parlay-footer"><span>Stake: $50</span><span>Payout: $178</span><span>Win%: 26.5%</span><span class="ev">EV: $-2.71</span></div></div><div class="parlay-card"><div class="parlay-header"><div class="parlay-type">Parlay C — Cross-Sport 3-Leg</div><div class="parlay-odds" style="color:#f0883e">4.41x</div></div><div class="parlay-legs">Oklahoma City Thunder +2.5 + Atlanta Braves ML + Arizona Diamondbacks ML</div><div class="parlay-footer"><span>Stake: $30</span><span>Payout: $132</span><span>Win%: 20.5%</span><span class="ev">EV: $-2.95</span></div></div><div class="parlay-card"><div class="parlay-header"><div class="parlay-type">SGP — Victor Props + Spurs ML</div><div class="parlay-odds" style="color:#f0883e">3.19x</div></div><div class="parlay-legs">Victor Wembanyama Over 34.5 PTS+REB+AST + San Antonio Spurs ML</div><div class="parlay-footer"><span>Stake: $35</span><span>Payout: $112</span><span>Win%: 38.2%</span><span class="ev">EV: +$7.61</span></div></div>
+</div>
+</div>
+
+<!-- RESULTS TAB -->
+<div class="tab-content" id="tab-results">
+<div class="section">
+<div class="section-title" style="color:#3fb950">&#9989; Today's Results <button onclick="refreshResults()" style="float:right;padding:6px 14px;background:#238636;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div>
+<div id="results-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:16px">
+<div class="game-card" style="text-align:center;padding:14px"><div style="font-size:1.6em;font-weight:800;color:#34d399" id="res-wins">—</div><div style="font-size:0.7em;color:#6b7280;text-transform:uppercase">Wins</div></div>
+<div class="game-card" style="text-align:center;padding:14px"><div style="font-size:1.6em;font-weight:800;color:#f87171" id="res-losses">—</div><div style="font-size:0.7em;color:#6b7280;text-transform:uppercase">Losses</div></div>
+<div class="game-card" style="text-align:center;padding:14px"><div style="font-size:1.6em;font-weight:800" id="res-pending" style="color:#8b949e">—</div><div style="font-size:0.7em;color:#6b7280;text-transform:uppercase">Pending</div></div>
+<div class="game-card" style="text-align:center;padding:14px"><div style="font-size:1.6em;font-weight:800" id="res-winpct">—</div><div style="font-size:0.7em;color:#6b7280;text-transform:uppercase">Win %</div></div>
+</div>
+<div id="results-list"></div>
+<p style="color:#8b949e;font-size:0.8em;margin-top:12px">Click Refresh to grade completed games against MLB Stats API final scores.</p>
+<p style="margin-top:8px"><a href="/tracker" style="color:#58a6ff;text-decoration:none;font-weight:600">View Full Tracker &rarr;</a></p>
+</div>
+</div>
 
 <div class="nav-links">
 <a href="/early">Early Action</a>
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
 <a href="/nba">NBA</a>
+<a href="/dashboard">Dashboard</a>
 </div>
 
 <footer>
 <p>Model: Ensemble v2.1 (Pythagorean + Elo + FIP + Market) | Data: ESPN/DraftKings + MLB Stats API</p>
-<p style="margin-top:4px">Auto-graded at 2am ET. Refresh pulls live scores.</p>
+<p style="margin-top:4px">Auto-generated 2026-05-24 16:00:11 UTC</p>
 </footer>
 </div>
 
 <script>
-let todayData = null;
-let trackerData = null;
-
-function calcPnl(odds, stake, result) {
-  if (result === 'pending' || result === 'push') return 0;
-  odds = parseInt(odds) || -110;
-  stake = stake || 25;
-  if (result === 'win') return odds > 0 ? (stake * odds / 100) : (stake * 100 / Math.abs(odds));
-  return -stake;
-}
-
-function formatPnl(val) {
-  if (val === 0) return '—';
-  const cls = val >= 0 ? 'green' : 'red';
-  return '<span style="color:' + (val >= 0 ? '#34d399' : '#f87171') + ';font-weight:700">' + (val >= 0 ? '+' : '') + '$' + Math.abs(val).toFixed(2) + '</span>';
-}
-
-function resultBadge(result, odds, stake) {
-  if (result === 'pending') return '';
-  const pnl = calcPnl(odds, stake, result);
-  const badge = result === 'win'
-    ? '<span class="badge win">W</span>'
-    : '<span class="badge loss">L</span>';
-  const winnings = '<span class="winnings" style="color:' + (pnl >= 0 ? '#34d399' : '#f87171') + '">' + (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2) + '</span>';
-  return '<span class="pick-result">' + badge + winnings + '</span>';
-}
-
 function switchTab(name) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
@@ -186,356 +170,139 @@ function switchTab(name) {
   event.target.classList.add('active');
 }
 
-function toggleDay(el) {
-  const body = el.nextElementSibling;
-  const chevron = el.querySelector('.chevron');
-  body.classList.toggle('open');
-  chevron.classList.toggle('open');
-}
-
-function getAbbrev(name) {
-  const abbrevs = {
-    'Atlanta Braves': 'ATL', 'Miami Marlins': 'MIA', 'New York Mets': 'NYM',
-    'Philadelphia Phillies': 'PHI', 'Washington Nationals': 'WSH',
-    'Chicago Cubs': 'CHC', 'Cincinnati Reds': 'CIN', 'Milwaukee Brewers': 'MIL',
-    'Pittsburgh Pirates': 'PIT', 'St. Louis Cardinals': 'STL',
-    'Arizona Diamondbacks': 'ARI', 'Colorado Rockies': 'COL',
-    'Los Angeles Dodgers': 'LAD', 'San Diego Padres': 'SD',
-    'San Francisco Giants': 'SF', 'Baltimore Orioles': 'BAL',
-    'Boston Red Sox': 'BOS', 'New York Yankees': 'NYY',
-    'Tampa Bay Rays': 'TB', 'Toronto Blue Jays': 'TOR',
-    'Chicago White Sox': 'CHW', 'Cleveland Guardians': 'CLE',
-    'Detroit Tigers': 'DET', 'Kansas City Royals': 'KC',
-    'Minnesota Twins': 'MIN', 'Houston Astros': 'HOU',
-    'Los Angeles Angels': 'LAA', 'Oakland Athletics': 'ATH',
-    'Athletics': 'ATH', 'Seattle Mariners': 'SEA', 'Texas Rangers': 'TEX',
-  };
-  return abbrevs[name] || name.split(' ').pop().toUpperCase().slice(0, 3);
-}
-
-function findResult(pick, trackerDay) {
-  if (!trackerDay) return null;
-  const homeAbbr = getAbbrev(pick.home);
-  const awayAbbr = getAbbrev(pick.away);
-  for (const tp of trackerDay.picks) {
-    if (tp.matchup && tp.matchup.includes(homeAbbr) && tp.matchup.includes(awayAbbr)) {
-      if (tp.type === 'ml' && pick._type === 'ml') return tp;
-      if (tp.type === 'over' && pick._type === 'over') return tp;
-      if (tp.type === 'under' && pick._type === 'under') return tp;
-    }
-  }
-  return null;
-}
-
-function renderPicks() {
-  if (!todayData) return;
-  const container = document.getElementById('tab-picks');
-  const trackerDay = trackerData?.days?.find(d => d.date === todayData.date);
-
-  const mlb = todayData.mlb || [];
-  const nba = todayData.nba || [];
-  const actionable = mlb.filter(g => !g.coinFlip && (g.confidence === 'high' || (g.kelly && g.kelly.betSize > 0)));
-
-  let wins = 0, losses = 0, totalExposure = 0;
-
-  let html = '<div class="top-picks"><h2>Today\'s Best Plays <button class="btn" onclick="refreshResults()" id="refresh-btn">Refresh Results</button></h2>';
-
-  for (const game of actionable) {
-    const isKelly = game.kelly && game.kelly.betSize > 0;
-    const side = game.prediction.homeWinProb > game.prediction.awayWinProb ? 'home' : 'away';
-    const team = side === 'home' ? game.home : game.away;
-    const odds = side === 'home' ? game.homeML : game.awayML;
-    const stake = game.kelly?.betSize || 25;
-    const edge = game.kelly?.edge || Math.abs(game.edge?.home || 0);
-    totalExposure += stake;
-
-    const pickData = { home: game.home, away: game.away, _type: 'ml' };
-    const result = findResult(pickData, trackerDay);
-    const gradeClass = result?.result === 'win' ? ' graded-win' : result?.result === 'loss' ? ' graded-loss' : '';
-    const itemClass = isKelly ? 'kelly' : 'nba';
-
-    html += '<div class="pick-item ' + itemClass + gradeClass + '">';
-    html += '<div class="pick-details"><div class="pick-game">' + game.away + ' @ ' + game.home + ' &bull; Moneyline' + (isKelly ? ' (Kelly)' : '') + '</div>';
-    html += '<div class="pick-bet">' + team + ' ML (' + (odds > 0 ? '+' : '') + odds + ')' + (isKelly ? ' &mdash; $' + stake : '') + '</div></div>';
-    html += '<div class="pick-edge">+' + edge.toFixed(1) + '%</div>';
-    html += '<span class="pick-conf ' + (isKelly ? 'kelly' : 'high') + '">' + (isKelly ? 'KELLY' : 'HIGH') + '</span>';
-    html += resultBadge(result?.result || 'pending', odds, stake);
-
-    if (result?.result === 'win') wins++;
-    else if (result?.result === 'loss') losses++;
-
-    html += '</div>';
-  }
-
-  // Over/Under picks
-  for (const game of mlb) {
-    const totalEdge = game.ouLine ? (game.prediction?.expectedTotal || 0) - game.ouLine : 0;
-    if (game.ouLine && Math.abs(totalEdge) >= 1.5) {
-      const dir = totalEdge > 0 ? 'OVER' : 'UNDER';
-      const stake = 20;
-      totalExposure += stake;
-      const pickData = { home: game.home, away: game.away, _type: totalEdge > 0 ? 'over' : 'under' };
-      const result = findResult(pickData, trackerDay);
-      const gradeClass = result?.result === 'win' ? ' graded-win' : result?.result === 'loss' ? ' graded-loss' : '';
-
-      if (result?.result === 'win') wins++;
-      else if (result?.result === 'loss') losses++;
-
-      html += '<div class="pick-item over' + gradeClass + '">';
-      html += '<div class="pick-details"><div class="pick-game">' + game.away + ' @ ' + game.home + ' &bull; Total</div>';
-      html += '<div class="pick-bet">' + dir + ' ' + game.ouLine + ' (-110) &mdash; Proj ' + (game.prediction?.expectedTotal || 0).toFixed(1) + ' runs</div></div>';
-      html += '<div class="pick-edge">+' + Math.abs(totalEdge).toFixed(1) + '</div>';
-      html += '<span class="pick-conf high">HIGH</span>';
-      html += resultBadge(result?.result || 'pending', -110, stake);
-      html += '</div>';
-    }
-  }
-
-  // NBA picks
-  for (const game of nba) {
-    html += '<div class="pick-item nba">';
-    html += '<div class="pick-details"><div class="pick-game">NBA: ' + game.away + ' @ ' + game.home + ' &bull; Spread</div>';
-    html += '<div class="pick-bet">' + game.away + ' ' + (parseFloat(game.spread) > 0 ? '+' : '') + game.spread + ' (' + game.awayML + ')</div></div>';
-    html += '<div class="pick-edge">' + game.spread + '</div>';
-    html += '<span class="pick-conf med">MED</span>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-
-  // NBA section
-  if (nba.length > 0) {
-    html += '<div class="section"><div class="section-title nba">NBA</div>';
-    for (const game of nba) {
-      html += '<div class="game-card" style="border-color:#f0883e"><div class="game-header"><div class="game-matchup">' + game.away + ' (' + game.awayRecord + ') @ ' + game.home + ' (' + game.homeRecord + ')</div><div class="game-time">' + game.time + '</div></div>';
-      html += '<div class="game-details"><div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">' + game.home + ' ' + game.spread + '</div></div>';
-      html += '<div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">' + game.ou + '</div></div>';
-      html += '<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">' + game.home + ' ' + game.homeML + ' / ' + game.away + ' ' + game.awayML + '</div></div></div></div>';
-    }
-    html += '</div>';
-  }
-
-  container.innerHTML = html;
-
-  // Update stats
-  const recordEl = document.getElementById('today-record');
-  if (wins + losses > 0) {
-    recordEl.textContent = wins + '-' + losses;
-    recordEl.style.color = wins > losses ? '#34d399' : wins < losses ? '#f87171' : '#8b949e';
-  }
-
-  document.getElementById('picks-count').textContent = actionable.length + mlb.filter(g => g.ouLine && Math.abs((g.prediction?.expectedTotal || 0) - g.ouLine) >= 1.5).length;
-  document.getElementById('parlays-count').textContent = (todayData.parlays || []).length;
-  document.getElementById('exposure').textContent = '$' + totalExposure;
-
-  // Calculate running P&L from tracker
-  if (trackerData?.days) {
-    let runPnl = 0;
-    for (const day of trackerData.days) {
-      for (const p of day.picks) {
-        runPnl += calcPnl(p.odds, p.stake, p.result);
-      }
-      for (const p of day.parlays) {
-        if (p.result === 'win') runPnl += (p.stake * p.odds) - p.stake;
-        else if (p.result === 'loss') runPnl -= p.stake;
-      }
-    }
-    const pnlEl = document.getElementById('running-pnl');
-    pnlEl.textContent = (runPnl >= 0 ? '+' : '') + '$' + runPnl.toFixed(0);
-    pnlEl.style.color = runPnl >= 0 ? '#3fb950' : '#f87171';
-    const pct = Math.max(0, (runPnl / 3000 * 100)).toFixed(0);
-    document.getElementById('target-pct').textContent = pct + '%';
-  }
-}
-
-function renderProjections() {
-  if (!todayData) return;
-  const container = document.getElementById('tab-projections');
-  const mlb = todayData.mlb || [];
-  const trackerDay = trackerData?.days?.find(d => d.date === todayData.date);
-
-  let html = '<div class="section"><div class="section-title" style="display:flex;justify-content:space-between;align-items:center">MLB Full Projections &mdash; ' + mlb.length + ' Games <button class="btn" onclick="refreshResults()">Refresh Results</button></div>';
-  html += '<div class="table-wrapper"><table><thead><tr><th>Game</th><th>Pitchers</th><th>ML</th><th>O/U</th><th>Pick</th><th>Win%</th><th>Edge</th><th>Proj Total</th><th>Roster</th><th>Signal</th></tr></thead><tbody>';
-
-  for (const game of mlb) {
-    const side = game.prediction.homeWinProb > game.prediction.awayWinProb ? 'home' : 'away';
-    const pickTeam = side === 'home' ? game.home : game.away;
-    const winProb = side === 'home' ? game.prediction.homeWinProb : game.prediction.awayWinProb;
-    const edge = game.kelly?.edge || Math.abs(game.edge?.home || 0);
-    const totalEdge = game.ouLine ? (game.prediction.expectedTotal - game.ouLine).toFixed(1) : '0.0';
-    const isSkip = game.coinFlip || edge < 3;
-
-    const pickData = { home: game.home, away: game.away, _type: 'ml' };
-    const result = findResult(pickData, trackerDay);
-    const rowClass = result?.result === 'win' ? 'row-win' : result?.result === 'loss' ? 'row-loss' : (isSkip ? 'skip' : '');
-
-    const signal = game.kelly?.betSize > 0 ? 'KELLY' : edge >= 5 ? 'HIGH' : !isSkip ? 'LEAN' : 'SKIP';
-    const signalClass = signal === 'KELLY' ? 'edge-high' : signal === 'HIGH' ? 'edge-positive' : '';
-
-    const rosterAdj = game.rosterAdj || 0;
-    const rosterHtml = rosterAdj !== 0
-      ? '<span style="color:' + (rosterAdj > 0 ? '#3fb950' : '#f85149') + ';font-weight:600">' + (rosterAdj > 0 ? '+' : '') + rosterAdj.toFixed(1) + '%</span>'
-      : '—';
-
-    html += '<tr class="' + rowClass + '">';
-    html += '<td' + (signal !== 'SKIP' ? ' class="edge-positive"' : '') + '>' + getAbbrev(game.away) + ' @ ' + getAbbrev(game.home) + '</td>';
-    html += '<td>' + (game.awayPitcher || 'TBD') + ' vs ' + (game.homePitcher || 'TBD') + '</td>';
-    html += '<td>' + (game.homeML || '—') + '</td>';
-    html += '<td>' + (game.ouLine || '—') + '</td>';
-    html += '<td class="' + (isSkip ? '' : 'edge-positive') + '">' + (isSkip ? '—' : getAbbrev(pickTeam)) + '</td>';
-    html += '<td class="' + (isSkip ? '' : 'edge-positive') + '">' + winProb.toFixed(1) + '%</td>';
-    html += '<td class="' + signalClass + '">' + (isSkip ? '—' : '+' + edge.toFixed(1) + '%') + '</td>';
-    html += '<td>' + (game.prediction.expectedTotal || 0).toFixed(1) + ' (' + (parseFloat(totalEdge) > 0 ? '+' : '') + totalEdge + ')</td>';
-    html += '<td>' + rosterHtml + '</td>';
-    html += '<td class="' + signalClass + '">' + signal + '</td>';
-    html += '</tr>';
-  }
-
-  html += '</tbody></table></div></div>';
-  container.innerHTML = html;
-}
-
-function renderParlays() {
-  if (!todayData) return;
-  const container = document.getElementById('tab-parlays');
-  const parlays = todayData.parlays || [];
-  const trackerDay = trackerData?.days?.find(d => d.date === todayData.date);
-
-  let html = '<div class="section"><div class="section-title parlays" style="display:flex;justify-content:space-between;align-items:center">Parlay Plays <button class="btn" style="background:#7c3aed" onclick="refreshResults()">Refresh Results</button></div>';
-
-  for (let i = 0; i < parlays.length; i++) {
-    const p = parlays[i];
-    const result = trackerDay?.parlays?.[i];
-    let cardClass = p.best ? 'parlay-card best' : 'parlay-card';
-    if (result?.result === 'win') cardClass += ' graded-win';
-    else if (result?.result === 'loss') cardClass += ' graded-loss';
-
-    html += '<div class="' + cardClass + '">';
-    html += '<div class="parlay-header"><div class="parlay-type">' + (p.best ? '&#9733; ' : '') + p.label + '</div><div class="parlay-odds" style="color:#f0883e">' + p.odds.toFixed(2) + 'x</div></div>';
-    html += '<div class="parlay-legs">' + p.legs + '</div>';
-    html += '<div class="parlay-footer"><span>Stake: $' + p.stake + '</span><span>Payout: $' + p.payout + '</span><span>Win%: ' + p.prob + '%</span><span class="ev">EV: ' + (parseFloat(p.ev) >= 0 ? '+' : '') + '$' + p.ev + '</span></div>';
-
-    if (result && result.result !== 'pending') {
-      const pnl = result.result === 'win' ? (p.stake * p.odds) - p.stake : -p.stake;
-      html += '<div class="parlay-result ' + result.result + '">';
-      html += '<span class="badge ' + result.result + '" style="padding:3px 10px;border-radius:4px;font-weight:700;background:' + (result.result === 'win' ? '#064e3b;color:#34d399' : '#7f1d1d;color:#f87171') + '">' + (result.result === 'win' ? 'W' : 'L') + '</span>';
-      html += '<span style="font-weight:800;color:' + (pnl >= 0 ? '#34d399' : '#f87171') + '">' + (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2) + '</span>';
-      html += '</div>';
-    }
-
-    html += '</div>';
-  }
-
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-function renderHistory() {
-  if (!trackerData || !trackerData.days) return;
-  const container = document.getElementById('tab-history');
-  const days = trackerData.days;
-  const today = new Date().toISOString().split('T')[0];
-
-  let html = '<div class="section"><div class="section-title" style="color:#3fb950">Day-by-Day History <button class="btn" onclick="refreshResults()">Refresh Results</button></div>';
-
-  for (let i = 0; i < days.length; i++) {
-    const day = days[i];
-    const isToday = day.date === today;
-    const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-
-    let dayW = 0, dayL = 0, dayPnl = 0;
-    for (const p of day.picks) {
-      if (p.result === 'win') { dayW++; dayPnl += calcPnl(p.odds, p.stake, 'win'); }
-      else if (p.result === 'loss') { dayL++; dayPnl += calcPnl(p.odds, p.stake, 'loss'); }
-    }
-    for (const p of day.parlays) {
-      if (p.result === 'win') { dayW++; dayPnl += (p.stake * p.odds) - p.stake; }
-      else if (p.result === 'loss') { dayL++; dayPnl -= p.stake; }
-    }
-
-    const pnlCls = dayPnl >= 0 ? 'green' : 'red';
-    const pnlStr = dayPnl === 0 ? '—' : (dayPnl >= 0 ? '+' : '') + '$' + dayPnl.toFixed(2);
-
-    html += '<div class="day-group">';
-    html += '<div class="day-header" onclick="toggleDay(this)"><h4>' + dateLabel + (isToday ? ' (Today)' : '') + '</h4>';
-    html += '<div class="day-summary"><span style="color:#3fb950">' + dayW + 'W</span><span style="color:#f87171">' + dayL + 'L</span>';
-    html += '<span style="color:' + (dayPnl >= 0 ? '#34d399' : '#f87171') + ';font-weight:700">' + pnlStr + '</span>';
-    html += '<span class="chevron' + (i === 0 ? ' open' : '') + '">&#9660;</span></div></div>';
-    html += '<div class="day-body' + (i === 0 ? ' open' : '') + '">';
-
-    html += '<table style="width:100%;border-collapse:collapse;font-size:0.82em;min-width:600px"><thead><tr><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">Pick</th><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">Matchup</th><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">Odds</th><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">Score</th><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">Result</th><th style="padding:6px 8px;color:#8b949e;font-size:0.7em;text-transform:uppercase;border-bottom:1px solid #21262d">P&L</th></tr></thead><tbody>';
-
-    for (const p of day.picks) {
-      const pnl = calcPnl(p.odds, p.stake, p.result);
-      const bg = p.result === 'win' ? 'rgba(52,211,153,0.06)' : p.result === 'loss' ? 'rgba(248,113,113,0.06)' : 'transparent';
-      const bl = p.result === 'win' ? '3px solid #34d399' : p.result === 'loss' ? '3px solid #f87171' : '3px solid transparent';
-      html += '<tr style="background:' + bg + ';border-left:' + bl + '"><td style="padding:6px 8px;font-weight:600">' + p.team + ' ' + (p.type === 'ml' ? 'ML' : p.type.toUpperCase()) + '</td>';
-      html += '<td style="padding:6px 8px">' + p.matchup + '</td>';
-      html += '<td style="padding:6px 8px">' + (p.odds ? (parseInt(p.odds) > 0 ? '+' : '') + p.odds : '-110') + '</td>';
-      html += '<td style="padding:6px 8px;color:#8b949e">' + (p.score || '—') + '</td>';
-      const resBadge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">PEND</span>';
-      html += '<td style="padding:6px 8px">' + resBadge + '</td>';
-      html += '<td style="padding:6px 8px;font-weight:700;color:' + (pnl >= 0 && p.result !== 'pending' ? '#34d399' : pnl < 0 ? '#f87171' : '#8b949e') + '">' + (p.result === 'pending' ? '—' : (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2)) + '</td></tr>';
-    }
-
-    for (const p of day.parlays) {
-      const pnl = p.result === 'win' ? (p.stake * p.odds) - p.stake : p.result === 'loss' ? -p.stake : 0;
-      const bg = p.result === 'win' ? 'rgba(52,211,153,0.06)' : p.result === 'loss' ? 'rgba(248,113,113,0.06)' : 'transparent';
-      const bl = p.result === 'win' ? '3px solid #34d399' : p.result === 'loss' ? '3px solid #f87171' : '3px solid transparent';
-      html += '<tr style="background:' + bg + ';border-left:' + bl + '"><td style="padding:6px 8px;font-weight:600;color:#a371f7">' + p.label + '</td>';
-      html += '<td style="padding:6px 8px;color:#8b949e;font-size:0.8em">' + p.legs + '</td>';
-      html += '<td style="padding:6px 8px">' + (p.odds ? p.odds.toFixed(2) + 'x' : '—') + '</td>';
-      html += '<td style="padding:6px 8px">—</td>';
-      const resBadge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.8em">PEND</span>';
-      html += '<td style="padding:6px 8px">' + resBadge + '</td>';
-      html += '<td style="padding:6px 8px;font-weight:700;color:' + (pnl >= 0 && p.result !== 'pending' ? '#34d399' : pnl < 0 ? '#f87171' : '#8b949e') + '">' + (p.result === 'pending' ? '—' : (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(2)) + '</td></tr>';
-    }
-
-    html += '</tbody></table></div></div>';
-  }
-
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-async function loadAll() {
-  try {
-    const [todayRes, trackerRes] = await Promise.all([
-      fetch('/api/today'),
-      fetch('/api/tracker')
-    ]);
-    todayData = await todayRes.json();
-    trackerData = await trackerRes.json();
-
-    // Update header
-    if (todayData.date) {
-      const d = new Date(todayData.date + 'T12:00:00');
-      document.getElementById('date-subtitle').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-      document.title = 'Today\'s Picks - ' + todayData.date;
-    }
-
-    renderPicks();
-    renderProjections();
-    renderParlays();
-    renderHistory();
-  } catch (e) {
-    document.getElementById('tab-picks').innerHTML = '<div class="loading">Failed to load data. Try refreshing.</div>';
-  }
-}
-
 async function refreshResults() {
   const btn = document.getElementById('refresh-btn');
-  if (btn) { btn.textContent = 'Grading...'; btn.disabled = true; }
+  btn.textContent = 'Refreshing...';
+  btn.disabled = true;
   try {
-    await fetch('/api/grade', { method: 'POST' });
-    await loadAll();
-    if (btn) { btn.textContent = 'Updated!'; setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000); }
-  } catch (e) {
-    if (btn) { btn.textContent = 'Error'; setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000); }
+    const today = '2026-05-24';
+    const res = await fetch('https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=' + today + '&hydrate=linescore');
+    const data = await res.json();
+    const games = (data.dates?.[0]?.games || []).filter(g => g.status.detailedState.includes('Final'));
+    if (games.length === 0) { btn.textContent = 'No finals yet'; btn.disabled = false; return; }
+
+    const results = new Map();
+    for (const g of games) {
+      results.set(g.teams.home.team.name, {
+        home: g.teams.home.team.name, away: g.teams.away.team.name,
+        homeScore: g.teams.home.score, awayScore: g.teams.away.score,
+        winner: g.teams.home.score > g.teams.away.score ? g.teams.home.team.name : g.teams.away.team.name,
+        total: g.teams.home.score + g.teams.away.score
+      });
+    }
+
+    let wins = 0, losses = 0;
+
+    document.querySelectorAll('.pick-item[data-home]').forEach(el => {
+      const home = el.dataset.home;
+      const type = el.dataset.type;
+      const game = results.get(home);
+      if (!game) return;
+
+      const resultEl = el.querySelector('.pick-result');
+      if (!resultEl) return;
+
+      let won = false;
+      let score = game.away.split(' ').pop() + ' ' + game.awayScore + ', ' + game.home.split(' ').pop() + ' ' + game.homeScore;
+
+      if (type === 'ml') {
+        const team = el.dataset.team;
+        won = game.winner.includes(team.split(' ').pop()) || team.includes(game.winner.split(' ').pop());
+      } else if (type === 'over') {
+        const line = parseFloat(el.dataset.line);
+        won = game.total > line;
+        score += ' (' + game.total + ' total)';
+      }
+
+      if (won) { wins++; } else { losses++; }
+
+      el.classList.remove('graded-win', 'graded-loss');
+      el.classList.add(won ? 'graded-win' : 'graded-loss');
+
+      const badge = won
+        ? '<span style="background:#064e3b;color:#34d399;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
+        : '<span style="background:#7f1d1d;color:#f87171;padding:3px 10px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
+      resultEl.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em;margin-left:4px">' + score + '</span>';
+    });
+
+    // Highlight projection table rows
+    document.querySelectorAll('tr[data-proj-home]').forEach(row => {
+      const home = row.dataset.projHome;
+      const pick = row.dataset.projPick;
+      const game = results.get(home);
+      if (!game || !pick) return;
+      const won = game.winner.includes(pick.split(' ').pop()) || pick.includes(game.winner.split(' ').pop());
+      row.classList.remove('row-win', 'row-loss');
+      row.classList.add(won ? 'row-win' : 'row-loss');
+    });
+
+    // Update W-L record in stats bar
+    const recordEl = document.getElementById('today-record');
+    if (recordEl) {
+      recordEl.textContent = wins + '-' + losses;
+      recordEl.style.color = wins > losses ? '#34d399' : wins < losses ? '#f87171' : '#8b949e';
+    }
+
+    // Update Results tab
+    const totalPicks = document.querySelectorAll('.pick-item[data-home]').length;
+    const pending = totalPicks - wins - losses;
+    const winPct = (wins + losses) > 0 ? ((wins / (wins + losses)) * 100).toFixed(0) : '—';
+    const rw = document.getElementById('res-wins');
+    const rl = document.getElementById('res-losses');
+    const rp = document.getElementById('res-pending');
+    const rwp = document.getElementById('res-winpct');
+    if (rw) rw.textContent = wins;
+    if (rl) rl.textContent = losses;
+    if (rp) { rp.textContent = pending; rp.style.color = pending > 0 ? '#f59e0b' : '#8b949e'; }
+    if (rwp) { rwp.textContent = winPct + '%'; rwp.style.color = parseInt(winPct) >= 50 ? '#34d399' : '#f87171'; }
+
+    // Build results list
+    const resultsList = document.getElementById('results-list');
+    if (resultsList) {
+      let rhtml = '';
+      document.querySelectorAll('.pick-item[data-home]').forEach(el => {
+        const home = el.dataset.home;
+        const game = results.get(home);
+        if (!game) return;
+        const type = el.dataset.type;
+        const team = el.dataset.team || '';
+        let won = false;
+        let pickLabel = '';
+        const score = game.away.split(' ').pop() + ' ' + game.awayScore + ' - ' + game.home.split(' ').pop() + ' ' + game.homeScore;
+
+        if (type === 'ml') {
+          won = game.winner.includes(team.split(' ').pop()) || team.includes(game.winner.split(' ').pop());
+          pickLabel = team.split(' ').pop() + ' ML';
+        } else if (type === 'over') {
+          const line = parseFloat(el.dataset.line);
+          won = game.total > line;
+          pickLabel = 'Over ' + line;
+        }
+
+        const bg = won ? 'rgba(52,211,153,0.08)' : 'rgba(248,113,113,0.08)';
+        const border = won ? '#34d399' : '#f87171';
+        const badge = won
+          ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:700">W</span>'
+          : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:700">L</span>';
+        rhtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:' + bg + ';border-left:3px solid ' + border + ';border-radius:6px;margin-bottom:6px">';
+        rhtml += '<div><span style="font-weight:600">' + pickLabel + '</span><span style="color:#8b949e;margin-left:8px;font-size:0.85em">' + game.away.split(' ').pop() + ' @ ' + game.home.split(' ').pop() + '</span></div>';
+        rhtml += '<div style="display:flex;align-items:center;gap:10px"><span style="color:#8b949e;font-size:0.8em">' + score + '</span>' + badge + '</div>';
+        rhtml += '</div>';
+      });
+      resultsList.innerHTML = rhtml || '<p style="color:#8b949e">Click Refresh to load results.</p>';
+    }
+
+    // Persist grading server-side
+    try { await fetch('/api/grade', { method: 'POST' }); } catch(e) {}
+
+    btn.textContent = '\u2713 ' + wins + 'W-' + losses + 'L';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.textContent = 'Error';
+    btn.disabled = false;
   }
 }
 
-loadAll();
 </script>
 </body>
 </html>
