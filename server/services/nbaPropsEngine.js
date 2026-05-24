@@ -89,8 +89,8 @@ const PLAYER_DB = {
   'Aaron Gordon': { team: 'DEN', pos: 'F', pts: 14.2, reb: 6.5, ast: 3.5, min: 31.0 },
 };
 
-function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false) {
-  const player = PLAYER_DB[name];
+function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false, customDB = null) {
+  const player = (customDB || PLAYER_DB)[name];
   if (!player) return null;
 
   const paceMultiplier = projectedTotal / AVG_NBA_TOTAL;
@@ -180,9 +180,10 @@ function consensusLine(allLines, playerName, stat) {
   return { line: parseFloat(avg.toFixed(1)), odds: bestOdds, books: matching.length };
 }
 
-async function generateNBAProps(espnEvents) {
+async function generateNBAProps(espnEvents, calibratedDB = null) {
   const games = [];
   const props = [];
+  const activePlayerDB = calibratedDB || PLAYER_DB;
 
   // Get Odds API event IDs for prop line fetching
   const oddsEvents = await getOddsApiEvents();
@@ -228,12 +229,12 @@ async function generateNBAProps(espnEvents) {
     }
 
     // Find players and generate projections
-    const gamePlayers = Object.entries(PLAYER_DB)
+    const gamePlayers = Object.entries(activePlayerDB)
       .filter(([_, p]) => p.team === homeAbbrev || p.team === awayAbbrev)
       .map(([name]) => name);
 
     const projections = gamePlayers
-      .map(name => projectPlayer(name, projTotal, true, isGame1))
+      .map(name => projectPlayer(name, projTotal, true, isGame1, activePlayerDB))
       .filter(Boolean)
       .sort((a, b) => b.projPts - a.projPts);
 

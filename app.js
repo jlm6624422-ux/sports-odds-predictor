@@ -736,10 +736,59 @@ async function runPredictions() {
     });
   }
 
-  // NBA (fetch from ESPN + rest/travel adjustments)
+  // Sharp money detection — adjust kelly sizing when market moves against us
+  try {
+    const { captureOpeningLines } = require('./server/services/historicalOdds');
+    const currentLines = await captureOpeningLines('MLB');
+    for (const game of mlbResults) {
+      const lineData = currentLines.find(l => l.homeTeam === game.home);
+      if (!lineData || !game.kelly || game.kelly.betSize <= 0) continue;
+
+      const marketML = game.pickSide === 'home' ? lineData.h2h.home?.price : lineData.h2h.away?.price;
+      const ourML = game.pickSide === 'home' ? game.homeML : game.awayML;
+      if (!marketML || !ourML) continue;
+
+      // Convert American to decimal for comparison
+      const toDecimal = (ml) => ml > 0 ? (ml / 100) + 1 : (100 / Math.abs(ml)) + 1;
+      const openDec = toDecimal(ourML);
+      const currentDec = marketML;
+      const drift = currentDec - openDec;
+
+      // If line drifted away from our pick (price went UP = less implied prob), sharps disagree
+      if (drift > 0.08) {
+        game.sharpSignal = { direction: 'against', strength: parseFloat(drift.toFixed(3)), aligned: false };
+        game.kelly.betSize = parseFloat((game.kelly.betSize * 0.5).toFixed(2));
+        game.kelly.recommendation = game.kelly.recommendation + ' (SHARP FADE -50%)';
+      } else if (drift < -0.08) {
+        game.sharpSignal = { direction: 'with', strength: parseFloat(Math.abs(drift).toFixed(3)), aligned: true };
+        game.kelly.recommendation = game.kelly.recommendation + ' (SHARP CONFIRM)';
+      } else {
+        game.sharpSignal = { direction: 'neutral', strength: 0, aligned: null };
+      }
+    }
+    console.log(`[sharp] Line movement analysis complete for ${mlbResults.length} games`);
+  } catch (e) {
+    console.log('[sharp] Sharp money detection skipped:', e.message);
+  }
+
+  // NBA (fetch from ESPN + rest/travel adjustments + calibrated props)
   let nbaGames = [];
   let nbaProps = [];
   const { calculateRestTravelAdj } = require('./server/services/nbaRestTravel');
+
+  // Calibrate player projections from historical market data
+  let calibratedDB = null;
+  try {
+    const { calibratePlayerDB, mergeWithPlayerDB } = require('./server/services/propCalibrator');
+    const { PLAYER_DB } = require('./server/services/nbaPropsEngine');
+    const calibrated = await calibratePlayerDB(5);
+    if (calibrated.size > 0) {
+      calibratedDB = mergeWithPlayerDB(PLAYER_DB, calibrated);
+      console.log(`[calibrator] Using market-calibrated stats for ${calibrated.size} players`);
+    }
+  } catch (e) {
+    console.log('[calibrator] Calibration skipped:', e.message);
+  }
 
   try {
     // Fetch today and tomorrow (games after 8pm CT show as next UTC day)
@@ -754,7 +803,7 @@ async function runPredictions() {
     }
 
     const { generateNBAProps } = require('./server/services/nbaPropsEngine');
-    const propsResult = await generateNBAProps(nbaEvents);
+    const propsResult = await generateNBAProps(nbaEvents, calibratedDB);
     nbaGames = propsResult?.games || [];
     nbaProps = propsResult?.props || [];
   } catch(e) {
