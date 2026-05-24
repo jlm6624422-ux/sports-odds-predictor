@@ -665,6 +665,15 @@ async function runPredictions() {
       };
     }
 
+    // Extract game time from schedule data
+    let gameTime = null, gameHour = null;
+    if (game.gameDate) {
+      const gd = new Date(game.gameDate);
+      const etStr = gd.toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true });
+      gameTime = etStr;
+      gameHour = parseInt(gd.toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }));
+    }
+
     mlbResults.push({
       home: homeTeamName, away: awayTeamName, venue,
       homePitcher: homePitcher?.name || 'TBD', awayPitcher: awayPitcher?.name || 'TBD',
@@ -673,6 +682,7 @@ async function runPredictions() {
       modelAgreement: pred.modelAgreement,
       ouLine, totalEdge: ouLine ? parseFloat((pred.prediction.expectedTotal - ouLine).toFixed(1)) : null,
       f5: f5, f5Pick,
+      gameTime, gameHour,
       umpire: umpireAdj.name ? { name: umpireAdj.name, adjustment: umpireAdj.adjustment, reason: umpireAdj.reason } : null,
       bullpenGrade: { home: homeBullpen?.summary?.grade || 'unknown', away: awayBullpen?.summary?.grade || 'unknown' },
       lineupConfirmed: !!(gameLineup?.home?.confirmed && gameLineup?.away?.confirmed),
