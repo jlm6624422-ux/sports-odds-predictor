@@ -719,7 +719,7 @@ async function runPredictions() {
     }
 
     const { generateNBAProps } = require('./server/services/nbaPropsEngine');
-    const propsResult = generateNBAProps(nbaEvents);
+    const propsResult = await generateNBAProps(nbaEvents);
     nbaGames = propsResult?.games || [];
     nbaProps = propsResult?.props || [];
   } catch(e) {
