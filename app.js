@@ -489,6 +489,41 @@ app.get('/api/tracker', (req, res) => {
   res.json({ days });
 });
 
+// API: Historical odds — line movement, CLV, prop backtesting
+app.get('/api/line-movement', async (req, res) => {
+  try {
+    const { detectLineMovement } = require('./server/services/historicalOdds');
+    const { date, team, sport } = req.query;
+    if (!date || !team) return res.status(400).json({ error: 'date and team required' });
+    const result = await detectLineMovement(sport || 'NBA', date, team);
+    res.json(result || { movements: [] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/clv', async (req, res) => {
+  try {
+    const { captureOpeningLines } = require('./server/services/historicalOdds');
+    const sport = req.query.sport || 'MLB';
+    const lines = await captureOpeningLines(sport);
+    res.json({ sport, games: lines.length, lines });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/prop-backtest', async (req, res) => {
+  try {
+    const { backtestProps } = require('./server/services/historicalOdds');
+    const date = req.query.date || new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const props = await backtestProps(date);
+    res.json({ date, props: props.length, data: props });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // API: Trigger grading on demand (used by tracker Refresh button)
 app.post('/api/grade', async (req, res) => {
   try {
