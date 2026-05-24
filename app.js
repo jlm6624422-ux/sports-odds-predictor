@@ -59,7 +59,20 @@ app.get('/api/early-action', (req, res) => {
   if (!fs.existsSync(cachePath)) return res.json({ games: [], message: 'No predictions yet' });
 
   const data = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-  const earlyGames = (data.mlb || []).filter(g => g.gameHour && g.gameHour < 16).sort((a, b) => a.gameHour - b.gameHour);
+  const getHour = (g) => {
+    if (g.gameHour) return g.gameHour;
+    if (g.gameTime) {
+      const match = g.gameTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (match) {
+        let h = parseInt(match[1]);
+        if (match[3].toUpperCase() === 'PM' && h !== 12) h += 12;
+        if (match[3].toUpperCase() === 'AM' && h === 12) h = 0;
+        return h;
+      }
+    }
+    return 99;
+  };
+  const earlyGames = (data.mlb || []).filter(g => getHour(g) < 16).sort((a, b) => getHour(a) - getHour(b));
 
   const picks = earlyGames.map(g => {
     const kelly = g.kelly || {};
