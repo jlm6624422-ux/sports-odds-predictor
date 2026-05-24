@@ -678,8 +678,8 @@ async function runPredictions() {
 
     const { generateNBAProps } = require('./server/services/nbaPropsEngine');
     const propsResult = generateNBAProps(nbaEvents);
-    nbaGames = propsResult.games;
-    nbaProps = propsResult.props;
+    nbaGames = propsResult?.games || [];
+    nbaProps = propsResult?.props || [];
   } catch(e) {
     console.log('[NBA] Props generation failed, falling back to basic game info:', e.message);
     try {
