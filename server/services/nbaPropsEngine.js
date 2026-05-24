@@ -262,7 +262,7 @@ async function generateNBAProps(espnEvents) {
         const edge = s.projected - market.line;
         const direction = edge > 0 ? 'OVER' : 'UNDER';
         const absEdge = Math.abs(edge);
-        const conf = absEdge >= 3 ? 'HIGH' : absEdge >= 1.5 ? 'MED' : absEdge >= 0.8 ? 'LOW' : 'SKIP';
+        const conf = absEdge >= 4 ? 'HIGH' : absEdge >= 2.5 ? 'MED' : absEdge >= 1.5 ? 'LOW' : 'SKIP';
         if (conf === 'SKIP') continue;
 
         evaluated.push({
