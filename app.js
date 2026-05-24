@@ -725,9 +725,17 @@ async function runPredictions() {
   } catch(e) {
     console.log('[NBA] Props generation failed, falling back to basic game info:', e.message);
     try {
+      let nbaFallbackEvents = [];
       const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
       const nbaData = await nbaRes.json();
-      nbaGames = (nbaData.events || []).map(e => {
+      nbaFallbackEvents = nbaData.events || [];
+      if (nbaFallbackEvents.length === 0) {
+        const tomorrow = new Date(new Date().getTime() + 86400000).toISOString().split('T')[0].replace(/-/g, '');
+        const nbaRes2 = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${tomorrow}`);
+        const nbaData2 = await nbaRes2.json();
+        nbaFallbackEvents = nbaData2.events || [];
+      }
+      nbaGames = nbaFallbackEvents.map(e => {
         const comp = e.competitions[0];
         const home = comp.competitors.find(c => c.homeAway === 'home');
         const away = comp.competitors.find(c => c.homeAway === 'away');
@@ -736,10 +744,13 @@ async function runPredictions() {
           home: home.team.displayName, away: away.team.displayName,
           homeRecord: (home.records||[{}])[0]?.summary, awayRecord: (away.records||[{}])[0]?.summary,
           spread: odds.details, ou: odds.overUnder,
+          homeML: odds.homeTeamOdds?.moneyLine || null,
+          awayML: odds.awayTeamOdds?.moneyLine || null,
+          time: comp.status?.type?.shortDetail || comp.date,
           status: comp.status?.type?.shortDetail,
         };
       });
-    } catch(e2) {}
+    } catch(e2) { console.log('[NBA] Fallback also failed:', e2.message); }
   }
 
   // Apply NBA rest/travel adjustments
