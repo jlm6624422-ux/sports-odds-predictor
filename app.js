@@ -72,7 +72,8 @@ app.get('/api/early-action', (req, res) => {
     }
     return 99;
   };
-  const earlyGames = (data.mlb || []).filter(g => getHour(g) < 16).sort((a, b) => getHour(a) - getHour(b));
+  // Early games = before 3pm CT (times stored in Central)
+  const earlyGames = (data.mlb || []).filter(g => getHour(g) < 15).sort((a, b) => getHour(a) - getHour(b));
 
   const picks = earlyGames.map(g => {
     const kelly = g.kelly || {};
@@ -665,14 +666,21 @@ async function runPredictions() {
       };
     }
 
-    // Extract game time from schedule data
+    // Extract game time from schedule data (Central Time)
     let gameTime = null, gameHour = null;
     if (game.gameDate) {
       const gd = new Date(game.gameDate);
-      const etStr = gd.toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', hour12: true });
-      gameTime = etStr;
-      gameHour = parseInt(gd.toLocaleString('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }));
+      const ctStr = gd.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit', hour12: true });
+      gameTime = ctStr;
+      gameHour = parseInt(gd.toLocaleString('en-US', { timeZone: 'America/Chicago', hour: 'numeric', hour12: false }));
     }
+
+    // Derive pick fields for display
+    const pickSide = pred.prediction.homeWinProb > pred.prediction.awayWinProb ? 'home' : 'away';
+    const pickTeam = pickSide === 'home' ? homeTeamName : awayTeamName;
+    const homeML = bookmakers ? (() => { for (const bk of bookmakers) { const ml = bk.markets?.find(m => m.key === 'h2h'); if (ml) { const ho = ml.outcomes?.find(o => o.name === homeTeamName); return ho?.price || null; } } return null; })() : null;
+    const awayML = bookmakers ? (() => { for (const bk of bookmakers) { const ml = bk.markets?.find(m => m.key === 'h2h'); if (ml) { const ao = ml.outcomes?.find(o => o.name === awayTeamName); return ao?.price || null; } } return null; })() : null;
+    const coinFlip = pred.confidence === 'coin-flip' || (pred.modelAgreement < 0.6 && Math.abs(pred.prediction.homeWinProb - 50) < 3);
 
     mlbResults.push({
       home: homeTeamName, away: awayTeamName, venue,
@@ -680,9 +688,13 @@ async function runPredictions() {
       prediction: pred.prediction, edge: pred.edge, kelly: pred.kelly,
       subModels: pred.subModels, confidence: pred.confidence, modelsUsed: pred.modelsUsed,
       modelAgreement: pred.modelAgreement,
+      coinFlip,
       ouLine, totalEdge: ouLine ? parseFloat((pred.prediction.expectedTotal - ouLine).toFixed(1)) : null,
-      f5: f5, f5Pick,
+      homeML, awayML,
       gameTime, gameHour,
+      pick: pickTeam, pickSide,
+      conf: pickSide === 'home' ? pred.prediction.homeWinProb : pred.prediction.awayWinProb,
+      f5: f5, f5Pick,
       umpire: umpireAdj.name ? { name: umpireAdj.name, adjustment: umpireAdj.adjustment, reason: umpireAdj.reason } : null,
       bullpenGrade: { home: homeBullpen?.summary?.grade || 'unknown', away: awayBullpen?.summary?.grade || 'unknown' },
       lineupConfirmed: !!(gameLineup?.home?.confirmed && gameLineup?.away?.confirmed),
@@ -695,9 +707,16 @@ async function runPredictions() {
   const { calculateRestTravelAdj } = require('./server/services/nbaRestTravel');
 
   try {
+    // Fetch today and tomorrow (games after 8pm CT show as next UTC day)
     const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
     const nbaData = await nbaRes.json();
-    const nbaEvents = nbaData.events || [];
+    let nbaEvents = nbaData.events || [];
+    if (nbaEvents.length === 0) {
+      const tomorrow = new Date(new Date().getTime() + 86400000).toISOString().split('T')[0].replace(/-/g, '');
+      const nbaRes2 = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${tomorrow}`);
+      const nbaData2 = await nbaRes2.json();
+      nbaEvents = nbaData2.events || [];
+    }
 
     const { generateNBAProps } = require('./server/services/nbaPropsEngine');
     const propsResult = generateNBAProps(nbaEvents);
