@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NBA Picks - 2026-05-24</title>
+<title>NBA Picks & Props</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0f1117;color:#e1e4e8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;line-height:1.6;padding:20px}
@@ -12,8 +12,10 @@ header{text-align:center;padding:20px 0 16px;border-bottom:1px solid #21262d;mar
 header h1{font-size:2em;background:linear-gradient(135deg,#f0883e,#d2a8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
 header .subtitle{color:#8b949e;font-size:1em}
 .section{margin-bottom:30px}
-.section-title{font-size:1.3em;color:#f0883e;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d}
+.section-title{font-size:1.3em;color:#f0883e;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #21262d;display:flex;justify-content:space-between;align-items:center}
 .game-card{background:#161b22;border:1px solid #21262d;border-radius:12px;padding:18px;margin-bottom:12px}
+.game-card.graded-win{border-color:#34d399;background:rgba(52,211,153,0.05)}
+.game-card.graded-loss{border-color:#f87171;background:rgba(248,113,113,0.05)}
 .game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .game-matchup{font-size:1.1em;font-weight:600}
 .game-time{color:#8b949e;font-size:0.85em}
@@ -27,49 +29,49 @@ table{width:100%;border-collapse:collapse;font-size:0.85em;min-width:600px}
 th{text-align:left;padding:8px 10px;background:#161b22;border-bottom:2px solid #21262d;color:#8b949e;font-size:0.75em;text-transform:uppercase;white-space:nowrap}
 td{padding:8px 10px;border-bottom:1px solid #1a1f2e;white-space:nowrap}
 tr:hover td{background:rgba(240,136,62,0.03)}
+tr.row-win td{background:rgba(52,211,153,0.06);border-left:3px solid #34d399}
+tr.row-loss td{background:rgba(248,113,113,0.06);border-left:3px solid #f87171}
+.badge-win{background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700}
+.badge-loss{background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700}
+.badge-pend{background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700}
+.stats-banner{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center}
+.stat-card .value{font-size:1.8em;font-weight:700}
+.stat-card .label{font-size:0.8em;color:#8b949e;margin-top:4px}
+.day-section{background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.day-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer;user-select:none}
+.day-header:hover{background:#22272e}
+.day-header .chevron{color:#8b949e;transition:transform 0.2s}
+.day-section.collapsed .chevron{transform:rotate(-90deg)}
+.day-section.collapsed .day-body{display:none}
+.day-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.btn{padding:6px 14px;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer}
+.btn-orange{background:#f0883e;color:#fff}
+.btn-purple{background:#d2a8ff;color:#0f1117}
+.btn:disabled{background:#374151;color:#6b7280;cursor:not-allowed}
 .nav-links{text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
 .nav-links a{color:#58a6ff;text-decoration:none;margin:0 12px;font-size:0.9em}
-.nav-links a:hover{text-decoration:underline}
 footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top:1px solid #21262d;margin-top:30px}
+.loading{text-align:center;padding:40px;color:#8b949e}
+.empty{text-align:center;padding:40px;color:#6b7280}
 </style>
 </head>
 <body>
 <div class="container">
 <header>
 <h1>NBA Picks &amp; Props</h1>
-<div class="subtitle">Sunday, May 24, 2026</div>
+<div class="subtitle" id="nba-date">Loading...</div>
 </header>
 
-<div class="section"><div class="section-title nba">&#127936; NBA Daily Bets <button id="nba-refresh-btn" onclick="refreshNBA()" style="float:right;padding:6px 14px;background:#f0883e;color:#fff;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button></div><div class="game-card" style="border-color:#f0883e" data-nba-game="San Antonio Spurs">
-<div class="game-header"><div class="game-matchup">Oklahoma City Thunder (64-18) @ San Antonio Spurs (62-20)</div><div class="game-time">5/24 - 8:00 PM EDT</div></div>
-<div class="game-details">
-<div class="detail-item"><div class="detail-label">Spread</div><div class="detail-value">San Antonio Spurs -2.5</div></div>
-<div class="detail-item"><div class="detail-label">O/U</div><div class="detail-value">219.5</div></div>
-<div class="detail-item"><div class="detail-label">Moneyline</div><div class="detail-value orange">San Antonio Spurs -142 / Oklahoma City Thunder +120</div></div>
-<div class="detail-item"><div class="detail-label">Best Play</div><div class="detail-value green">Oklahoma City Thunder +2.5</div></div>
+<div class="section">
+<div class="section-title"><span>Today's NBA Games</span><button class="btn btn-orange" id="refresh-btn" onclick="refreshAll()">Refresh Results</button></div>
+<div id="today-games"><div class="loading">Loading...</div></div>
 </div>
-<div style="margin-top:12px;padding-top:10px;border-top:1px solid #21262d">
-<div style="font-size:0.85em;font-weight:600;margin-bottom:8px;color:#f0883e">Game Bets</div>
-<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;font-size:0.85em;min-width:400px">
-<thead><tr><th>Bet</th><th>Line</th><th>Thesis</th><th>Result</th></tr></thead>
-<tbody>
-<tr data-nba-bet="spread" data-team="Oklahoma City Thunder" data-line="2.5"><td style="font-weight:600">Oklahoma City Thunder +2.5</td><td>-115</td><td>Playoff games run tight</td><td class="nba-result">—</td></tr>
-<tr data-nba-bet="ml" data-team="San Antonio Spurs"><td style="font-weight:600">San Antonio Spurs ML</td><td>-142</td><td>Home court + better record</td><td class="nba-result">—</td></tr>
-<tr data-nba-bet="over" data-line="219.5"><td style="font-weight:600">Over 219.5</td><td>-110</td><td>Competitive series = pace</td><td class="nba-result">—</td></tr>
-</tbody></table></div>
-</div>
-</div><div style="margin-top:20px"><div style="font-size:1.1em;font-weight:700;color:#f0883e;margin-bottom:4px">&#127942; Player Prop Best Bets</div>
-<p style="color:#8b949e;font-size:0.8em;margin-bottom:12px">Top 10 props ranked by edge vs. projected line. Hit Refresh after game for actual results.</p><div class="table-wrapper" style="margin-bottom:16px"><table>
-<thead><tr><th>Player</th><th>Team</th><th>Prop</th><th>Line</th><th>Season Avg</th><th>Edge</th><th>Confidence</th><th>Result</th></tr></thead>
-<tbody id="nba-props-body"><tr data-prop-player="Shai Gilgeous-Alexander" data-prop-type="PTS+REB+AST" data-prop-line="35.5"><td style="font-weight:600">Shai Gilgeous-Alexander</td><td>Thunder</td><td>PTS+REB+AST</td><td>O 35.5</td><td style="font-weight:700;color:#58a6ff">37.7</td><td style="color:#3fb950;font-weight:600">+2.2</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Victor Wembanyama" data-prop-type="PTS+REB+AST" data-prop-line="34.5"><td style="font-weight:600">Victor Wembanyama</td><td>Spurs</td><td>PTS+REB+AST</td><td>O 34.5</td><td style="font-weight:700;color:#58a6ff">36.5</td><td style="color:#3fb950;font-weight:600">+2.0</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Shai Gilgeous-Alexander" data-prop-type="Points" data-prop-line="29.5"><td style="font-weight:600">Shai Gilgeous-Alexander</td><td>Thunder</td><td>Points</td><td>O 29.5</td><td style="font-weight:700;color:#58a6ff">31.1</td><td style="color:#3fb950;font-weight:600">+1.6</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Victor Wembanyama" data-prop-type="Points" data-prop-line="23.5"><td style="font-weight:600">Victor Wembanyama</td><td>Spurs</td><td>Points</td><td>O 23.5</td><td style="font-weight:700;color:#58a6ff">25.0</td><td style="color:#3fb950;font-weight:600">+1.5</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Chet Holmgren" data-prop-type="Rebounds" data-prop-line="7.5"><td style="font-weight:600">Chet Holmgren</td><td>Thunder</td><td>Rebounds</td><td>O 7.5</td><td style="font-weight:700;color:#58a6ff">8.9</td><td style="color:#3fb950;font-weight:600">+1.4</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Shai Gilgeous-Alexander" data-prop-type="Assists" data-prop-line="5.5"><td style="font-weight:600">Shai Gilgeous-Alexander</td><td>Thunder</td><td>Assists</td><td>O 5.5</td><td style="font-weight:700;color:#58a6ff">6.6</td><td style="color:#3fb950;font-weight:600">+1.1</td><td><span style="background:#2d2a1f;color:#d29922;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">MED</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Victor Wembanyama" data-prop-type="Rebounds" data-prop-line="10.5"><td style="font-weight:600">Victor Wembanyama</td><td>Spurs</td><td>Rebounds</td><td>O 10.5</td><td style="font-weight:700;color:#58a6ff">11.5</td><td style="color:#3fb950;font-weight:600">+1.0</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr><tr data-prop-player="Stephon Castle" data-prop-type="Assists" data-prop-line="6.5"><td style="font-weight:600">Stephon Castle</td><td>Spurs</td><td>Assists</td><td>O 6.5</td><td style="font-weight:700;color:#58a6ff">7.4</td><td style="color:#3fb950;font-weight:600">+0.9</td><td><span style="background:#21262d;color:#8b949e;padding:2px 7px;border-radius:4px;font-size:0.75em;font-weight:600">LOW</span></td><td class="nba-prop-result">—</td></tr></tbody></table></div></div></div>
 
-<div class="section" style="margin-top:40px">
-<div class="section-title" style="color:#d2a8ff;display:flex;justify-content:space-between;align-items:center">
-<span>&#128202; NBA Best Bets Tracker</span>
-<button id="nba-tracker-refresh" onclick="refreshTrackerResults()" style="padding:6px 14px;background:#d2a8ff;color:#0f1117;border:none;border-radius:6px;font-size:0.75em;font-weight:600;cursor:pointer">Refresh Results</button>
-</div>
-<div id="nba-stats-banner" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px"></div>
-<div id="nba-tracker-days"></div>
+<div class="section">
+<div class="section-title" style="color:#d2a8ff"><span>NBA Best Bets Tracker</span><button class="btn btn-purple" onclick="refreshAll()">Refresh</button></div>
+<div class="stats-banner" id="nba-stats"></div>
+<div id="tracker-days"><div class="loading">Loading...</div></div>
 </div>
 
 <div class="nav-links">
@@ -77,289 +79,140 @@ footer{text-align:center;padding:20px 0;color:#6e7681;font-size:0.8em;border-top
 <a href="/early">Early Action</a>
 <a href="/tracker">Betting Tracker</a>
 <a href="/mlb">MLB Season</a>
-<a href="/dashboard">Dashboard</a>
 </div>
 
-<footer>
-<p>Data: ESPN Scoreboard + Box Scores | Props graded live via Refresh</p>
-</footer>
+<footer>Data: ESPN Scoreboard + Box Scores | Props graded live via Refresh</footer>
 </div>
 
 <script>
-async function refreshNBA() {
-  const btn = document.getElementById('nba-refresh-btn');
-  if (!btn) return;
-  btn.textContent = 'Refreshing...';
-  btn.disabled = true;
+let todayData = null;
+let trackerData = null;
+
+async function loadAll() {
   try {
-    const today = '2026-05-24';
-    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + today.replace(/-/g,''));
-    const data = await res.json();
-    const events = data.events || [];
+    const [todayRes, trackerRes] = await Promise.all([
+      fetch('/api/today'),
+      fetch('/api/nba-bestbets')
+    ]);
+    todayData = await todayRes.json();
+    trackerData = await trackerRes.json();
 
-    for (const event of events) {
-      const comp = event.competitions[0];
-      const home = comp.competitors?.find(c => c.homeAway === 'home');
-      const away = comp.competitors?.find(c => c.homeAway === 'away');
-      if (!home || !away) continue;
-
-      const homeScore = parseInt(home.score || 0);
-      const awayScore = parseInt(away.score || 0);
-      const total = homeScore + awayScore;
-      const margin = homeScore - awayScore;
-      const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
-      const isFinal = comp.status?.type?.completed;
-      const statusText = comp.status?.type?.shortDetail || '';
-
-      document.querySelectorAll('[data-nba-bet]').forEach(row => {
-        const betType = row.dataset.nbaBet;
-        const resultCell = row.querySelector('.nba-result');
-        if (!resultCell) return;
-        let won = null;
-        if (betType === 'spread') {
-          const team = row.dataset.team;
-          const line = parseFloat(row.dataset.line);
-          const isHome = home.team.displayName.includes(team.split(' ').pop());
-          const teamMargin = isHome ? margin : -margin;
-          won = (teamMargin + line) > 0;
-        } else if (betType === 'ml') {
-          const team = row.dataset.team;
-          won = winner.includes(team.split(' ').pop());
-        } else if (betType === 'over') {
-          const line = parseFloat(row.dataset.line);
-          won = total > line;
-        }
-        if (isFinal && won !== null) {
-          const badge = won
-            ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>'
-            : '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>';
-          resultCell.innerHTML = badge + ' <span style="color:#8b949e;font-size:0.75em">' + awayScore + '-' + homeScore + '</span>';
-        } else if (total > 0) {
-          resultCell.innerHTML = '<span style="color:#f59e0b;font-size:0.8em">' + statusText + ' (' + awayScore + '-' + homeScore + ')</span>';
-        }
-      });
-
-      const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-      const boxData = await boxRes.json();
-      const boxscore = boxData.boxscore;
-
-      if (boxscore?.players) {
-        let propsHTML = '';
-        for (const team of boxscore.players) {
-          for (const stat of team.statistics) {
-            const labels = stat.labels || [];
-            const ptsIdx = labels.indexOf('PTS');
-            const rebIdx = labels.indexOf('REB');
-            const astIdx = labels.indexOf('AST');
-            const minIdx = labels.indexOf('MIN');
-            for (const athlete of stat.athletes) {
-              const mins = parseInt(athlete.stats[minIdx]) || 0;
-              if (mins < 15) continue;
-              const pts = parseInt(athlete.stats[ptsIdx]) || 0;
-              const reb = parseInt(athlete.stats[rebIdx]) || 0;
-              const ast = parseInt(athlete.stats[astIdx]) || 0;
-              const ptsLine = Math.round(pts * 0.85) + 0.5;
-              const rebLine = Math.round(reb * 0.8) + 0.5;
-              const astLine = Math.round(ast * 0.8) + 0.5;
-              const mkBadge = (actual, line) => {
-                if (!isFinal) return '—';
-                return actual > line
-                  ? '<span style="background:#064e3b;color:#34d399;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">W</span>'
-                  : '<span style="background:#7f1d1d;color:#f87171;padding:2px 6px;border-radius:3px;font-size:0.75em;font-weight:700">L</span>';
-              };
-              const teamShort = team.team.displayName.split(' ').pop();
-              propsHTML += '<tr><td style="font-weight:600">' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Points</td><td>O ' + ptsLine + '</td><td style="font-weight:700;color:#58a6ff">' + pts + '</td><td>' + (pts - ptsLine > 0 ? '+' : '') + (pts - ptsLine).toFixed(1) + '</td><td>' + mkBadge(pts, ptsLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Rebounds</td><td>O ' + rebLine + '</td><td style="font-weight:700;color:#58a6ff">' + reb + '</td><td>' + (reb - rebLine > 0 ? '+' : '') + (reb - rebLine).toFixed(1) + '</td><td>' + mkBadge(reb, rebLine) + '</td></tr>';
-              propsHTML += '<tr><td>' + athlete.athlete.displayName + '</td><td>' + teamShort + '</td><td>Assists</td><td>O ' + astLine + '</td><td style="font-weight:700;color:#58a6ff">' + ast + '</td><td>' + (ast - astLine > 0 ? '+' : '') + (ast - astLine).toFixed(1) + '</td><td>' + mkBadge(ast, astLine) + '</td></tr>';
-            }
-          }
-        }
-        const propsBody = document.getElementById('nba-props-body');
-        if (propsBody && propsHTML) propsBody.innerHTML = propsHTML;
-      }
+    if (todayData.date) {
+      const d = new Date(todayData.date + 'T12:00:00');
+      document.getElementById('nba-date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
-    btn.textContent = '\u2713 Updated';
-    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
-  } catch(e) {
-    console.error('NBA refresh:', e);
-    btn.textContent = 'Error';
-    btn.disabled = false;
+
+    renderTodayGames();
+    renderTracker();
+  } catch (e) {
+    document.getElementById('today-games').innerHTML = '<div class="loading">Failed to load data.</div>';
   }
 }
 
-// NBA BEST BETS TRACKER
-let NBA_TRACKER_DATA = [
-  { date: "2026-05-24", picks: [] },
-  { date: "2026-05-21", picks: [
-    { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +6.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight — road dogs cover", result: "pending", score: "" },
-    { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -238", odds: "-238", confidence: "high", thesis: "Home court + series lead", result: "pending", score: "" },
-    { type: "over", team: "OVER 216.5", matchup: "CLE @ NYK", line: "O 216.5", odds: "-110", confidence: "med", thesis: "Series pace trending up", result: "pending", score: "" }
-  ]},
-  { date: "2026-05-20", picks: [
-    { type: "spread", team: "San Antonio Spurs", matchup: "SA @ OKC", line: "SA +8.5", odds: "-110", confidence: "med", thesis: "Playoff games run tight", result: "pending", score: "" },
-    { type: "over", team: "OVER 218.5", matchup: "SA @ OKC", line: "O 218.5", odds: "-110", confidence: "med", thesis: "Pace projection", result: "pending", score: "" },
-    { type: "prop", team: "Shai Gilgeous-Alexander O 34.5 PRA", matchup: "SA @ OKC", line: "O 34.5 (+3.1 edge)", odds: "-115", confidence: "high", thesis: "Avg 37.7 PRA", result: "pending", score: "" },
-    { type: "prop", team: "Victor Wembanyama O 36.5 PRA", matchup: "SA @ OKC", line: "O 36.5 (+2.9 edge)", odds: "-110", confidence: "high", thesis: "Avg 39.4 PRA", result: "pending", score: "" },
-    { type: "prop", team: "Jalen Williams O 28.5 PRA", matchup: "SA @ OKC", line: "O 28.5 (+2.5 edge)", odds: "-110", confidence: "med", thesis: "Avg 31.0 PRA", result: "pending", score: "" }
-  ]},
-  { date: "2026-05-19", picks: [
-    { type: "spread", team: "Cleveland Cavaliers", matchup: "CLE @ NYK", line: "CLE +7.5", odds: "-115", confidence: "high", thesis: "Playoff games run tight", result: "loss", score: "Cavaliers 104, Knicks 115 (OT)" },
-    { type: "ml", team: "New York Knicks", matchup: "CLE @ NYK", line: "NYK -265", odds: "-265", confidence: "med", thesis: "Home court + better record", result: "win", score: "Cavaliers 104, Knicks 115 (OT)" },
-    { type: "over", team: "OVER 217.5", matchup: "CLE @ NYK", line: "O 217.5", odds: "-110", confidence: "med", thesis: "Competitive series = pace", result: "win", score: "Cavaliers 104, Knicks 115 (219 total)" },
-    { type: "prop", team: "Jalen Brunson O 30.5 PRA", matchup: "CLE @ NYK", line: "O 30.5 (+2.3 edge)", odds: "-115", confidence: "med", thesis: "Avg 32.8 PRA", result: "win", score: "49 actual" },
-    { type: "prop", team: "Donovan Mitchell O 31.5 PRA", matchup: "CLE @ NYK", line: "O 31.5 (+2.1 edge)", odds: "-110", confidence: "med", thesis: "Avg 33.6 PRA", result: "win", score: "37 actual" },
-    { type: "prop", team: "Karl-Anthony Towns O 10.5 REB", matchup: "CLE @ NYK", line: "O 10.5 (+1.4 edge)", odds: "-120", confidence: "med", thesis: "Avg 11.9 RPG", result: "win", score: "13 actual" }
-  ]}
-];
+function renderTodayGames() {
+  const container = document.getElementById('today-games');
+  const nba = todayData?.nba || [];
 
-// Auto-populate today's picks from page game bets + props
-function loadTodayPicks() {
-  const todayEntry = NBA_TRACKER_DATA.find(d => d.date === '2026-05-24');
-  if (!todayEntry || todayEntry.picks.length > 0) return;
-
-  // Grab game bets from the page
-  document.querySelectorAll('[data-nba-bet]').forEach(row => {
-    const type = row.dataset.nbaBet;
-    const team = row.dataset.team || '';
-    const line = row.dataset.line || '';
-    const betCell = row.querySelector('td');
-    const betText = betCell ? betCell.textContent : '';
-
-    if (type === 'spread') {
-      todayEntry.picks.push({ type: 'spread', team, matchup: '', line: betText, odds: '-110', confidence: 'med', thesis: 'Playoff games run tight', result: 'pending', score: '' });
-    } else if (type === 'ml') {
-      todayEntry.picks.push({ type: 'ml', team, matchup: '', line: betText, odds: '-110', confidence: 'med', thesis: 'Home court edge', result: 'pending', score: '' });
-    } else if (type === 'over') {
-      todayEntry.picks.push({ type: 'over', team: 'OVER ' + line, matchup: '', line: 'O ' + line, odds: '-110', confidence: 'med', thesis: 'Pace projection', result: 'pending', score: '' });
-    }
-  });
-
-  // Grab prop picks from the table
-  document.querySelectorAll('[data-prop-player]').forEach(row => {
-    const player = row.dataset.propPlayer;
-    const stat = row.dataset.propType;
-    const line = row.dataset.propLine;
-    todayEntry.picks.push({ type: 'prop', team: player + ' O ' + line + ' ' + stat, matchup: '', line: 'O ' + line, odds: '-110', confidence: 'med', thesis: 'Model projection', result: 'pending', score: '' });
-  });
-}
-
-async function autoGradePendingDays() {
-  for (const day of NBA_TRACKER_DATA) {
-    if (!day.picks.some(p => p.result === 'pending')) continue;
-    try {
-      const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=' + day.date.replace(/-/g, ''));
-      const data = await res.json();
-      for (const event of (data.events || [])) {
-        const comp = event.competitions[0];
-        const home = comp.competitors?.find(c => c.homeAway === 'home');
-        const away = comp.competitors?.find(c => c.homeAway === 'away');
-        if (!home || !away || !comp.status?.type?.completed) continue;
-        const homeScore = parseInt(home.score || 0);
-        const awayScore = parseInt(away.score || 0);
-        const total = homeScore + awayScore;
-        const margin = homeScore - awayScore;
-        const winner = homeScore > awayScore ? home.team.displayName : away.team.displayName;
-        const scoreStr = away.team.shortDisplayName + ' ' + awayScore + ', ' + home.team.shortDisplayName + ' ' + homeScore;
-
-        for (const pick of day.picks) {
-          if (pick.result !== 'pending') continue;
-          if (pick.type === 'ml') {
-            const won = winner.toLowerCase().includes(pick.team.split(' ').slice(-1)[0].toLowerCase());
-            pick.result = won ? 'win' : 'loss'; pick.score = scoreStr;
-          } else if (pick.type === 'spread') {
-            const lineMatch = pick.line.match(/([+-]?\d+\.?\d*)/);
-            if (lineMatch) {
-              const spread = parseFloat(lineMatch[1]);
-              const isHome = home.team.displayName.includes(pick.team.split(' ').pop());
-              const teamMargin = isHome ? margin : -margin;
-              pick.result = (teamMargin + spread) > 0 ? 'win' : 'loss'; pick.score = scoreStr;
-            }
-          } else if (pick.type === 'over') {
-            const lineMatch = pick.line.match(/([\d.]+)/);
-            if (lineMatch) { const line = parseFloat(lineMatch[1]); pick.result = total > line ? 'win' : 'loss'; pick.score = scoreStr + ' (' + total + ' total)'; }
-          } else if (pick.type === 'prop') {
-            try {
-              const boxRes = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=' + event.id);
-              const boxData = await boxRes.json();
-              const lineMatch = pick.line.match(/O\s*([\d.]+)/);
-              if (!lineMatch) continue;
-              const propLine = parseFloat(lineMatch[1]);
-              const playerName = pick.team.split(' O ')[0].split(' U ')[0];
-              for (const team of (boxData.boxscore?.players || [])) {
-                for (const stat of team.statistics) {
-                  const labels = stat.labels || [];
-                  for (const athlete of stat.athletes) {
-                    if (!athlete.athlete.displayName.includes(playerName.split(' ').pop())) continue;
-                    const pts = parseInt(athlete.stats[labels.indexOf('PTS')]) || 0;
-                    const reb = parseInt(athlete.stats[labels.indexOf('REB')]) || 0;
-                    const ast = parseInt(athlete.stats[labels.indexOf('AST')]) || 0;
-                    let actual = null;
-                    if (pick.team.includes('PRA')) actual = pts + reb + ast;
-                    else if (pick.team.includes('REB')) actual = reb;
-                    else if (pick.team.includes('AST')) actual = ast;
-                    else if (pick.team.includes('PTS')) actual = pts;
-                    if (actual !== null) { pick.result = actual > propLine ? 'win' : 'loss'; pick.score = actual + ' actual'; }
-                  }
-                }
-              }
-            } catch(e) {}
-          }
-        }
-      }
-    } catch(e) {}
+  if (nba.length === 0) {
+    container.innerHTML = '<div class="empty">No NBA games today.</div>';
+    return;
   }
+
+  let html = '';
+  for (const game of nba) {
+    html += '<div class="game-card" style="border-color:#f0883e">';
+    html += '<div class="game-header"><div class="game-matchup">' + game.away + ' (' + (game.awayRecord || '') + ') @ ' + game.home + ' (' + (game.homeRecord || '') + ')</div>';
+    html += '<div class="game-time">' + (game.time || '') + '</div></div>';
+    html += '<div class="game-details">';
+    html += '<div><div class="detail-label">Spread</div><div class="detail-value">' + game.home + ' ' + game.spread + '</div></div>';
+    html += '<div><div class="detail-label">O/U</div><div class="detail-value">' + game.ou + '</div></div>';
+    html += '<div><div class="detail-label">Moneyline</div><div class="detail-value orange">' + game.home + ' ' + game.homeML + ' / ' + game.away + ' ' + game.awayML + '</div></div>';
+    html += '<div><div class="detail-label">Records</div><div class="detail-value">' + (game.homeHomeRecord ? 'Home: ' + game.homeHomeRecord : '') + (game.awayRoadRecord ? ' | Road: ' + game.awayRoadRecord : '') + '</div></div>';
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
 }
 
-function renderNBATracker() {
-  const days = NBA_TRACKER_DATA.filter(d => d.picks.length > 0);
+function renderTracker() {
+  const days = trackerData?.days || [];
+
+  // Stats
   let totalW = 0, totalL = 0, totalPend = 0;
-  for (const d of days) { for (const p of d.picks) { if (p.result === 'win') totalW++; else if (p.result === 'loss') totalL++; else totalPend++; } }
+  for (const d of days) {
+    for (const p of d.picks) {
+      if (p.result === 'win') totalW++;
+      else if (p.result === 'loss') totalL++;
+      else totalPend++;
+    }
+  }
   const pct = (totalW + totalL) > 0 ? ((totalW / (totalW + totalL)) * 100).toFixed(1) : '0';
 
-  document.getElementById('nba-stats-banner').innerHTML = '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#3fb950">' + totalW + '</div><div style="font-size:0.8em;color:#8b949e">Wins</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f85149">' + totalL + '</div><div style="font-size:0.8em;color:#8b949e">Losses</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#d2a8ff">' + pct + '%</div><div style="font-size:0.8em;color:#8b949e">Win Rate</div></div><div style="background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px;text-align:center"><div style="font-size:1.8em;font-weight:700;color:#f59e0b">' + totalPend + '</div><div style="font-size:0.8em;color:#8b949e">Pending</div></div>';
+  document.getElementById('nba-stats').innerHTML =
+    '<div class="stat-card"><div class="value" style="color:#3fb950">' + totalW + '</div><div class="label">Wins</div></div>' +
+    '<div class="stat-card"><div class="value" style="color:#f85149">' + totalL + '</div><div class="label">Losses</div></div>' +
+    '<div class="stat-card"><div class="value" style="color:#d2a8ff">' + pct + '%</div><div class="label">Win Rate</div></div>' +
+    '<div class="stat-card"><div class="value" style="color:#f59e0b">' + totalPend + '</div><div class="label">Pending</div></div>';
+
+  // Days
+  const container = document.getElementById('tracker-days');
+  if (days.length === 0) {
+    container.innerHTML = '<div class="empty">No NBA bets tracked yet.</div>';
+    return;
+  }
 
   let html = '';
   for (let i = 0; i < days.length; i++) {
     const day = days[i];
-    const isToday = day.date === '2026-05-24';
-    const isOpen = i === 0;
+    const collapsed = i > 0 ? ' collapsed' : '';
     const dW = day.picks.filter(p => p.result === 'win').length;
     const dL = day.picks.filter(p => p.result === 'loss').length;
     const dP = day.picks.filter(p => p.result === 'pending').length;
     const dateLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-    const dayId = 'nba-tracker-' + day.date;
 
-    html += '<div style="background:#161b22;border:1px solid #21262d;border-radius:10px;margin-bottom:10px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:#1c2128;cursor:pointer;user-select:none;border-radius:10px 10px 0 0" onclick="var b=document.getElementById(\'' + dayId + '\');b.style.display=b.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.chv\').style.transform=b.style.display===\'none\'?\'rotate(-90deg)\':\'rotate(0deg)\'">';
-    html += '<div style="display:flex;align-items:center;gap:10px"><h4 style="font-size:0.95em">' + dateLabel + (isToday ? ' (Today)' : '') + '</h4></div>';
-    html += '<div style="display:flex;align-items:center;gap:12px"><span style="font-size:0.85em"><span style="color:#3fb950;font-weight:600">' + dW + 'W</span> <span style="color:#f85149;font-weight:600">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '</span><span class="chv" style="color:#8b949e;transition:transform 0.2s;display:inline-block;' + (isOpen ? '' : 'transform:rotate(-90deg)') + '">&#9660;</span></div>';
+    html += '<div class="day-section' + collapsed + '" id="nba-day-' + day.date + '">';
+    html += '<div class="day-header" onclick="document.getElementById(\'nba-day-' + day.date + '\').classList.toggle(\'collapsed\')">';
+    html += '<div style="display:flex;align-items:center;gap:10px"><h4 style="font-size:0.95em">' + dateLabel + '</h4></div>';
+    html += '<div style="display:flex;align-items:center;gap:12px;font-size:0.85em"><span style="color:#3fb950;font-weight:600">' + dW + 'W</span> <span style="color:#f85149;font-weight:600">' + dL + 'L</span>' + (dP > 0 ? ' <span style="color:#f59e0b">' + dP + ' pend</span>' : '') + '<span class="chevron">&#9660;</span></div>';
     html += '</div>';
 
-    html += '<div id="' + dayId + '" style="overflow-x:auto;-webkit-overflow-scrolling:touch;' + (isOpen ? '' : 'display:none') + '">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:0.85em;min-width:650px">';
-    html += '<thead><tr><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Type</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Pick</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Line</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Thesis</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Score</th><th style="padding:8px 12px;color:#8b949e;font-size:0.75em;text-transform:uppercase;border-bottom:1px solid #21262d;white-space:nowrap">Result</th></tr></thead><tbody>';
+    html += '<div class="day-body"><table><thead><tr><th>Type</th><th>Pick</th><th>Line</th><th>Info</th><th>Score</th><th>Result</th></tr></thead><tbody>';
+
     for (const p of day.picks) {
-      const bg = p.result === 'win' ? 'background:rgba(52,211,153,0.06);border-left:3px solid #34d399' : p.result === 'loss' ? 'background:rgba(248,113,113,0.06);border-left:3px solid #f87171' : 'border-left:3px solid transparent';
-      const badge = p.result === 'win' ? '<span style="background:#064e3b;color:#34d399;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">W</span>' : p.result === 'loss' ? '<span style="background:#7f1d1d;color:#f87171;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">L</span>' : '<span style="background:#78350f;color:#f59e0b;padding:2px 8px;border-radius:4px;font-size:0.8em;font-weight:700">PEND</span>';
-      html += '<tr style="' + bg + '"><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap"><span style="background:' + (p.type === 'prop' ? '#2d2a1f;color:#f0883e' : p.type === 'spread' ? '#2d1f3d;color:#d2a8ff' : p.type === 'ml' ? '#1f3a5f;color:#58a6ff' : '#1a4023;color:#3fb950') + ';padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:600">' + p.type.toUpperCase() + '</span></td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;font-weight:600">' + p.team + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + p.line + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e;font-size:0.85em">' + (p.thesis || '') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap;color:#8b949e">' + (p.score || '—') + '</td><td style="padding:10px 12px;border-bottom:1px solid #21262d;white-space:nowrap">' + badge + '</td></tr>';
+      const rowCls = p.result === 'win' ? 'row-win' : p.result === 'loss' ? 'row-loss' : '';
+      const badge = p.result === 'win' ? '<span class="badge-win">W</span>' : p.result === 'loss' ? '<span class="badge-loss">L</span>' : '<span class="badge-pend">PEND</span>';
+      const typeBg = p.type === 'prop' ? '#2d2a1f;color:#f0883e' : p.type === 'spread' ? '#2d1f3d;color:#d2a8ff' : p.type === 'over' ? '#1a4023;color:#3fb950' : '#1f3a5f;color:#58a6ff';
+
+      html += '<tr class="' + rowCls + '">';
+      html += '<td><span style="background:' + typeBg + ';padding:2px 8px;border-radius:4px;font-size:0.78em;font-weight:600">' + p.type.toUpperCase() + '</span></td>';
+      html += '<td style="font-weight:600">' + (p.team || '—') + '</td>';
+      html += '<td>' + (p.line || '—') + '</td>';
+      html += '<td style="color:#8b949e;font-size:0.85em">' + (p.thesis || p.matchup || '—') + '</td>';
+      html += '<td style="color:#8b949e">' + (p.score || '—') + '</td>';
+      html += '<td>' + badge + '</td>';
+      html += '</tr>';
     }
+
     html += '</tbody></table></div></div>';
   }
-  document.getElementById('nba-tracker-days').innerHTML = html || '<p style="color:#8b949e;text-align:center;padding:20px">No tracker data yet</p>';
+
+  container.innerHTML = html;
 }
 
-async function refreshTrackerResults() {
-  const btn = document.getElementById('nba-tracker-refresh');
+async function refreshAll() {
+  const btn = document.getElementById('refresh-btn');
   btn.textContent = 'Grading...'; btn.disabled = true;
-  await autoGradePendingDays();
-  renderNBATracker();
-  btn.textContent = '\u2713 Updated';
-  setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 3000);
+  try {
+    await fetch('/api/grade', { method: 'POST' });
+    await loadAll();
+    btn.textContent = 'Updated!';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000);
+  } catch (e) {
+    btn.textContent = 'Error';
+    setTimeout(() => { btn.textContent = 'Refresh Results'; btn.disabled = false; }, 2000);
+  }
 }
 
-// Load tracker on page init
-loadTodayPicks();
-autoGradePendingDays().then(() => renderNBATracker());
+loadAll();
 </script>
 </body>
 </html>

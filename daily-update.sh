@@ -8,8 +8,11 @@ cd "$(dirname "$0")"
 
 echo "[$(date)] Starting daily update..."
 
-# Generate full picks page (MLB + NBA + parlays + HTML)
-node generate-daily.js
+# NOTE: Pages are now dynamic (fetch from API on load).
+# Do NOT run generate-daily.js — it used to overwrite HTML with static content.
+# The Railway app's built-in cron at 10am ET handles predictions.
+# This script is only needed if you want to manually trigger a data refresh.
+echo "[$(date)] Pages are dynamic — skipping HTML generation."
 
 echo "[$(date)] Page generated. Committing and pushing..."
 

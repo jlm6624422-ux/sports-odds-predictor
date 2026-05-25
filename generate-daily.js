@@ -459,25 +459,10 @@ async function main() {
   }
   const allParlays = [...parlays, ...existingParlays];
 
-  // --- GENERATE HTML ---
-  const html = buildHTML({
-    today, yesterday, formatDate: formatDate(today),
-    mlbPicks, nbaGames, parlays: allParlays, kellyBets, actionable,
-    runningTotal, daysActive,
-  });
-
-  fs.writeFileSync(path.join(__dirname, 'today-picks.html'), html);
-
-  // Save prediction data
+  // Save prediction data (pages are now dynamic — do NOT overwrite HTML files)
   const output = { date: today, generatedAt: new Date().toISOString(), mlb: mlbPicks, nba: nbaGames, parlays: allParlays };
   fs.writeFileSync(path.join(dataDir, 'today.json'), JSON.stringify(output, null, 2));
   fs.writeFileSync(historyPath, JSON.stringify(output, null, 2));
-
-  // NBA props already fetched earlier for SGP parlays (nbaPropsArr)
-
-  // Generate NBA page
-  const nbaPageHTML = buildNBAPage(nbaGames, today, formatDate(today), nbaPropsArr);
-  fs.writeFileSync(path.join(__dirname, 'nba-picks.html'), nbaPageHTML);
 
   const totalExposure = kellyBets.reduce((s, p) => s + (p.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0);
   console.log(`[generate] Done: ${actionable.length} picks, ${kellyBets.length} kelly bets, ${parlays.length} parlays, $${totalExposure} exposure`);
