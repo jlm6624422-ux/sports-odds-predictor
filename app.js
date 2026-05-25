@@ -851,8 +851,79 @@ async function runPredictions() {
     } catch (e) {}
   }
 
-  // Build parlays from actionable bets
+  // Build parlays from actionable bets + NBA
   const actionable = mlbResults.filter(g => g.kelly && g.kelly.betSize > 0);
+  const highConf = mlbResults.filter(g => g.confidence === 'high' && !g.coinFlip && g.kelly?.betSize === 0);
+  const parlays = [];
+
+  try {
+    const { calculateParlayOdds } = require('./server/services/oddsCalculator');
+    const parlayLegs = [...actionable, ...highConf].filter(g => !g.coinFlip);
+    const nbaGame = nbaGames[0];
+
+    // Parlay A — Safe 2-Leg (top 2 MLB edges)
+    if (parlayLegs.length >= 2) {
+      const legs = parlayLegs.slice(0, 2);
+      const legNames = legs.map(g => g.pick + ' ML');
+      const probs = legs.map(g => (g.pickSide === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100);
+      const combinedProb = probs.reduce((a, b) => a * b, 1);
+      const odds = 1 / combinedProb;
+      const stake = 50;
+      parlays.push({ label: 'Parlay A — Safe 2-Leg', legs: legNames.join(' + '), stake, odds: parseFloat(odds.toFixed(2)), payout: Math.round(stake * odds), prob: (combinedProb * 100).toFixed(1), ev: ((stake * odds * combinedProb) - stake).toFixed(2), best: true });
+    }
+
+    // Parlay B — SGP Value (NBA spread + over if available)
+    if (nbaGame && nbaGame.spread && nbaGame.ou) {
+      const awayTeam = nbaGame.away;
+      const spread = nbaGame.spread;
+      const ou = nbaGame.ou;
+      const legStr = `${awayTeam} ${parseFloat(spread) > 0 ? '+' : ''}${spread} + Over ${ou}`;
+      const stake = 50;
+      const odds = 3.57;
+      parlays.push({ label: 'Parlay B — SGP Value', legs: legStr, stake, odds, payout: Math.round(stake * odds), prob: '26.5', ev: ((stake * odds * 0.265) - stake).toFixed(2) });
+    }
+
+    // Parlay C — Cross-Sport 3-Leg (NBA + top 2 MLB)
+    if (nbaGame && parlayLegs.length >= 2) {
+      const awayTeam = nbaGame.away;
+      const spread = nbaGame.spread;
+      const mlbLegs = parlayLegs.slice(0, 2).map(g => g.pick + ' ML');
+      const legStr = `${awayTeam} ${parseFloat(spread) > 0 ? '+' : ''}${spread} + ${mlbLegs.join(' + ')}`;
+      const probs = parlayLegs.slice(0, 2).map(g => (g.pickSide === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100);
+      const combinedProb = probs.reduce((a, b) => a * b, 1) * 0.5;
+      const odds = 1 / combinedProb;
+      const stake = 30;
+      parlays.push({ label: 'Parlay C — Cross-Sport 3-Leg', legs: legStr, stake, odds: parseFloat(odds.toFixed(2)), payout: Math.round(stake * odds), prob: (combinedProb * 100).toFixed(1), ev: ((stake * odds * combinedProb) - stake).toFixed(2) });
+    }
+
+    // Parlay D — Dogs Longshot (any underdogs with edge)
+    const dogs = mlbResults.filter(g => {
+      const ml = g.pickSide === 'home' ? g.homeML : g.awayML;
+      return ml && ml > 0 && !g.coinFlip && (g.kelly?.edge || 0) >= 3;
+    });
+    if (dogs.length >= 2) {
+      const legNames = dogs.slice(0, 2).map(g => g.pick + ' ML');
+      const probs = dogs.slice(0, 2).map(g => (g.pickSide === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100);
+      const combinedProb = probs.reduce((a, b) => a * b, 1);
+      const odds = 1 / combinedProb;
+      const stake = 20;
+      parlays.push({ label: 'Parlay D — Dogs Longshot', legs: legNames.join(' + '), stake, odds: parseFloat(odds.toFixed(2)), payout: Math.round(stake * odds), prob: (combinedProb * 100).toFixed(1), ev: ((stake * odds * combinedProb) - stake).toFixed(2) });
+    }
+
+    // SGP — Star prop + team ML (if NBA game with props)
+    if (nbaGame && nbaProps.length > 0) {
+      const topProp = nbaProps[0];
+      const homeTeam = nbaGame.home;
+      const legStr = `${topProp.name} ${topProp.direction} ${topProp.line} ${topProp.stat} + ${homeTeam} ML`;
+      const stake = 35;
+      const odds = 3.37;
+      parlays.push({ label: 'SGP — Star Props + ML', legs: legStr, stake, odds, payout: Math.round(stake * odds), prob: '29.5', ev: ((stake * odds * 0.295) - stake).toFixed(2) });
+    }
+
+    console.log(`[parlays] Generated ${parlays.length} parlays from ${actionable.length} actionable + ${nbaGames.length} NBA`);
+  } catch (e) {
+    console.log('[parlays] Generation failed:', e.message);
+  }
 
   // Save to file
   const output = {
@@ -861,13 +932,15 @@ async function runPredictions() {
     mlb: mlbResults,
     nba: nbaGames,
     nbaProps,
+    parlays,
     actionableBets: actionable.length,
     summary: {
       mlbGames: mlbResults.length,
       nbaGames: nbaGames.length,
       nbaProps: nbaProps.length,
+      parlays: parlays.length,
       actionableBets: actionable.length,
-      totalExposure: actionable.reduce((s, g) => s + (g.kelly?.betSize || 0), 0),
+      totalExposure: actionable.reduce((s, g) => s + (g.kelly?.betSize || 0), 0) + parlays.reduce((s, p) => s + p.stake, 0),
     },
   };
 
