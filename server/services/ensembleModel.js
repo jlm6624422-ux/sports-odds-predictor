@@ -252,11 +252,12 @@ function ensembleMLB(params) {
     }
   }
 
-  // Anchor final probability toward market (40% model, 60% market)
-  // This prevents betting on phantom edges the market has already priced in
+  // Anchor final probability toward market (50% model, 50% market)
+  // Respects market efficiency while still allowing model to identify genuine edges
+  // Research: winning models blend 50-70% market — 50/50 is aggressive but allows action
   if (effectiveMarketProb) {
     const rawModelProb = finalHomeProb;
-    finalHomeProb = rawModelProb * 0.4 + effectiveMarketProb * 0.6;
+    finalHomeProb = rawModelProb * 0.5 + effectiveMarketProb * 0.5;
     finalHomeProb = Math.min(0.85, Math.max(0.15, finalHomeProb));
   }
 
