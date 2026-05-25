@@ -524,6 +524,35 @@ app.get('/api/prop-backtest', async (req, res) => {
   }
 });
 
+// API: CLV capture — save opening odds for today's picks
+app.post('/api/clv/capture', async (req, res) => {
+  try {
+    const { captureOpeningLines } = require('./server/services/historicalOdds');
+    const lines = await captureOpeningLines('MLB');
+    const clvPath = path.join(__dirname, 'data', 'clv-opening.json');
+    const today = new Date().toISOString().split('T')[0];
+    let clvData = {};
+    if (fs.existsSync(clvPath)) clvData = JSON.parse(fs.readFileSync(clvPath, 'utf8'));
+    clvData[today] = { capturedAt: new Date().toISOString(), lines };
+    fs.writeFileSync(clvPath, JSON.stringify(clvData, null, 2));
+    res.json({ success: true, games: lines.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// API: CLV report — compare picks vs closing lines
+app.get('/api/clv/report', (req, res) => {
+  const clvPath = path.join(__dirname, 'data', 'clv-history.json');
+  if (!fs.existsSync(clvPath)) return res.json({ picks: [], avgCLV: 0, beatRate: 0 });
+  const data = JSON.parse(fs.readFileSync(clvPath, 'utf8'));
+  const picks = data.picks || [];
+  const withCLV = picks.filter(p => p.clv !== null && p.clv !== undefined);
+  const avgCLV = withCLV.length > 0 ? withCLV.reduce((s, p) => s + p.clv, 0) / withCLV.length : 0;
+  const beatRate = withCLV.length > 0 ? withCLV.filter(p => p.clv > 0).length / withCLV.length : 0;
+  res.json({ totalPicks: picks.length, tracked: withCLV.length, avgCLV: parseFloat(avgCLV.toFixed(3)), beatRate: parseFloat((beatRate * 100).toFixed(1)), picks: picks.slice(-20) });
+});
+
 // API: Trigger grading on demand (used by tracker Refresh button)
 app.post('/api/grade', async (req, res) => {
   try {
@@ -769,6 +798,38 @@ async function runPredictions() {
     console.log(`[sharp] Line movement analysis complete for ${mlbResults.length} games`);
   } catch (e) {
     console.log('[sharp] Sharp money detection skipped:', e.message);
+  }
+
+  // Bullpen fatigue adjustment — penalize picks on teams with gassed bullpens
+  try {
+    const { calculateBullpenFatigue } = require('./server/services/bullpenFatigue');
+    for (const game of mlbResults) {
+      if (!game.kelly || game.kelly.betSize <= 0) continue;
+      const pickedTeamId = games.find(g => g.teams.home.team.name === game.pick || g.teams.away.team.name === game.pick);
+      const opponentName = game.pick === game.home ? game.away : game.home;
+      const opponentGame = games.find(g => g.teams.home.team.name === opponentName || g.teams.away.team.name === opponentName);
+
+      if (pickedTeamId) {
+        const isHome = pickedTeamId.teams.home.team.name === game.pick;
+        const teamId = isHome ? pickedTeamId.teams.home.team.id : pickedTeamId.teams.away.team.id;
+        const fatigue = await calculateBullpenFatigue(teamId, game.pick);
+        if (fatigue.unavailableArms >= 2) {
+          game.kelly.betSize = parseFloat((game.kelly.betSize * 0.7).toFixed(2));
+          game.bullpenFatigue = { team: game.pick, ...fatigue, action: 'REDUCED 30%' };
+        }
+      }
+      if (opponentGame) {
+        const isHome = opponentGame.teams.home.team.name === opponentName;
+        const oppId = isHome ? opponentGame.teams.home.team.id : opponentGame.teams.away.team.id;
+        const oppFatigue = await calculateBullpenFatigue(oppId, opponentName);
+        if (oppFatigue.unavailableArms >= 2 && !game.bullpenFatigue) {
+          game.bullpenFatigue = { team: opponentName, ...oppFatigue, action: 'OPPONENT FATIGUED (edge boost)' };
+        }
+      }
+    }
+    console.log('[bullpen-fatigue] Analysis complete');
+  } catch (e) {
+    console.log('[bullpen-fatigue] Skipped:', e.message);
   }
 
   // NBA (fetch from ESPN + rest/travel adjustments + calibrated props)

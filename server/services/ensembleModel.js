@@ -231,8 +231,10 @@ function ensembleMLB(params) {
     }
   }
 
-  // --- EDGES ---
-  // Calculate market-implied probability from bookmakers (even if consensus module needs 2+)
+  // --- MARKET-MODEL BLEND ---
+  // The market is the strongest signal. Blend our model probability with market.
+  // Research shows winning models use 60-70% market + 30-40% model.
+  // We only bet when our model STILL shows edge after blending.
   let effectiveMarketProb = marketHomeProb;
   if (!effectiveMarketProb && bookmakers && bookmakers.length > 0) {
     for (const bk of bookmakers) {
@@ -248,6 +250,14 @@ function ensembleMLB(params) {
         }
       }
     }
+  }
+
+  // Anchor final probability toward market (40% model, 60% market)
+  // This prevents betting on phantom edges the market has already priced in
+  if (effectiveMarketProb) {
+    const rawModelProb = finalHomeProb;
+    finalHomeProb = rawModelProb * 0.4 + effectiveMarketProb * 0.6;
+    finalHomeProb = Math.min(0.85, Math.max(0.15, finalHomeProb));
   }
 
   let mlEdge = null, totalEdge = null;
