@@ -8,7 +8,7 @@
 
 const DEFAULT_FRACTION = 0.25; // Quarter Kelly (conservative, industry standard)
 const MAX_BET_PCT = 0.03;     // Never bet more than 3% of bankroll
-const MIN_EDGE_THRESHOLD = 0.05; // Only bet when edge > 5% (was 3% — too many marginal bets)
+const MIN_EDGE_THRESHOLD = 0.03; // 3% edge after market blend = real edge (blend already filters noise)
 
 /**
  * Calculate full Kelly stake percentage.
@@ -81,11 +81,11 @@ function calculateBetSize(modelProb, americanOdds, bankroll, options = {}) {
   // Calculate dollar amount
   const betSize = Math.round(bankroll * fractionalKelly * 100) / 100;
 
-  // Confidence tier (aligned with 5% min edge)
+  // Confidence tier (aligned with 3% min edge after market blend)
   let recommendation;
-  if (edge >= 0.10) recommendation = 'STRONG BET';
-  else if (edge >= 0.07) recommendation = 'STANDARD BET';
-  else if (edge >= 0.05) recommendation = 'SMALL BET';
+  if (edge >= 0.07) recommendation = 'STRONG BET';
+  else if (edge >= 0.05) recommendation = 'STANDARD BET';
+  else if (edge >= 0.03) recommendation = 'SMALL BET';
   else recommendation = 'NO BET';
 
   return {
