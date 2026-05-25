@@ -89,24 +89,35 @@ const PLAYER_DB = {
   'Aaron Gordon': { team: 'DEN', pos: 'F', pts: 14.2, reb: 6.5, ast: 3.5, min: 31.0 },
 };
 
-function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false, customDB = null) {
+function projectPlayer(name, projectedTotal, isPlayoffs = true, isGame1 = false, customDB = null, restContext = null) {
   const player = (customDB || PLAYER_DB)[name];
   if (!player) return null;
 
   const paceMultiplier = projectedTotal / AVG_NBA_TOTAL;
   const g1Adj = isGame1 ? GAME1_CONSERVATIVE : 1.0;
 
+  // Back-to-back / rest day adjustments (research: B2B = -8%, 2+ rest = +3%)
+  let restMultiplier = 1.0;
+  if (restContext) {
+    const isStar = player.pts >= 20 || player.min >= 32;
+    if (restContext.isB2B) {
+      restMultiplier = isStar ? 0.88 : 0.92; // Veterans/stars hit harder on B2B
+    } else if (restContext.daysRest >= 2) {
+      restMultiplier = 1.03;
+    }
+  }
+
   // Playoff assists discount: teams go iso-heavy in postseason
   const isIsoTeam = ISO_HEAVY_TEAMS.includes(player.team);
   const astAdj = isPlayoffs ? (isIsoTeam ? PLAYOFF_AST_DISCOUNT * 0.85 : PLAYOFF_AST_DISCOUNT) : 1.0;
 
-  // Conservative projections — close to season averages with pace adjustment only
-  const projPts = player.pts * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj;
-  const projReb = player.reb * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj;
-  const projAst = player.ast * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj * astAdj;
+  // Conservative projections with pace + rest adjustments
+  const projPts = player.pts * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj * restMultiplier;
+  const projReb = player.reb * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj * restMultiplier;
+  const projAst = player.ast * paceMultiplier * PLAYOFF_PACE_ADJ * g1Adj * astAdj * restMultiplier;
   const pra = projPts + projReb + projAst;
 
-  return { ...player, name, projPts, projReb, projAst, pra };
+  return { ...player, name, projPts, projReb, projAst, pra, restMultiplier };
 }
 
 function evaluateProp(playerProj, stat, line) {

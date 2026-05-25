@@ -220,10 +220,39 @@ async function getGameWeatherImpact(venueName, gameDateTime) {
   return { ...impact, weather };
 }
 
+/**
+ * Get a clear weather edge signal for totals betting.
+ * Returns actionable signal: bet over, bet under, or no weather edge.
+ */
+async function getWeatherEdge(venueName, gameDateTime) {
+  const impact = await getGameWeatherImpact(venueName, gameDateTime);
+  if (!impact.weather || !impact.isOutdoor) {
+    return { hasEdge: false, direction: null, adjustment: 0, confidence: 'none', factors: [] };
+  }
+
+  const adj = impact.totalAdjustment;
+  let direction = null, confidence = 'none';
+
+  if (adj >= 1.2) { direction = 'over'; confidence = 'high'; }
+  else if (adj >= 0.8) { direction = 'over'; confidence = 'medium'; }
+  else if (adj <= -0.8) { direction = 'under'; confidence = 'medium'; }
+  else if (adj <= -0.5) { direction = 'under'; confidence = 'low'; }
+
+  return {
+    hasEdge: direction !== null,
+    direction,
+    adjustment: adj,
+    confidence,
+    factors: impact.factors,
+    weather: impact.weather,
+  };
+}
+
 module.exports = {
   calculateWeatherImpact,
   fetchGameWeather,
   getGameWeatherImpact,
+  getWeatherEdge,
   windTowardCF,
   PARK_CF_BEARING,
   PARK_LOCATIONS,

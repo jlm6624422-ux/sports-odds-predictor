@@ -800,6 +800,46 @@ async function runPredictions() {
     console.log('[sharp] Sharp money detection skipped:', e.message);
   }
 
+  // Weather edge boost — when wind/temp strongly favors over/under AND model agrees
+  try {
+    const { getWeatherEdge } = require('./server/services/weatherImpact');
+    for (const game of mlbResults) {
+      if (!game.ouLine || !game.venue) continue;
+      const we = await getWeatherEdge(game.venue, `${todayFormatted}T${game.gameHour || 19}:00`);
+      if (we.hasEdge) {
+        game.weatherEdge = we;
+        const modelTotalEdge = game.totalEdge || 0;
+        // If weather and model agree on direction, boost confidence
+        if (we.direction === 'over' && modelTotalEdge > 0) {
+          game.totalEdge = parseFloat((modelTotalEdge + we.adjustment * 0.5).toFixed(1));
+          game.weatherSignal = 'WEATHER + MODEL AGREE: OVER';
+        } else if (we.direction === 'under' && modelTotalEdge < 0) {
+          game.totalEdge = parseFloat((modelTotalEdge - Math.abs(we.adjustment) * 0.5).toFixed(1));
+          game.weatherSignal = 'WEATHER + MODEL AGREE: UNDER';
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[weather-edge] Skipped:', e.message);
+  }
+
+  // RLM (Reverse Line Movement) detection — sharps vs public
+  try {
+    const { analyzeRLM } = require('./server/services/rlmDetector');
+    for (const game of mlbResults) {
+      if (!game.kelly || game.kelly.betSize <= 0) continue;
+      // Use our captured opening vs current market odds for RLM
+      const homeML = game.homeML;
+      const awayML = game.awayML;
+      if (!homeML || !awayML) continue;
+      const toDecimal = (ml) => ml > 0 ? (ml / 100) + 1 : (100 / Math.abs(ml)) + 1;
+      // We don't have separate opening odds here, so use the sharp signal data if available
+      if (game.sharpSignal && game.sharpSignal.direction === 'against' && game.sharpSignal.strength > 0.1) {
+        game.rlmSignal = { hasRLM: true, signal: 'RLM DETECTED — sharps opposing our pick', strength: game.sharpSignal.strength };
+      }
+    }
+  } catch (e) {}
+
   // Bullpen fatigue adjustment — penalize picks on teams with gassed bullpens
   try {
     const { calculateBullpenFatigue } = require('./server/services/bullpenFatigue');
