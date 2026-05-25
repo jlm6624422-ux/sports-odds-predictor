@@ -288,7 +288,7 @@ function ensembleMLB(params) {
   // --- KELLY SIZING (if bankroll provided) ---
   // Only size bets when model agreement >= 75% (eliminates conflicted signals)
   let kellySizing = null;
-  if (bankroll && mlEdge && modelAgreement >= 0.75) {
+  if (bankroll && mlEdge && modelAgreement >= 0.67) {
     const bestSide = mlEdge.home > mlEdge.away ? 'home' : 'away';
     const bestProb = bestSide === 'home' ? finalHomeProb : 1 - finalHomeProb;
     const mktProb = bestSide === 'home' ? effectiveMarketProb : 1 - effectiveMarketProb;

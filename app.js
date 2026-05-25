@@ -318,7 +318,7 @@ app.get('/api/bestbets', (req, res) => {
         });
       }
 
-      if (ouLine && totalEdge >= 1.5) {
+      if (ouLine && totalEdge >= 1.0) {
         const resultKey = `${matchupStr}-over`;
         picks.push({
           type: 'over', team: `OVER ${ouLine}`, matchup: matchupStr,
@@ -328,7 +328,7 @@ app.get('/api/bestbets', (req, res) => {
           result: dayResults[resultKey]?.result || 'pending',
           score: dayResults[resultKey]?.score || '',
         });
-      } else if (ouLine && totalEdge <= -1.5) {
+      } else if (ouLine && totalEdge <= -1.0) {
         const resultKey = `${matchupStr}-under`;
         picks.push({
           type: 'under', team: `UNDER ${ouLine}`, matchup: matchupStr,
@@ -434,7 +434,7 @@ app.get('/api/tracker', (req, res) => {
       }
 
       // Over/under picks
-      if (ouLine && totalEdge >= 1.5) {
+      if (ouLine && totalEdge >= 1.0) {
         const resultKey = `${matchupStr}-over`;
         picks.push({
           type: 'over', team: `OVER ${ouLine}`, matchup: matchupStr,
@@ -444,7 +444,7 @@ app.get('/api/tracker', (req, res) => {
           result: dayResults[resultKey]?.result || 'pending',
           score: dayResults[resultKey]?.score || '',
         });
-      } else if (ouLine && totalEdge <= -1.5) {
+      } else if (ouLine && totalEdge <= -1.0) {
         const resultKey = `${matchupStr}-under`;
         picks.push({
           type: 'under', team: `UNDER ${ouLine}`, matchup: matchupStr,
@@ -721,7 +721,7 @@ async function runPredictions() {
 
     // Generate F5 pick if edge >= 1.0 run
     let f5Pick = null;
-    if (f5.f5Edge && Math.abs(f5.f5Edge) >= 1.0) {
+    if (f5.f5Edge && Math.abs(f5.f5Edge) >= 0.7) {
       f5Pick = {
         type: f5.f5Edge > 0 ? 'f5_over' : 'f5_under',
         line: f5.marketF5Line,
@@ -1140,14 +1140,14 @@ async function gradeResults() {
         }
       }
 
-      if (ouLine && totalEdge >= 1.5) {
+      if (ouLine && totalEdge >= 1.0) {
         const resultKey = `${matchupStr}-over`;
         if (!dayResults[resultKey]) {
           const won = total > ouLine;
           dayResults[resultKey] = { result: won ? 'win' : (total === ouLine ? 'push' : 'loss'), score: `${score} (${total} total)`, recordedAt: new Date().toISOString() };
           graded++;
         }
-      } else if (ouLine && totalEdge <= -1.5) {
+      } else if (ouLine && totalEdge <= -1.0) {
         const resultKey = `${matchupStr}-under`;
         if (!dayResults[resultKey]) {
           const won = total < ouLine;
