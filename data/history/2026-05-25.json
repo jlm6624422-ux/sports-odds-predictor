@@ -1,0 +1,132 @@
+{
+  "date": "2026-05-25",
+  "generatedAt": "2026-05-25T15:00:00.000Z",
+  "mlb": [
+    {
+      "away": "Colorado Rockies",
+      "home": "Los Angeles Dodgers",
+      "awayPitcher": "TBD",
+      "homePitcher": "TBD",
+      "pick": "Los Angeles Dodgers",
+      "pickSide": "home",
+      "homeML": -180,
+      "awayML": 155,
+      "ouLine": null,
+      "confidence": "high",
+      "coinFlip": false,
+      "prediction": {
+        "homeWinProb": 62.5,
+        "awayWinProb": 37.5,
+        "expectedTotal": 9.2
+      },
+      "kelly": {
+        "betSize": 12.39,
+        "edge": 3.74,
+        "recommendation": "BET"
+      },
+      "edge": {
+        "home": 3.74,
+        "away": -3.74
+      }
+    },
+    {
+      "away": "Seattle Mariners",
+      "home": "Athletics",
+      "awayPitcher": "TBD",
+      "homePitcher": "TBD",
+      "pick": "Athletics",
+      "pickSide": "home",
+      "homeML": -110,
+      "awayML": -110,
+      "ouLine": 10.5,
+      "confidence": "low",
+      "coinFlip": true,
+      "prediction": {
+        "homeWinProb": 50,
+        "awayWinProb": 50,
+        "expectedTotal": 9.4
+      },
+      "kelly": {
+        "betSize": 0,
+        "edge": 0,
+        "recommendation": "SKIP"
+      },
+      "edge": {
+        "home": 0,
+        "away": 0
+      }
+    }
+  ],
+  "nba": [
+    {
+      "home": "Cleveland Cavaliers",
+      "away": "New York Knicks",
+      "homeRecord": "53-29",
+      "awayRecord": "50-32",
+      "spread": "-2.5",
+      "ou": "218.5",
+      "homeML": -140,
+      "awayML": 120,
+      "propPicks": [
+        {
+          "name": "Donovan Mitchell",
+          "direction": "UNDER",
+          "line": 35.6,
+          "stat": "PRA",
+          "edge": 2.1,
+          "confidence": "med",
+          "seasonAvg": 33.2,
+          "projected": 32.8
+        },
+        {
+          "name": "Jarrett Allen",
+          "direction": "Over",
+          "line": 7.8,
+          "stat": "REB",
+          "edge": 1.8,
+          "confidence": "med",
+          "seasonAvg": 9.1,
+          "projected": 9.6
+        }
+      ]
+    }
+  ],
+  "parlays": [
+    {
+      "label": "Parlay A — Safe 2-Leg",
+      "legs": "Cleveland Cavaliers ML + Los Angeles Dodgers ML",
+      "stake": 50,
+      "odds": 2.57,
+      "payout": 129,
+      "prob": "38.9",
+      "ev": "0.00"
+    },
+    {
+      "label": "Parlay B — SGP Value",
+      "legs": "New York Knicks +2.5 + Over 218.5",
+      "stake": 50,
+      "odds": 3.57,
+      "payout": 179,
+      "prob": "26.5",
+      "ev": "-2.75"
+    },
+    {
+      "label": "Parlay C — Cross-Sport 3-Leg",
+      "legs": "New York Knicks +2.5 + Los Angeles Dodgers ML + Cleveland Guardians ML",
+      "stake": 30,
+      "odds": 6.25,
+      "payout": 188,
+      "prob": "16.0",
+      "ev": "0.00"
+    },
+    {
+      "label": "SGP — Star Props + ML",
+      "legs": "Donovan Mitchell UNDER 35.6 PRA + Cleveland Cavaliers ML",
+      "stake": 35,
+      "odds": 3.37,
+      "payout": 118,
+      "prob": "29.5",
+      "ev": "-0.20"
+    }
+  ]
+}

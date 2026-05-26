@@ -1452,7 +1452,7 @@ function scheduleDailyRun() {
     lastGradeDate = todayDate;
   }
 
-  if (etHourNow >= 10 && !todayHistoryExists()) {
+  if (etHourNow >= 8 && !todayHistoryExists()) {
     console.log(`[CRON] Startup catch-up: no predictions for ${todayDate}, running now...`);
     runPredictions().catch(e => console.error('[CRON] Startup catch-up failed:', e.message));
     lastRunDate = todayDate;
@@ -1474,10 +1474,10 @@ function scheduleDailyRun() {
       gradeResults().catch(e => console.error('[CRON] Grade failed:', e.message));
     }
 
-    // Predictions: fires at 10am ET (after lineups confirmed, ~2hrs before first pitch)
-    if (etHour >= 10 && lastRunDate !== todayStr && !todayHistoryExists()) {
+    // Predictions: fires at 8am ET (7am CST — before first pitch)
+    if (etHour >= 8 && lastRunDate !== todayStr && !todayHistoryExists()) {
       lastRunDate = todayStr;
-      console.log(`[CRON] Auto-running predictions for ${todayStr} (post-lineup)`);
+      console.log(`[CRON] Auto-running predictions for ${todayStr}`);
       runPredictions().catch(e => console.error('[CRON] Failed:', e.message));
     } else if (todayHistoryExists()) {
       lastRunDate = todayStr;
@@ -1498,7 +1498,7 @@ function scheduleDailyRun() {
     }
   }, checkInterval);
 
-  console.log('[CRON] Scheduled: grade 2am, predictions 10am, CLV 6:45pm+10pm ET');
+  console.log('[CRON] Scheduled: grade 2am, predictions 8am, CLV 6pm+10pm ET');
 }
 
 function getLastPredictionTime() {
