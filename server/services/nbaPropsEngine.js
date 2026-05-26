@@ -219,7 +219,7 @@ async function generateNBAProps(espnEvents, calibratedDB = null) {
       awayAbbrev,
       homeRecord: (home.records || [{}])[0]?.summary,
       awayRecord: (away.records || [{}])[0]?.summary,
-      spread: odds.details,
+      spread: odds.pointSpread?.home?.close?.line || odds.spread || odds.details,
       homeML: odds.homeTeamOdds?.moneyLine || null,
       awayML: odds.awayTeamOdds?.moneyLine || null,
       ou,

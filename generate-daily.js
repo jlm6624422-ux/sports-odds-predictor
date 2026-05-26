@@ -191,7 +191,7 @@ async function main() {
       away: away.team.displayName,
       homeRecord: (home.records || [{}])[0]?.summary || '',
       awayRecord: (away.records || [{}])[0]?.summary || '',
-      spread: odds.pointSpread?.home?.close?.line || odds.details || '',
+      spread: odds.pointSpread?.home?.close?.line || odds.spread || '',
       homeML: odds.moneyline?.home?.close?.odds || '',
       awayML: odds.moneyline?.away?.close?.odds || '',
       ou: odds.total?.over?.close?.line?.replace(/[ou]/gi, '') || odds.overUnder || '',

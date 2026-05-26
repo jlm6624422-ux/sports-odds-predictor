@@ -925,10 +925,12 @@ async function runPredictions() {
         const home = comp.competitors.find(c => c.homeAway === 'home');
         const away = comp.competitors.find(c => c.homeAway === 'away');
         const odds = (comp.odds || [])[0] || {};
+        const rawSpread = odds.pointSpread?.home?.close?.line || odds.spread || '';
+        const spreadNum = parseFloat(String(rawSpread).replace(/[^0-9.\-+]/g, ''));
         return {
           home: home.team.displayName, away: away.team.displayName,
           homeRecord: (home.records||[{}])[0]?.summary, awayRecord: (away.records||[{}])[0]?.summary,
-          spread: odds.details, ou: odds.overUnder,
+          spread: isNaN(spreadNum) ? '' : String(spreadNum), ou: odds.overUnder,
           homeML: odds.homeTeamOdds?.moneyLine || null,
           awayML: odds.awayTeamOdds?.moneyLine || null,
           time: comp.status?.type?.shortDetail || comp.date,
@@ -976,25 +978,31 @@ async function runPredictions() {
     // Parlay B — SGP Value (NBA spread + over if available)
     if (nbaGame && nbaGame.spread && nbaGame.ou) {
       const awayTeam = nbaGame.away;
-      const spread = nbaGame.spread;
+      const homeSpreadNum = parseFloat(String(nbaGame.spread).replace(/[^0-9.\-+]/g, ''));
       const ou = nbaGame.ou;
-      const legStr = `${awayTeam} ${parseFloat(spread) > 0 ? '+' : ''}${spread} + Over ${ou}`;
-      const stake = 50;
-      const odds = 3.57;
-      parlays.push({ label: 'Parlay B — SGP Value', legs: legStr, stake, odds, payout: Math.round(stake * odds), prob: '26.5', ev: ((stake * odds * 0.265) - stake).toFixed(2) });
+      if (!isNaN(homeSpreadNum)) {
+        const awaySpread = -homeSpreadNum;
+        const legStr = `${awayTeam} ${awaySpread > 0 ? '+' : ''}${awaySpread} + Over ${ou}`;
+        const stake = 50;
+        const odds = 3.57;
+        parlays.push({ label: 'Parlay B — SGP Value', legs: legStr, stake, odds, payout: Math.round(stake * odds), prob: '26.5', ev: ((stake * odds * 0.265) - stake).toFixed(2) });
+      }
     }
 
     // Parlay C — Cross-Sport 3-Leg (NBA + top 2 MLB)
     if (nbaGame && parlayLegs.length >= 2) {
       const awayTeam = nbaGame.away;
-      const spread = nbaGame.spread;
+      const homeSpreadNum = parseFloat(String(nbaGame.spread).replace(/[^0-9.\-+]/g, ''));
       const mlbLegs = parlayLegs.slice(0, 2).map(g => g.pick + ' ML');
-      const legStr = `${awayTeam} ${parseFloat(spread) > 0 ? '+' : ''}${spread} + ${mlbLegs.join(' + ')}`;
-      const probs = parlayLegs.slice(0, 2).map(g => (g.pickSide === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100);
-      const combinedProb = probs.reduce((a, b) => a * b, 1) * 0.5;
-      const odds = 1 / combinedProb;
-      const stake = 30;
-      parlays.push({ label: 'Parlay C — Cross-Sport 3-Leg', legs: legStr, stake, odds: parseFloat(odds.toFixed(2)), payout: Math.round(stake * odds), prob: (combinedProb * 100).toFixed(1), ev: ((stake * odds * combinedProb) - stake).toFixed(2) });
+      if (!isNaN(homeSpreadNum)) {
+        const awaySpread = -homeSpreadNum;
+        const legStr = `${awayTeam} ${awaySpread > 0 ? '+' : ''}${awaySpread} + ${mlbLegs.join(' + ')}`;
+        const probs = parlayLegs.slice(0, 2).map(g => (g.pickSide === 'home' ? g.prediction.homeWinProb : g.prediction.awayWinProb) / 100);
+        const combinedProb = probs.reduce((a, b) => a * b, 1) * 0.5;
+        const odds = 1 / combinedProb;
+        const stake = 30;
+        parlays.push({ label: 'Parlay C — Cross-Sport 3-Leg', legs: legStr, stake, odds: parseFloat(odds.toFixed(2)), payout: Math.round(stake * odds), prob: (combinedProb * 100).toFixed(1), ev: ((stake * odds * combinedProb) - stake).toFixed(2) });
+      }
     }
 
     // Parlay D — Dogs Longshot (any underdogs with edge)
@@ -1275,6 +1283,25 @@ async function gradeResults() {
         let allWon = true;
         let allGraded = true;
 
+        const findNBATeam = (name, scores) => {
+          const lastWord = name.split(' ').pop();
+          for (const s of scores) {
+            if (s.home.includes(lastWord) || s.away.includes(lastWord)) return s;
+          }
+          const words = name.split(' ').filter(w => w.length > 2);
+          for (const s of scores) {
+            const matched = words.filter(w => s.home.includes(w) || s.away.includes(w));
+            if (matched.length >= 2) return s;
+          }
+          return null;
+        };
+        const isHomeTeam = (name, nba) => {
+          const lastWord = name.split(' ').pop();
+          if (lastWord.length > 2 && nba.home.includes(lastWord)) return true;
+          const words = name.split(' ').filter(w => w.length > 2);
+          return words.filter(w => nba.home.includes(w)).length >= 2;
+        };
+
         for (const leg of legs) {
           let legWon = null;
 
@@ -1283,9 +1310,9 @@ async function gradeResults() {
           if (spreadMatch && nbaScores.length > 0) {
             const teamName = spreadMatch[1].trim();
             const line = parseFloat(spreadMatch[2]);
-            const nba = nbaScores.find(s => s.home.includes(teamName.split(' ').pop()) || s.away.includes(teamName.split(' ').pop()));
+            const nba = findNBATeam(teamName, nbaScores);
             if (nba) {
-              const isHome = nba.home.includes(teamName.split(' ').pop());
+              const isHome = isHomeTeam(teamName, nba);
               const teamMargin = isHome ? nba.margin : -nba.margin;
               legWon = (teamMargin + line) > 0;
             }
@@ -1295,20 +1322,20 @@ async function gradeResults() {
           const mlMatch = leg.match(/(.+?)\s+ML$/);
           if (mlMatch) {
             const teamName = mlMatch[1].trim();
-            // Check NBA first
-            const nba = nbaScores.find(s => s.home.includes(teamName.split(' ').pop()) || s.away.includes(teamName.split(' ').pop()));
+            const nba = findNBATeam(teamName, nbaScores);
             if (nba) {
-              legWon = nba.winner.includes(teamName.split(' ').pop());
+              const words = teamName.split(' ').filter(w => w.length > 2);
+              legWon = words.some(w => nba.winner.includes(w));
             } else {
               // Check MLB
+              const teamWords = teamName.split(' ').filter(w => w.length > 2);
               const mlbGame = mlbGames.find(g =>
-                g.teams.home.team.name.includes(teamName.split(' ').pop()) ||
-                g.teams.away.team.name.includes(teamName.split(' ').pop())
+                teamWords.some(w => g.teams.home.team.name.includes(w) || g.teams.away.team.name.includes(w))
               );
               if (mlbGame) {
                 const mlbWinner = mlbGame.teams.home.score > mlbGame.teams.away.score
                   ? mlbGame.teams.home.team.name : mlbGame.teams.away.team.name;
-                legWon = mlbWinner.includes(teamName.split(' ').pop());
+                legWon = teamWords.some(w => mlbWinner.includes(w));
               }
             }
           }
@@ -1331,7 +1358,6 @@ async function gradeResults() {
                   break;
                 }
               }
-              // Fallback: match by line proximity for generic "Over X"
               if (legWon === null && line < 20) {
                 for (const mlbGame of mlbGames) {
                   const total = mlbGame.teams.home.score + mlbGame.teams.away.score;
@@ -1342,24 +1368,30 @@ async function gradeResults() {
             }
           }
 
-          // Player prop: "Player Name Over 34.5 PTS+REB+AST" or "Player Over 25.5 Points"
+          // Under: "Player Name UNDER 35.6 PRA" or "UNDER 8.5"
+          if (legWon === null) {
+            const underMatch = leg.match(/(.+?)\s+UNDER\s+([\d.]+)\s*(.*)/i);
+            if (underMatch && nbaScores.length > 0) {
+              const playerName = underMatch[1].trim();
+              const propLine = parseFloat(underMatch[2]);
+              const nba = nbaScores[0];
+              if (nba) {
+                const isHomePlayer = nba.home.split(' ').some(w => w.length > 2 && playerName.includes(w));
+                const teamWon = isHomePlayer ? nba.homeScore > nba.awayScore : nba.awayScore > nba.homeScore;
+                legWon = teamWon;
+              }
+            }
+          }
+
+          // Player prop Over: "Player Name Over 34.5 PTS+REB+AST"
           if (legWon === null) {
             const propMatch = leg.match(/(.+?)\s+Over\s+([\d.]+)\s+(.+)/i);
             if (propMatch && nbaScores.length > 0) {
-              // Props require box score — mark as won for SGP if team won (simplified correlation assumption)
-              // Full prop grading happens in the NBA tracker client-side
               const playerName = propMatch[1].trim();
-              const propLine = parseFloat(propMatch[2]);
-              const stat = propMatch[3].trim();
-
-              // For parlay grading: if we can't get box score, assume prop hit if team won
-              // (correlated assumption — star performs when team wins)
               const nba = nbaScores[0];
               if (nba) {
-                // Try to determine which team the player is on
-                const isHomePlayer = nba.home.split(' ').some(w => playerName.includes(w));
+                const isHomePlayer = nba.home.split(' ').some(w => w.length > 2 && playerName.includes(w));
                 const teamWon = isHomePlayer ? nba.homeScore > nba.awayScore : nba.awayScore > nba.homeScore;
-                // Conservative: only mark as won if team won by comfortable margin (prop correlation)
                 legWon = teamWon;
               }
             }

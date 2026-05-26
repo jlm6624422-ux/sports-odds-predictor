@@ -242,6 +242,21 @@
       "result": "win",
       "score": "Spurs 113, Thunder 122 (235 total)",
       "recordedAt": "2026-05-22T13:51:30.992Z"
+    },
+    "CIN @ PHI-over": {
+      "result": "win",
+      "score": "Reds 9, Phillies 4 (13 total)",
+      "recordedAt": "2026-05-26T13:29:09.999Z"
+    },
+    "NYM @ WSH-over": {
+      "result": "win",
+      "score": "Mets 4, Nationals 8 (12 total)",
+      "recordedAt": "2026-05-26T13:29:09.999Z"
+    },
+    "PIT @ STL-over": {
+      "result": "loss",
+      "score": "Pirates 7, Cardinals 0 (7 total)",
+      "recordedAt": "2026-05-26T13:29:09.999Z"
     }
   },
   "2026-05-21": {
@@ -473,6 +488,21 @@
     "parlay-2026-05-21-5": {
       "result": "loss",
       "recordedAt": "2026-05-22T13:51:30.847Z"
+    },
+    "CLE @ DET-over": {
+      "result": "loss",
+      "score": "Guardians 3, Tigers 1 (4 total)",
+      "recordedAt": "2026-05-26T13:29:09.768Z"
+    },
+    "ATH @ LAA-over": {
+      "result": "loss",
+      "score": "Athletics 3, Angels 2 (5 total)",
+      "recordedAt": "2026-05-26T13:29:09.768Z"
+    },
+    "COL @ ARI-over": {
+      "result": "loss",
+      "score": "Rockies 1, Diamondbacks 2 (3 total)",
+      "recordedAt": "2026-05-26T13:29:09.768Z"
     }
   },
   "2026-05-22": {
@@ -582,6 +612,64 @@
     "parlay-2026-05-23-3": {
       "result": "loss",
       "recordedAt": "2026-05-24T14:53:59.137Z"
+    },
+    "WSH @ ATL-over": {
+      "result": "loss",
+      "score": "Nationals 2, Braves 0 (2 total)",
+      "recordedAt": "2026-05-26T13:29:09.187Z"
+    }
+  },
+  "2026-05-24": {
+    "parlay-2026-05-24-0": {
+      "result": "loss",
+      "recordedAt": "2026-05-25T18:29:18.099Z"
+    },
+    "parlay-2026-05-24-1": {
+      "result": "loss",
+      "recordedAt": "2026-05-25T18:29:18.100Z"
+    },
+    "parlay-2026-05-24-2": {
+      "result": "loss",
+      "recordedAt": "2026-05-25T18:29:18.100Z"
+    },
+    "parlay-2026-05-24-3": {
+      "result": "loss",
+      "recordedAt": "2026-05-25T18:29:18.102Z"
+    },
+    "NYM @ MIA-ml": {
+      "result": "win",
+      "score": "Mets 0, Marlins 4",
+      "recordedAt": "2026-05-26T13:29:08.771Z"
+    },
+    "SEA @ KC-under": {
+      "result": "loss",
+      "score": "Mariners 6, Royals 8 (14 total)",
+      "recordedAt": "2026-05-26T13:29:08.771Z"
+    },
+    "HOU @ CHC-ml": {
+      "result": "loss",
+      "score": "Astros 8, Cubs 5",
+      "recordedAt": "2026-05-26T13:29:08.771Z"
+    },
+    "COL @ ARI-ml": {
+      "result": "win",
+      "score": "Rockies 1, Diamondbacks 9",
+      "recordedAt": "2026-05-26T13:29:08.771Z"
+    },
+    "WSH @ ATL-ml": {
+      "result": "loss",
+      "score": "Nationals 2, Braves 1",
+      "recordedAt": "2026-05-26T13:29:08.771Z"
+    },
+    "nba-2026-05-24-spread": {
+      "result": "loss",
+      "score": "Thunder 82, Spurs 103",
+      "recordedAt": "2026-05-26T13:29:09.024Z"
+    },
+    "nba-2026-05-24-over": {
+      "result": "loss",
+      "score": "Thunder 82, Spurs 103 (185 total)",
+      "recordedAt": "2026-05-26T13:29:09.024Z"
     }
   }
 }
