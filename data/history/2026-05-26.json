@@ -1,0 +1,90 @@
+{
+  "date": "2026-05-26",
+  "generatedAt": "2026-05-26T12:00:00.000Z",
+  "mlb": [],
+  "nba": [
+    {
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "homeRecord": "",
+      "awayRecord": "",
+      "spread": "-9.5",
+      "ou": "215",
+      "homeML": -450,
+      "awayML": 340,
+      "propPicks": [
+        {
+          "name": "Shai Gilgeous-Alexander",
+          "direction": "UNDER",
+          "line": 41.5,
+          "stat": "PRA",
+          "edge": -3.6,
+          "confidence": "high",
+          "seasonAvg": 41.900000000000006,
+          "projected": 37.9
+        },
+        {
+          "name": "Victor Wembanyama",
+          "direction": "UNDER",
+          "line": 43.5,
+          "stat": "PRA",
+          "edge": -3.5,
+          "confidence": "high",
+          "seasonAvg": 44,
+          "projected": 40
+        },
+        {
+          "name": "Shai Gilgeous-Alexander",
+          "direction": "UNDER",
+          "line": 29,
+          "stat": "PTS",
+          "edge": -1,
+          "confidence": "low",
+          "seasonAvg": 30.5,
+          "projected": 28
+        },
+        {
+          "name": "Victor Wembanyama",
+          "direction": "UNDER",
+          "line": 27,
+          "stat": "PTS",
+          "edge": -0.9,
+          "confidence": "low",
+          "seasonAvg": 28.5,
+          "projected": 26.1
+        },
+        {
+          "name": "Stephon Castle",
+          "direction": "UNDER",
+          "line": 7.5,
+          "stat": "AST",
+          "edge": -0.9,
+          "confidence": "low",
+          "seasonAvg": 8,
+          "projected": 6.6
+        },
+        {
+          "name": "Chris Paul",
+          "direction": "UNDER",
+          "line": 6.5,
+          "stat": "AST",
+          "edge": -0.7,
+          "confidence": "low",
+          "seasonAvg": 7,
+          "projected": 5.8
+        },
+        {
+          "name": "Stephon Castle",
+          "direction": "UNDER",
+          "line": 17.5,
+          "stat": "PTS",
+          "edge": -0.5,
+          "confidence": "low",
+          "seasonAvg": 18.5,
+          "projected": 17
+        }
+      ]
+    }
+  ],
+  "parlays": []
+}

@@ -21,14 +21,17 @@ const PLAYER_DB = {
   'Lu Dort': { team: 'OKC', pos: 'G', pts: 9.0, reb: 3.5, ast: 1.2, min: 28.0 },
   'Isaiah Hartenstein': { team: 'OKC', pos: 'C', pts: 7.5, reb: 8.0, ast: 2.5, min: 26.0 },
   'Alex Caruso': { team: 'OKC', pos: 'G', pts: 7.0, reb: 3.5, ast: 3.0, min: 25.0 },
+  'Jared McCain': { team: 'OKC', pos: 'G', pts: 15.5, reb: 3.0, ast: 2.5, min: 26.0 },
 
   // San Antonio Spurs (2026 playoff averages - calibrated to market lines)
   'Victor Wembanyama': { team: 'SA', pos: 'C', pts: 28.5, reb: 12.0, ast: 3.5, min: 36.0 },
   'Stephon Castle': { team: 'SA', pos: 'G', pts: 18.5, reb: 4.5, ast: 8.0, min: 34.0 },
+  "De'Aaron Fox": { team: 'SA', pos: 'G', pts: 17.0, reb: 4.0, ast: 7.5, min: 33.0 },
   'Devin Vassell': { team: 'SA', pos: 'G', pts: 16.0, reb: 3.5, ast: 3.2, min: 30.0 },
-  'Keldon Johnson': { team: 'SA', pos: 'F', pts: 9.0, reb: 3.5, ast: 1.5, min: 24.0 },
+  'Julian Champagnie': { team: 'SA', pos: 'F', pts: 12.5, reb: 5.5, ast: 1.5, min: 28.0 },
   'Harrison Barnes': { team: 'SA', pos: 'F', pts: 10.5, reb: 4.0, ast: 1.5, min: 24.0 },
-  'Chris Paul': { team: 'SA', pos: 'G', pts: 7.5, reb: 3.0, ast: 7.0, min: 22.0 },
+  'Keldon Johnson': { team: 'SA', pos: 'F', pts: 9.0, reb: 3.5, ast: 1.5, min: 24.0 },
+  'Dylan Harper': { team: 'SA', pos: 'G', pts: 8.0, reb: 3.5, ast: 2.5, min: 20.0 },
 
   // Minnesota Timberwolves
   'Anthony Edwards': { team: 'MIN', pos: 'G', pts: 27.5, reb: 5.8, ast: 5.2, min: 35.5 },

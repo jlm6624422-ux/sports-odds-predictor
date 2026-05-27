@@ -21,15 +21,18 @@ const PLAYER_DB = {
   'Jalen Williams': { team: 'OKC', pos: 'F', pts: 21.5, reb: 5.8, ast: 5.2, min: 33.8 },
   'Lu Dort': { team: 'OKC', pos: 'G', pts: 10.2, reb: 3.8, ast: 1.5, min: 28.5 },
   'Isaiah Hartenstein': { team: 'OKC', pos: 'C', pts: 11.5, reb: 9.2, ast: 3.1, min: 28.0 },
-  'Alex Caruso': { team: 'OKC', pos: 'G', pts: 8.5, reb: 3.8, ast: 3.5, min: 26.0 },
+  'Alex Caruso': { team: 'OKC', pos: 'G', pts: 7.0, reb: 3.5, ast: 3.0, min: 25.0 },
+  'Jared McCain': { team: 'OKC', pos: 'G', pts: 15.5, reb: 3.0, ast: 2.5, min: 26.0 },
 
   // San Antonio Spurs
-  'Victor Wembanyama': { team: 'SA', pos: 'C', pts: 25.0, reb: 11.5, ast: 3.9, min: 34.5 },
-  'Stephon Castle': { team: 'SA', pos: 'G', pts: 15.8, reb: 4.2, ast: 7.4, min: 33.0 },
-  'Devin Vassell': { team: 'SA', pos: 'G', pts: 17.2, reb: 3.5, ast: 3.8, min: 30.5 },
-  'Keldon Johnson': { team: 'SA', pos: 'F', pts: 12.5, reb: 4.8, ast: 2.1, min: 26.4 },
-  'Harrison Barnes': { team: 'SA', pos: 'F', pts: 11.8, reb: 4.5, ast: 1.8, min: 25.2 },
-  'Chris Paul': { team: 'SA', pos: 'G', pts: 8.2, reb: 3.5, ast: 7.8, min: 24.0 },
+  'Victor Wembanyama': { team: 'SA', pos: 'C', pts: 28.5, reb: 12.0, ast: 3.5, min: 36.0 },
+  'Stephon Castle': { team: 'SA', pos: 'G', pts: 18.5, reb: 4.5, ast: 8.0, min: 34.0 },
+  "De'Aaron Fox": { team: 'SA', pos: 'G', pts: 17.0, reb: 4.0, ast: 7.5, min: 33.0 },
+  'Devin Vassell': { team: 'SA', pos: 'G', pts: 16.0, reb: 3.5, ast: 3.2, min: 30.0 },
+  'Julian Champagnie': { team: 'SA', pos: 'F', pts: 12.5, reb: 5.5, ast: 1.5, min: 28.0 },
+  'Harrison Barnes': { team: 'SA', pos: 'F', pts: 10.5, reb: 4.0, ast: 1.5, min: 24.0 },
+  'Keldon Johnson': { team: 'SA', pos: 'F', pts: 9.0, reb: 3.5, ast: 1.5, min: 24.0 },
+  'Dylan Harper': { team: 'SA', pos: 'G', pts: 8.0, reb: 3.5, ast: 2.5, min: 20.0 },
 
   // Minnesota Timberwolves
   'Anthony Edwards': { team: 'MIN', pos: 'G', pts: 27.5, reb: 5.8, ast: 5.2, min: 35.5 },

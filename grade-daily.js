@@ -55,6 +55,41 @@ async function fetchNBAScores(date) {
   return results;
 }
 
+async function fetchNBABoxScores(date) {
+  const dateCompact = date.replace(/-/g, '');
+  const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${dateCompact}`);
+  const data = await res.json();
+  const playerStats = new Map();
+
+  for (const event of (data.events || [])) {
+    const comp = event.competitions[0];
+    if (!comp.status?.type?.completed) continue;
+
+    const boxRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${event.id}`);
+    const box = await boxRes.json();
+
+    for (const team of (box.boxscore?.players || [])) {
+      const stats = team.statistics?.[0];
+      if (!stats) continue;
+      const labels = stats.labels || [];
+      const ptsIdx = labels.indexOf('PTS');
+      const rebIdx = labels.indexOf('REB');
+      const astIdx = labels.indexOf('AST');
+
+      for (const athlete of (stats.athletes || [])) {
+        const name = athlete.athlete?.displayName;
+        if (!name || !athlete.stats) continue;
+        const pts = parseInt(athlete.stats[ptsIdx]) || 0;
+        const reb = parseInt(athlete.stats[rebIdx]) || 0;
+        const ast = parseInt(athlete.stats[astIdx]) || 0;
+        playerStats.set(name, { pts, reb, ast, pra: pts + reb + ast });
+      }
+    }
+  }
+
+  return playerStats;
+}
+
 async function main() {
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
   const mmdd = yesterday.slice(5);
@@ -72,13 +107,15 @@ async function main() {
   }
 
   const predictions = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-  const [mlbScores, nbaScores] = await Promise.all([
+  const [mlbScores, nbaScores, nbaPlayerStats] = await Promise.all([
     fetchMLBScores(yesterday),
     fetchNBAScores(yesterday),
+    fetchNBABoxScores(yesterday),
   ]);
 
   console.log(`  MLB games final: ${mlbScores.size}`);
-  console.log(`  NBA games final: ${nbaScores.length}\n`);
+  console.log(`  NBA games final: ${nbaScores.length}`);
+  console.log(`  NBA players with box scores: ${nbaPlayerStats.size}\n`);
 
   // --- GRADE MLB PICKS ---
   const mlbPicks = (predictions.mlb || []).filter(p => !p.coinFlip);
@@ -136,11 +173,54 @@ async function main() {
 
   // --- GRADE NBA ---
   if (nbaScores.length > 0) {
-    console.log('\n  NBA');
+    console.log('\n  NBA SCORES');
     console.log('  ' + '—'.repeat(56));
     for (const nba of nbaScores) {
       console.log(`  ${nba.away} ${nba.awayScore} @ ${nba.home} ${nba.homeScore} (${nba.winner} wins)`);
     }
+  }
+
+  // --- GRADE NBA PROPS ---
+  let propsW = 0, propsL = 0, propsPnl = 0;
+  const nbaGames = predictions.nba || [];
+  const allProps = nbaGames.flatMap(g => (g.propPicks || []).map(p => ({ ...p, game: `${g.away} @ ${g.home}` })));
+
+  if (allProps.length > 0 && nbaPlayerStats.size > 0) {
+    console.log('\n  NBA PROPS');
+    console.log('  ' + '—'.repeat(56));
+
+    for (const prop of allProps) {
+      const actual = nbaPlayerStats.get(prop.name);
+      if (!actual) {
+        console.log(`  ? ${prop.name} ${prop.stat} — player not found in box score`);
+        continue;
+      }
+
+      let actualVal;
+      const stat = (prop.stat || prop.prop || '').toUpperCase();
+      if (stat === 'PTS' || stat === 'POINTS') actualVal = actual.pts;
+      else if (stat === 'REB' || stat === 'REBOUNDS') actualVal = actual.reb;
+      else if (stat === 'AST' || stat === 'ASSISTS') actualVal = actual.ast;
+      else if (stat === 'PRA' || stat === 'PTS+REB+AST') actualVal = actual.pra;
+      else { console.log(`  ? ${prop.name} ${stat} — unknown stat type`); continue; }
+
+      const direction = (prop.direction || 'OVER').toUpperCase();
+      const won = direction === 'OVER' ? actualVal > prop.line : actualVal < prop.line;
+      const stake = 25;
+      const pnl = won ? parseFloat((stake * (americanToDecimal(-110) - 1)).toFixed(2)) : -stake;
+
+      propsW += won ? 1 : 0;
+      propsL += won ? 0 : 1;
+      propsPnl += pnl;
+
+      const mark = won ? '✓' : '✗';
+      const pnlStr = pnl >= 0 ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`;
+      console.log(`  ${mark} ${prop.name} ${stat} ${direction} ${prop.line} → Actual: ${actualVal} ${pnlStr}`);
+
+      report.push({ type: 'prop', sport: 'NBA', pick: `${prop.name} ${stat} ${direction} ${prop.line}`, actual: actualVal, odds: -110, stake, result: won ? 'won' : 'lost', pnl });
+    }
+
+    console.log(`\n  Props: ${propsW}-${propsL}  ${propsPnl >= 0 ? '+' : ''}$${propsPnl.toFixed(2)}`);
   }
 
   // --- GRADE PARLAYS ---
@@ -228,11 +308,12 @@ async function main() {
   }
 
   // --- SUMMARY ---
-  const dayTotal = straightPnl + parlayPnl;
+  const dayTotal = straightPnl + parlayPnl + propsPnl;
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`  DAILY SUMMARY — ${yesterday}`);
   console.log(`${'═'.repeat(60)}`);
   console.log(`  Straights: ${straightW}-${straightL}  ${straightPnl >= 0 ? '+' : ''}$${straightPnl.toFixed(2)}`);
+  console.log(`  NBA Props: ${propsW}-${propsL}  ${propsPnl >= 0 ? '+' : ''}$${propsPnl.toFixed(2)}`);
   console.log(`  Parlays:   ${parlayW}-${parlayL}  ${parlayPnl >= 0 ? '+' : ''}$${parlayPnl.toFixed(2)}`);
   console.log(`  DAY TOTAL: ${dayTotal >= 0 ? '+' : ''}$${dayTotal.toFixed(2)}`);
   console.log(`${'═'.repeat(60)}\n`);
@@ -245,6 +326,27 @@ async function main() {
   for (const bet of report.filter(r => r.type === 'straight')) {
     const pendingPattern = new RegExp(
       `<tr class="pending"><td>${mmdd}</td>.*?${escapeRegex(bet.pick)}.*?</tr>`
+    );
+    if (pendingPattern.test(tracker)) {
+      const cls = bet.result === 'won' ? 'win' : 'loss';
+      const badge = bet.result === 'won' ? '<span class="badge-win">W</span>' : '<span class="badge-loss">L</span>';
+      const pnlStr = bet.pnl >= 0 ? `+$${bet.pnl.toFixed(2)}` : `-$${Math.abs(bet.pnl).toFixed(2)}`;
+      const pnlCls = bet.pnl >= 0 ? 'green' : 'red';
+
+      tracker = tracker.replace(pendingPattern, (match) => {
+        return match
+          .replace('class="pending"', `class="${cls}"`)
+          .replace('<span class="badge-pending">PEND</span>', badge)
+          .replace('>—</td></tr>', ` class="${pnlCls}">${pnlStr}</td></tr>`);
+      });
+    }
+  }
+
+  // Find and replace pending prop rows for yesterday
+  for (const bet of report.filter(r => r.type === 'prop')) {
+    const playerEscaped = escapeRegex(bet.pick.split(' ')[0]);
+    const pendingPattern = new RegExp(
+      `<tr class="pending"><td>${mmdd}</td>.*?${playerEscaped}.*?</tr>`
     );
     if (pendingPattern.test(tracker)) {
       const cls = bet.result === 'won' ? 'win' : 'loss';
@@ -331,7 +433,7 @@ async function main() {
   const resultsPath = path.join(dataDir, 'results.json');
   let allResults = {};
   if (fs.existsSync(resultsPath)) allResults = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
-  allResults[yesterday] = { gradedAt: new Date().toISOString(), straights: { w: straightW, l: straightL, pnl: straightPnl }, parlays: { w: parlayW, l: parlayL, pnl: parlayPnl }, dayTotal, runningTotal: newRunning, bets: report };
+  allResults[yesterday] = { gradedAt: new Date().toISOString(), straights: { w: straightW, l: straightL, pnl: straightPnl }, props: { w: propsW, l: propsL, pnl: propsPnl }, parlays: { w: parlayW, l: parlayL, pnl: parlayPnl }, dayTotal, runningTotal: newRunning, bets: report };
   fs.writeFileSync(resultsPath, JSON.stringify(allResults, null, 2));
 
   console.log(`  Tracker updated. Running total: ${runStr}`);

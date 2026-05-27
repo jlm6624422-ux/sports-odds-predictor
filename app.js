@@ -1249,6 +1249,70 @@ async function gradeResults() {
       }
     }
 
+    // --- GRADE NBA PROPS ---
+    let nbaPlayerStats = new Map();
+    if (historyData.nba && historyData.nba.length > 0) {
+      const allProps = historyData.nba.flatMap(g => (g.propPicks || []).map(p => ({ ...p, game: `${g.away} @ ${g.home}` })));
+      if (allProps.length > 0) {
+        try {
+          const scoreRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${date.replace(/-/g, '')}`);
+          const scoreData = await scoreRes.json();
+          for (const event of (scoreData.events || [])) {
+            const comp = event.competitions[0];
+            if (!comp.status?.type?.completed) continue;
+            const boxRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${event.id}`);
+            const box = await boxRes.json();
+            for (const team of (box.boxscore?.players || [])) {
+              const stats = team.statistics?.[0];
+              if (!stats) continue;
+              const labels = stats.labels || [];
+              const ptsIdx = labels.indexOf('PTS');
+              const rebIdx = labels.indexOf('REB');
+              const astIdx = labels.indexOf('AST');
+              for (const athlete of (stats.athletes || [])) {
+                const name = athlete.athlete?.displayName;
+                if (!name || !athlete.stats) continue;
+                const pts = parseInt(athlete.stats[ptsIdx]) || 0;
+                const reb = parseInt(athlete.stats[rebIdx]) || 0;
+                const ast = parseInt(athlete.stats[astIdx]) || 0;
+                nbaPlayerStats.set(name, { pts, reb, ast, pra: pts + reb + ast });
+              }
+            }
+          }
+        } catch (e) { console.log('[GRADE] NBA box score fetch failed:', e.message); }
+
+        for (let i = 0; i < allProps.length; i++) {
+          const prop = allProps[i];
+          const resultKey = `nba-prop-${date}-${i}`;
+          if (dayResults[resultKey]) continue;
+
+          const actual = nbaPlayerStats.get(prop.name);
+          if (!actual) continue;
+
+          const stat = (prop.stat || prop.prop || '').toUpperCase();
+          let actualVal;
+          if (stat === 'PTS' || stat === 'POINTS') actualVal = actual.pts;
+          else if (stat === 'REB' || stat === 'REBOUNDS') actualVal = actual.reb;
+          else if (stat === 'AST' || stat === 'ASSISTS') actualVal = actual.ast;
+          else if (stat === 'PRA' || stat === 'PTS+REB+AST') actualVal = actual.pra;
+          else continue;
+
+          const direction = (prop.direction || 'OVER').toUpperCase();
+          const won = direction === 'OVER' ? actualVal > prop.line : actualVal < prop.line;
+          dayResults[resultKey] = {
+            result: won ? 'win' : (actualVal === prop.line ? 'push' : 'loss'),
+            actual: actualVal,
+            line: prop.line,
+            stat,
+            player: prop.name,
+            direction,
+            recordedAt: new Date().toISOString(),
+          };
+          graded++;
+        }
+      }
+    }
+
     // --- GRADE PARLAYS ---
     if (historyData.parlays && historyData.parlays.length > 0) {
       // We need both MLB and NBA final scores for parlay grading
@@ -1368,17 +1432,22 @@ async function gradeResults() {
             }
           }
 
-          // Under: "Player Name UNDER 35.6 PRA" or "UNDER 8.5"
+          // Under: "Player Name UNDER 35.6 PRA"
           if (legWon === null) {
             const underMatch = leg.match(/(.+?)\s+UNDER\s+([\d.]+)\s*(.*)/i);
-            if (underMatch && nbaScores.length > 0) {
+            if (underMatch && nbaPlayerStats.size > 0) {
               const playerName = underMatch[1].trim();
               const propLine = parseFloat(underMatch[2]);
-              const nba = nbaScores[0];
-              if (nba) {
-                const isHomePlayer = nba.home.split(' ').some(w => w.length > 2 && playerName.includes(w));
-                const teamWon = isHomePlayer ? nba.homeScore > nba.awayScore : nba.awayScore > nba.homeScore;
-                legWon = teamWon;
+              const statType = (underMatch[3] || '').toUpperCase();
+              const actual = nbaPlayerStats.get(playerName);
+              if (actual) {
+                let actualVal;
+                if (statType.includes('PRA') || statType.includes('PTS+REB+AST')) actualVal = actual.pra;
+                else if (statType.includes('PTS') || statType.includes('POINT')) actualVal = actual.pts;
+                else if (statType.includes('REB')) actualVal = actual.reb;
+                else if (statType.includes('AST')) actualVal = actual.ast;
+                else actualVal = actual.pra;
+                legWon = actualVal < propLine;
               }
             }
           }
@@ -1386,13 +1455,19 @@ async function gradeResults() {
           // Player prop Over: "Player Name Over 34.5 PTS+REB+AST"
           if (legWon === null) {
             const propMatch = leg.match(/(.+?)\s+Over\s+([\d.]+)\s+(.+)/i);
-            if (propMatch && nbaScores.length > 0) {
+            if (propMatch && nbaPlayerStats.size > 0) {
               const playerName = propMatch[1].trim();
-              const nba = nbaScores[0];
-              if (nba) {
-                const isHomePlayer = nba.home.split(' ').some(w => w.length > 2 && playerName.includes(w));
-                const teamWon = isHomePlayer ? nba.homeScore > nba.awayScore : nba.awayScore > nba.homeScore;
-                legWon = teamWon;
+              const propLine = parseFloat(propMatch[2]);
+              const statType = (propMatch[3] || '').toUpperCase();
+              const actual = nbaPlayerStats.get(playerName);
+              if (actual) {
+                let actualVal;
+                if (statType.includes('PRA') || statType.includes('PTS+REB+AST')) actualVal = actual.pra;
+                else if (statType.includes('PTS') || statType.includes('POINT')) actualVal = actual.pts;
+                else if (statType.includes('REB')) actualVal = actual.reb;
+                else if (statType.includes('AST')) actualVal = actual.ast;
+                else actualVal = actual.pra;
+                legWon = actualVal > propLine;
               }
             }
           }
