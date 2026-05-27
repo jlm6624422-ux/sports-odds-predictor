@@ -119,10 +119,14 @@ function renderTodayGames() {
   }
 
   let html = '';
+  const hasTomorrow = nba.some(g => g.isTomorrow);
+  if (hasTomorrow) {
+    html += '<div class="tomorrow-banner" style="background:#2d1f00;border:1px solid #f0883e;border-radius:8px;padding:8px 14px;margin-bottom:12px;color:#f0883e;font-weight:600;font-size:0.9em">&#128197; Tomorrow\'s Game (no NBA today)</div>';
+  }
   for (const game of nba) {
     html += '<div class="game-card" style="border-color:#f0883e">';
     html += '<div class="game-header"><div class="game-matchup">' + game.away + ' (' + (game.awayRecord || '') + ') @ ' + game.home + ' (' + (game.homeRecord || '') + ')</div>';
-    html += '<div class="game-time">' + (game.time || '') + '</div></div>';
+    html += '<div class="game-time">' + (game.isTomorrow ? 'TOMORROW — ' : '') + (game.time || '') + '</div></div>';
     html += '<div class="game-details">';
     html += '<div><div class="detail-label">Spread</div><div class="detail-value">' + game.home + ' ' + game.spread + '</div></div>';
     html += '<div><div class="detail-label">O/U</div><div class="detail-value">' + game.ou + '</div></div>';

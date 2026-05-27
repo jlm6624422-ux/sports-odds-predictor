@@ -896,21 +896,27 @@ async function runPredictions() {
     const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
     const nbaData = await nbaRes.json();
     let nbaEvents = nbaData.events || [];
+    let nbaIsTomorrow = false;
     if (nbaEvents.length === 0) {
       const tomorrow = new Date(new Date().getTime() + 86400000).toISOString().split('T')[0].replace(/-/g, '');
       const nbaRes2 = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${tomorrow}`);
       const nbaData2 = await nbaRes2.json();
       nbaEvents = nbaData2.events || [];
+      nbaIsTomorrow = nbaEvents.length > 0;
     }
 
     const { generateNBAProps } = require('./server/services/nbaPropsEngine');
     const propsResult = await generateNBAProps(nbaEvents, calibratedDB);
     nbaGames = propsResult?.games || [];
     nbaProps = propsResult?.props || [];
+    if (nbaIsTomorrow) {
+      nbaGames.forEach(g => g.isTomorrow = true);
+    }
   } catch(e) {
     console.log('[NBA] Props generation failed, falling back to basic game info:', e.message);
     try {
       let nbaFallbackEvents = [];
+      let nbaFallbackIsTomorrow = false;
       const nbaRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${today}`);
       const nbaData = await nbaRes.json();
       nbaFallbackEvents = nbaData.events || [];
@@ -919,6 +925,7 @@ async function runPredictions() {
         const nbaRes2 = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${tomorrow}`);
         const nbaData2 = await nbaRes2.json();
         nbaFallbackEvents = nbaData2.events || [];
+        nbaFallbackIsTomorrow = nbaFallbackEvents.length > 0;
       }
       nbaGames = nbaFallbackEvents.map(e => {
         const comp = e.competitions[0];
@@ -935,6 +942,7 @@ async function runPredictions() {
           awayML: odds.awayTeamOdds?.moneyLine || null,
           time: comp.status?.type?.shortDetail || comp.date,
           status: comp.status?.type?.shortDetail,
+          isTomorrow: nbaFallbackIsTomorrow,
         };
       });
     } catch(e2) { console.log('[NBA] Fallback also failed:', e2.message); }
